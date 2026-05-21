@@ -277,6 +277,17 @@
         $('.js-modal1').removeClass('show-modal1');
     });
 
+    /*==================================================================
+    [ Click block2 image to go to PDP ]*/
+    $("<style>.block2-pic img { cursor: pointer; }</style>").appendTo("head");
+    $(document).on('click', '.block2-pic img', function(){
+        var block2 = $(this).closest('.block2');
+        var pdpLink = block2.find('.block2-txt-child1 a').attr('href');
+        if(pdpLink) {
+            window.location.href = pdpLink;
+        }
+    });
+
 
 
 })(jQuery);
