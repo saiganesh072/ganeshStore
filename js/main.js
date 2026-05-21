@@ -288,7 +288,300 @@
         }
     });
 
+    /*==================================================================
+    [ Wishlist Functionality Integration ]*/
+    
+    // Helper to get wishlist from localStorage
+    function getWishlist() {
+        try {
+            return JSON.parse(localStorage.getItem('wishlist')) || [];
+        } catch (e) {
+            return [];
+        }
+    }
 
+    // Helper to save wishlist to localStorage
+    function saveWishlist(wishlist) {
+        localStorage.setItem('wishlist', JSON.stringify(wishlist));
+        updateWishlistBadges();
+    }
+
+    // Helper to update all header wishlist badges
+    function updateWishlistBadges() {
+        var wishlist = getWishlist();
+        var count = wishlist.length;
+        $('.icon-header-noti i.zmdi-favorite-outline, .icon-header-noti i.zmdi-favorite')
+            .parent()
+            .attr('data-notify', count);
+    }
+
+    // Initialize all wishlist interactions on load
+    function initWishlist() {
+        var wishlist = getWishlist();
+
+        // 1. Rewrite all header/mobile-header favorite icons to point to wishlist.html
+        $('.icon-header-item i.zmdi-favorite-outline, .icon-header-item i.zmdi-favorite')
+            .parent()
+            .attr('href', 'wishlist.html');
+
+        // 2. Update badges immediately
+        updateWishlistBadges();
+
+        // 3. Clear existing inline click handlers that would double-fire
+        $('.js-addwish-b2, .js-addwish-detail').off('click');
+
+        // 4. Sync active heart visual states for product grid cards
+        $('.js-addwish-b2').each(function() {
+            var name = $(this).closest('.block2').find('.js-name-b2').text().trim();
+            var isInWishlist = wishlist.some(function(item) {
+                return item.name === name;
+            });
+            if (isInWishlist) {
+                $(this).addClass('js-addedwish-b2');
+            } else {
+                $(this).removeClass('js-addedwish-b2');
+            }
+        });
+
+        // 5. Sync active state for PDP page main wishlist buttons contextually
+        $('.js-addwish-detail').each(function() {
+            var $btn = $(this);
+            var $row = $btn.closest('.row');
+            var nameDetail = $row.find('.js-name-detail').first().text().trim();
+            if (!nameDetail) {
+                nameDetail = $('.js-name-detail').first().text().trim();
+            }
+            var isInWishlist = wishlist.some(function(item) {
+                return item.name === nameDetail;
+            });
+            if (isInWishlist) {
+                $btn.addClass('js-addedwish-detail');
+                $btn.find('i').css('color', '#ec38bc');
+            } else {
+                $btn.removeClass('js-addedwish-detail');
+                $btn.find('i').css('color', '');
+            }
+        });
+
+        // 6. Render wishlist page if on wishlist.html
+        renderWishlistPage();
+    }
+
+    // Wishlist page dynamic rendering
+    function renderWishlistPage() {
+        var wishlist = getWishlist();
+        var $tableBody = $('#wishlist-table-body');
+        var $contentArea = $('#wishlist-content');
+        var $emptyState = $('#wishlist-empty-state');
+
+        if (!$tableBody.length) return; // Not on wishlist page
+
+        if (wishlist.length === 0) {
+            $contentArea.addClass('dis-none');
+            $emptyState.removeClass('dis-none');
+            return;
+        }
+
+        $emptyState.addClass('dis-none');
+        $contentArea.removeClass('dis-none');
+        $tableBody.empty();
+
+        wishlist.forEach(function(item) {
+            var rowHtml = 
+                '<tr class="table_row" style="transition: all 0.5s ease;">' +
+                '  <td class="column-1">' +
+                '    <div class="how-itemcart1 js-remove-wishlist-item" data-name="' + item.name + '" title="Remove from Wishlist">' +
+                '      <img src="' + item.image + '" alt="IMG">' +
+                '    </div>' +
+                '  </td>' +
+                '  <td class="column-2">' +
+                '    <a href="' + item.link + '" class="hov-cl1 trans-04 stext-115" style="font-family: Poppins-Medium; font-size: 15px; color: #333;">' + item.name + '</a>' +
+                '  </td>' +
+                '  <td class="column-3 stext-115">' + item.price + '</td>' +
+                '  <td class="column-4" style="text-align: center; padding-right: 20px;">' +
+                '    <div class="flex-c-m flex-w">' +
+                '      <button class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04 js-add-cart-from-wishlist" ' +
+                '              data-name="' + item.name + '" ' +
+                '              data-price="' + item.price + '" ' +
+                '              data-image="' + item.image + '" ' +
+                '              data-link="' + item.link + '">' +
+                '        Add to Cart' +
+                '      </button>' +
+                '    </div>' +
+                '  </td>' +
+                '</tr>';
+            $tableBody.append(rowHtml);
+        });
+    }
+
+    // Run initialization on DOM load
+    $(document).ready(function() {
+        initWishlist();
+        $(window).on('load', function() {
+            initWishlist();
+        });
+    });
+
+    // Handle click on product grid heart icons
+    $(document).on('click', '.js-addwish-b2', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        var $btn = $(this);
+        var $block = $btn.closest('.block2');
+        var name = $block.find('.js-name-b2').text().trim();
+        var price = $block.find('.stext-105').text().trim();
+        var img = $block.find('.block2-pic img').attr('src');
+        var link = $block.find('.block2-txt-child1 a').attr('href');
+        
+        var wishlist = getWishlist();
+        var itemIndex = wishlist.findIndex(function(item) {
+            return item.name === name;
+        });
+
+        if (itemIndex > -1) {
+            // Remove from wishlist (toggle off)
+            wishlist.splice(itemIndex, 1);
+            saveWishlist(wishlist);
+            $btn.removeClass('js-addedwish-b2');
+            if (typeof swal === 'function') {
+                swal(name, "has been removed from your wishlist.", "info");
+            }
+        } else {
+            // Add to wishlist
+            var newItem = {
+                name: name,
+                price: price,
+                image: img,
+                link: link
+            };
+            wishlist.push(newItem);
+            saveWishlist(wishlist);
+            $btn.addClass('js-addedwish-b2');
+            if (typeof swal === 'function') {
+                swal(name, "is added to wishlist !", "success");
+            }
+        }
+    });
+
+    // Handle click on PDP detail heart button contextually
+    $(document).on('click', '.js-addwish-detail', function(e) {
+        e.preventDefault();
+        
+        var $btn = $(this);
+        var $row = $btn.closest('.row');
+        
+        var name = $row.find('.js-name-detail').first().text().trim();
+        if (!name) {
+            name = $('.js-name-detail').first().text().trim();
+        }
+        
+        var price = $row.find('.mtext-106').first().text().trim();
+        if (!price) {
+            price = $('.mtext-106').first().text().trim();
+        }
+        
+        var img = $row.find('.wrap-pic-w img').first().attr('src') || $row.find('img').first().attr('src');
+        if (!img) {
+            img = $('.slick3 img').first().attr('src') || 'images/product-detail-01.jpg';
+        }
+        
+        var link = window.location.pathname.split('/').pop() || 'product-detail.html';
+        if (link === 'wishlist.html' || link === '') {
+            link = 'product-detail.html';
+        }
+        
+        var wishlist = getWishlist();
+        var itemIndex = wishlist.findIndex(function(item) {
+            return item.name === name;
+        });
+
+        if (itemIndex > -1) {
+            // Remove from wishlist
+            wishlist.splice(itemIndex, 1);
+            saveWishlist(wishlist);
+            
+            // Sync all matching detail buttons on the page (in case there's a modal and a main button)
+            $('.js-addwish-detail').each(function() {
+                var btnName = $(this).closest('.row').find('.js-name-detail').first().text().trim();
+                if (!btnName) btnName = $('.js-name-detail').first().text().trim();
+                if (btnName === name) {
+                    $(this).removeClass('js-addedwish-detail');
+                    $(this).find('i').css('color', '');
+                }
+            });
+            
+            if (typeof swal === 'function') {
+                swal(name, "has been removed from your wishlist.", "info");
+            }
+        } else {
+            // Add to wishlist
+            var newItem = {
+                name: name,
+                price: price,
+                image: img,
+                link: link
+            };
+            wishlist.push(newItem);
+            saveWishlist(wishlist);
+            
+            // Sync all matching detail buttons on the page
+            $('.js-addwish-detail').each(function() {
+                var btnName = $(this).closest('.row').find('.js-name-detail').first().text().trim();
+                if (!btnName) btnName = $('.js-name-detail').first().text().trim();
+                if (btnName === name) {
+                    $(this).addClass('js-addedwish-detail');
+                    $(this).find('i').css('color', '#ec38bc');
+                }
+            });
+            
+            if (typeof swal === 'function') {
+                swal(name, "is added to wishlist !", "success");
+            }
+        }
+    });
+
+    // Handle Remove from Wishlist Table Click
+    $(document).on('click', '.js-remove-wishlist-item', function() {
+        var name = $(this).attr('data-name');
+        var $row = $(this).closest('.table_row');
+        
+        var wishlist = getWishlist();
+        var index = wishlist.findIndex(function(item) {
+            return item.name === name;
+        });
+
+        if (index > -1) {
+            wishlist.splice(index, 1);
+            saveWishlist(wishlist);
+            
+            // Premium fade out transition animation
+            $row.css({
+                'opacity': '0',
+                'transform': 'translateX(-30px)'
+            });
+            
+            setTimeout(function() {
+                $row.remove();
+                if (getWishlist().length === 0) {
+                    $('#wishlist-content').addClass('dis-none');
+                    $('#wishlist-empty-state').removeClass('dis-none');
+                }
+            }, 500);
+            
+            if (typeof swal === 'function') {
+                swal(name, "has been removed from your wishlist.", "info");
+            }
+        }
+    });
+
+    // Handle Add to Cart from Wishlist Click
+    $(document).on('click', '.js-add-cart-from-wishlist', function() {
+        var name = $(this).attr('data-name');
+        if (typeof swal === 'function') {
+            swal(name, "is added to cart !", "success");
+        }
+    });
 
 })(jQuery);
 
