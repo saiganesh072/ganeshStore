@@ -83,6 +83,16 @@
       var pPrice = document.querySelector('.mtext-106')?.innerText?.trim() || '';
       var pId = document.querySelector('.js-addcart-detail')?.getAttribute('data-product-id') || '';
       
+      // Fallback: Generate product ID from product name or URL if data-product-id is not present
+      if (!pId) {
+        if (pName) {
+          pId = pName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        } else {
+          var filename = window.location.pathname.split('/').pop().replace('.html', '');
+          pId = filename || 'unknown-product';
+        }
+      }
+      
       var sku = '';
       var categories = [];
       
