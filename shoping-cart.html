@@ -387,7 +387,7 @@
     </div>
 
     <!-- Shoping Cart -->
-    <form class="bg0 p-t-75 p-b-85">
+    <form id="cart-form" class="bg0 p-t-75 p-b-85">
       <div class="container">
         <div class="row">
           <div class="col-lg-10 col-xl-7 m-lr-auto m-b-50">
@@ -567,6 +567,18 @@
         </div>
       </div>
     </form>
+
+    <!-- Cart Empty State -->
+    <div id="cart-empty-state" class="container p-t-75 p-b-85 txt-center dis-none" style="margin-top: 50px; margin-bottom: 50px;">
+      <div class="flex-col-c-m p-b-30">
+        <i class="zmdi zmdi-shopping-cart-off cl3 m-b-20" style="font-size: 80px; color: #ccc;"></i>
+        <span class="mtext-109 cl2 p-b-10" style="font-family: Poppins-Bold; font-size: 30px;">Your Cart is Empty</span>
+        <span class="stext-111 cl6 p-b-30" style="font-family: Poppins-Regular; font-size: 16px;">Add some products to your cart and start shopping today!</span>
+        <a href="product.html" class="flex-c-m stext-101 cl0 size-116 bg3 bor14 hov-btn3 p-lr-15 trans-04 pointer" style="max-width: 250px; border-radius: 25px; height: 50px; font-family: Poppins-Medium; margin: 0 auto;">
+          Return to Shop
+        </a>
+      </div>
+    </div>
 
     <!-- Footer -->
     <footer class="bg3 p-t-75 p-b-32">
@@ -750,152 +762,11 @@
       });
     </script>
     <!--===============================================================================================-->
+    <script src="vendor/sweetalert/sweetalert.min.js"></script>
+    <!--===============================================================================================-->
     <script src="js/main.js"></script>
     <!--===============================================================================================-->
 
-    <!-- Place this script after the HTML table code -->
-    <!-- Place this script after the HTML table code -->
-    <script>
-      // Iterate over the cartItems array and generate table rows for each product
-      let cartItems = JSON.parse(localStorage.getItem("cartItems"));
 
-      for (let i = 0; i < cartItems.length; i++) {
-        const product = cartItems[i];
-        const productImage = product.image;
-        const productName = product.name;
-        const productPrice = product.price;
-        let productQuantity = product.quantity;
-        const productTotal =
-          parseFloat(productPrice.replace("$", "")) * productQuantity;
-
-        // Create a new table row for the product
-        const tableRow = document.createElement("tr");
-        tableRow.classList.add("table_row");
-
-        // Create the HTML structure for the product row
-        tableRow.innerHTML = `
-        <td class="column-1">
-            <div class="how-itemcart1">
-                <img src="${productImage}" alt="Product Image">
-            </div>
-        </td>
-        <td class="column-2">${productName}</td>
-        <td class="column-3">${productPrice}</td>
-        <td class="column-4">
-            <div class="wrap-num-product flex-w m-l-auto m-r-0">
-                <div class="btn-num-product-down cl8 hov-btn3 trans-04 flex-c-m">
-                    <i class="fs-16 zmdi zmdi-minus"></i>
-                </div>
-                <input class="mtext-104 cl3 txt-center num-product" type="number" name="num-product${
-                  i + 1
-                }" value="${productQuantity}">
-                <div class="btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m">
-                    <i class="fs-16 zmdi zmdi-plus"></i>
-                </div>
-            </div>
-        </td>
-        <td class="column-5">$ ${productTotal.toFixed(2)}</td>
-        <td class="column-6">
-            <button class="remove-product-btn" data-product-id="${
-              product.id
-            }">Remove</button>
-        </td>
-    `;
-
-        // Add event listeners to the quantity buttons
-        const quantityInput = tableRow.querySelector(".num-product");
-        const decreaseBtn = tableRow.querySelector(".btn-num-product-down");
-        const increaseBtn = tableRow.querySelector(".btn-num-product-up");
-
-        decreaseBtn.addEventListener("click", () => {
-          if (productQuantity > 1) {
-            productQuantity--;
-            quantityInput.value = productQuantity;
-            updateProductTotal();
-            updateCartItems();
-            updateTotalAmount();
-          }
-        });
-
-        increaseBtn.addEventListener("click", () => {
-          productQuantity++;
-          quantityInput.value = productQuantity;
-          updateProductTotal();
-          updateCartItems();
-          updateTotalAmount();
-        });
-
-        // Function to update the product total
-        const updateProductTotal = () => {
-          const newProductTotal =
-            parseFloat(productPrice.replace("$", "")) * productQuantity;
-          tableRow.querySelector(
-            ".column-5"
-          ).textContent = `$ ${newProductTotal.toFixed(2)}`;
-        };
-
-        // Function to update the cartItems in localStorage
-        const updateCartItems = () => {
-          cartItems[i].quantity = productQuantity;
-          localStorage.setItem("cartItems", JSON.stringify(cartItems));
-        };
-
-        // Add event listener to the remove button
-        const removeBtn = tableRow.querySelector(".remove-product-btn");
-        removeBtn.addEventListener("click", () => {
-          // Remove the product from the cartItems array
-          cartItems.splice(i, 1);
-          // Update the localStorage with the modified cartItems
-          localStorage.setItem("cartItems", JSON.stringify(cartItems));
-          // Remove the table row from the cart display
-          tableRow.remove();
-          updateTotalAmount();
-        });
-
-        // Append the table row to the tbody element
-        document.querySelector("tbody").appendChild(tableRow);
-      }
-
-      // Store product IDs in localStorage and cookie
-      const productIds = cartItems.map((item) => item.id);
-      const productIdsString = productIds.join(",");
-      localStorage.setItem("productIds", productIdsString);
-      document.cookie = `productIds=${productIdsString}`;
-
-      // Function to calculate and update the total amount
-      const updateTotalAmount = () => {
-        const totalAmount = cartItems.reduce((total, item) => {
-          const itemPrice = parseFloat(item.price.replace("$", ""));
-          const itemQuantity = item.quantity;
-          return total + itemPrice * itemQuantity;
-        }, 0);
-
-        const totalAmountElements = document.querySelectorAll(".mtext-110");
-        totalAmountElements.forEach((element) => {
-          element.innerText = "$ " + totalAmount.toFixed(2);
-        });
-      };
-
-      // Update the total amount initially
-      updateTotalAmount();
-
-      // Add event listeners to trigger the update when the quantity changes or an item is removed
-      const quantityInputs = document.querySelectorAll(".num-product");
-      const removeButtons = document.querySelectorAll(".remove-product-btn");
-
-      quantityInputs.forEach((input, index) => {
-        input.addEventListener("change", () => {
-          cartItems[index].quantity = parseInt(input.value);
-          localStorage.setItem("cartItems", JSON.stringify(cartItems));
-          updateTotalAmount();
-        });
-      });
-
-      removeButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-          updateTotalAmount();
-        });
-      });
-    </script>
   </body>
 </html>
