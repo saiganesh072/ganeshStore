@@ -8,19 +8,10 @@
         $slick.each(function() {
             var el = this;
             var $el = $(el);
-            var isAnimating = false;
+            var slickInstance = null;
+            var isTouchpadSwiping = false;
             var accumulatedDeltaX = 0;
-            var threshold = 40; // horizontal swipe threshold in pixels
             var resetTimer = null;
-
-            $el.on('beforeChange', function() {
-                isAnimating = true;
-            });
-
-            $el.on('afterChange', function() {
-                isAnimating = false;
-                accumulatedDeltaX = 0;
-            });
 
             el.addEventListener('wheel', function(e) {
                 var deltaX = e.deltaX;
@@ -30,26 +21,66 @@
                 if (Math.abs(deltaX) > Math.abs(deltaY)) {
                     e.preventDefault(); // Stop standard browser horizontal history navigation / page shifting
 
-                    if (isAnimating) return;
+                    slickInstance = $el.slick('getSlick');
+                    if (!slickInstance || slickInstance.animating) return;
+
+                    // Initialize swipe if not already swiping
+                    if (!isTouchpadSwiping) {
+                        isTouchpadSwiping = true;
+                        accumulatedDeltaX = 0;
+
+                        // Mock swipeStart
+                        slickInstance.touchObject = {
+                            fingerCount: 1,
+                            startX: 0,
+                            startY: 0,
+                            curX: 0,
+                            curY: 0
+                        };
+                        slickInstance.dragging = true;
+                        slickInstance.swiping = true;
+                    }
 
                     accumulatedDeltaX += deltaX;
 
+                    // Mock swipeMove
+                    var curX = -accumulatedDeltaX;
+                    var mockEvent = {
+                        clientX: curX,
+                        clientY: 0,
+                        originalEvent: {
+                            touches: undefined
+                        },
+                        preventDefault: function() {}
+                    };
+
+                    slickInstance.touchObject.curX = curX;
+                    slickInstance.touchObject.swipeLength = Math.round(Math.abs(curX));
+
+                    // Let Slick update CSS translate dynamically
+                    slickInstance.swipeMove(mockEvent);
+
+                    // Debounce logic for swipeEnd
                     if (resetTimer) clearTimeout(resetTimer);
                     
-                    if (Math.abs(accumulatedDeltaX) >= threshold) {
-                        if ($el.hasClass('slick-initialized')) {
-                            if (accumulatedDeltaX > 0) {
-                                $el.slick('slickNext');
-                            } else {
-                                $el.slick('slickPrev');
-                            }
-                        }
-                        accumulatedDeltaX = 0;
-                    }
-
                     resetTimer = setTimeout(function() {
-                        accumulatedDeltaX = 0;
-                    }, 200);
+                        if (isTouchpadSwiping) {
+                            isTouchpadSwiping = false;
+
+                            // Dynamic 40% swipe threshold as requested by the user
+                            slickInstance.touchObject.minSwipe = slickInstance.listWidth * 0.4;
+
+                            var mockEndEvent = {
+                                originalEvent: {
+                                    touches: undefined
+                                }
+                            };
+
+                            // Let Slick finalize or snap back
+                            slickInstance.swipeEnd(mockEndEvent);
+                            accumulatedDeltaX = 0;
+                        }
+                    }, 150); // 150ms timeout to detect fingers lifted
                 }
             }, { passive: false });
         });
