@@ -170,7 +170,7 @@
         $('.wrap-slick4').each(function(){
             $(this).find('.slick4').slick({
               slidesToShow: 3,
-              slidesToScroll: 3,
+              slidesToScroll: 1,
               infinite: true,
               autoplay: true,
               autoplaySpeed: 4000,
@@ -178,26 +178,31 @@
               dots: true,
               appendDots: $(this),
               dotsClass:'slick2-dots',
+              swipeToSlide: true,
+              touchThreshold: 15,
+              customPaging: function(slick, index) {
+                return '<button type="button"></button>';
+              },
               responsive: [
                 {
                   breakpoint: 1200,
                   settings: {
                     slidesToShow: 3,
-                    slidesToScroll: 3
+                    slidesToScroll: 1
                   }
                 },
                 {
                   breakpoint: 992,
                   settings: {
                     slidesToShow: 2,
-                    slidesToScroll: 2
+                    slidesToScroll: 1
                   }
                 },
                 {
                   breakpoint: 768,
                   settings: {
                     slidesToShow: 2,
-                    slidesToScroll: 2
+                    slidesToScroll: 1
                   }
                 },
                 {
