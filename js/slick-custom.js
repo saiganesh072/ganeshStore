@@ -67,8 +67,8 @@
                         if (isTouchpadSwiping) {
                             isTouchpadSwiping = false;
 
-                            // Dynamic 40% swipe threshold as requested by the user
-                            slickInstance.touchObject.minSwipe = slickInstance.listWidth * 0.4;
+                            // Premium, user-friendly responsive swipe threshold: 15% capped at 120px for a smooth, natural feel
+                            slickInstance.touchObject.minSwipe = Math.min(slickInstance.listWidth * 0.15, 120);
 
                             var mockEndEvent = {
                                 originalEvent: {
