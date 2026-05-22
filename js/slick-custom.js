@@ -1,8 +1,59 @@
-
-
 (function ($) {
     // USE STRICT
     "use strict";
+
+    /*==================================================================
+    [ Helper to enable horizontal touchpad 2-finger swipe / scroll ]*/
+    function enableTouchpadScroll($slick) {
+        $slick.each(function() {
+            var el = this;
+            var $el = $(el);
+            var isAnimating = false;
+            var accumulatedDeltaX = 0;
+            var threshold = 40; // horizontal swipe threshold in pixels
+            var resetTimer = null;
+
+            $el.on('beforeChange', function() {
+                isAnimating = true;
+            });
+
+            $el.on('afterChange', function() {
+                isAnimating = false;
+                accumulatedDeltaX = 0;
+            });
+
+            el.addEventListener('wheel', function(e) {
+                var deltaX = e.deltaX;
+                var deltaY = e.deltaY;
+
+                // Handle horizontal scroll primarily
+                if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                    e.preventDefault(); // Stop standard browser horizontal history navigation / page shifting
+
+                    if (isAnimating) return;
+
+                    accumulatedDeltaX += deltaX;
+
+                    if (resetTimer) clearTimeout(resetTimer);
+                    
+                    if (Math.abs(accumulatedDeltaX) >= threshold) {
+                        if ($el.hasClass('slick-initialized')) {
+                            if (accumulatedDeltaX > 0) {
+                                $el.slick('slickNext');
+                            } else {
+                                $el.slick('slickPrev');
+                            }
+                        }
+                        accumulatedDeltaX = 0;
+                    }
+
+                    resetTimer = setTimeout(function() {
+                        accumulatedDeltaX = 0;
+                    }, 200);
+                }
+            }, { passive: false });
+        });
+    }
 
         /*==================================================================
         [ Slick1 ]*/
@@ -65,6 +116,8 @@
                 },
             });
 
+            enableTouchpadScroll(slick1);
+
             $(slick1).on('afterChange', function(event, slick, currentSlide){ 
 
                 var layerCurrentItem = $(itemSlick1[currentSlide]).find('.layer-slick1');
@@ -90,7 +143,8 @@
         /*==================================================================
         [ Slick2 ]*/
         $('.wrap-slick2').each(function(){
-            $(this).find('.slick2').slick({
+            var slick2 = $(this).find('.slick2');
+            slick2.slick({
               slidesToShow: 4,
               slidesToScroll: 4,
               infinite: false,
@@ -131,6 +185,7 @@
                 }
               ]    
             });
+            enableTouchpadScroll(slick2);
           });
 
 
@@ -142,7 +197,8 @@
         /*==================================================================
         [ Slick3 ]*/
         $('.wrap-slick3').each(function(){
-            $(this).find('.slick3').slick({
+            var slick3 = $(this).find('.slick3');
+            slick3.slick({
                 slidesToShow: 1,
                 slidesToScroll: 1,
                 fade: true,
@@ -163,12 +219,14 @@
                     return '<img src=" ' + portrait + ' "/><div class="slick3-dot-overlay"></div>';
                 },  
             });
+            enableTouchpadScroll(slick3);
         });
             
         /*==================================================================
         [ Slick4 ]*/
         $('.wrap-slick4').each(function(){
-            $(this).find('.slick4').slick({
+            var slick4 = $(this).find('.slick4');
+            slick4.slick({
               slidesToShow: 3,
               slidesToScroll: 1,
               infinite: true,
@@ -214,6 +272,7 @@
                 }
               ]    
             });
+            enableTouchpadScroll(slick4);
         });
 
 })(jQuery);
