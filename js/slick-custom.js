@@ -165,6 +165,50 @@
             });
         });
             
-                
+        /*==================================================================
+        [ Slick4 ]*/
+        $('.wrap-slick4').each(function(){
+            $(this).find('.slick4').slick({
+              slidesToShow: 3,
+              slidesToScroll: 3,
+              infinite: true,
+              autoplay: true,
+              autoplaySpeed: 4000,
+              arrows: false,
+              dots: true,
+              appendDots: $(this),
+              dotsClass:'slick2-dots',
+              responsive: [
+                {
+                  breakpoint: 1200,
+                  settings: {
+                    slidesToShow: 3,
+                    slidesToScroll: 3
+                  }
+                },
+                {
+                  breakpoint: 992,
+                  settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 2
+                  }
+                },
+                {
+                  breakpoint: 768,
+                  settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 2
+                  }
+                },
+                {
+                  breakpoint: 576,
+                  settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1
+                  }
+                }
+              ]    
+            });
+        });
 
 })(jQuery);
