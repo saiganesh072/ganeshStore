@@ -2270,23 +2270,15 @@ input.num-product::-webkit-inner-spin-button {
 .block2-btn {
   position: absolute;
   bottom: 20px;
-  left: 50%;
-  -webkit-transform: translate(-50%, 30px);
-  -moz-transform: translate(-50%, 30px);
-  -ms-transform: translate(-50%, 30px);
-  -o-transform: translate(-50%, 30px);
-  transform: translate(-50%, 30px);
+  left: 50% !important;
+  transform: translate(-50%, 30px) !important;
   opacity: 0;
   pointer-events: none;
   transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .block2-pic:hover .block2-btn {
-  -webkit-transform: translate(-50%, 0);
-  -moz-transform: translate(-50%, 0);
-  -ms-transform: translate(-50%, 0);
-  -o-transform: translate(-50%, 0);
-  transform: translate(-50%, 0);
+  transform: translate(-50%, 0) !important;
   opacity: 1;
   pointer-events: auto;
 }
@@ -3928,11 +3920,11 @@ input.size-116, textarea.size-120, input.size-117, input.size-111 {
 
 .inline-search-nav {
   position: absolute;
-  left: 200px; /* positioned gracefully after logo */
-  right: 40px; /* leaves breathing room */
+  left: 15px !important;
+  right: 15px !important;
   height: 48px;
-  background: rgba(113, 127, 224, 0.05);
-  border: 1px solid rgba(113, 127, 224, 0.15);
+  background: #fff;
+  border: 1px solid #717fe0;
   border-radius: 24px;
   display: flex;
   align-items: center;
@@ -3941,9 +3933,9 @@ input.size-116, textarea.size-120, input.size-117, input.size-111 {
   pointer-events: none;
   transform: scale(0.96) translateY(-50%);
   top: 50%;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 10px 30px rgba(113, 127, 224, 0.15);
   transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-  z-index: 100;
+  z-index: 1000 !important;
 }
 
 .inline-search-nav input {
@@ -4019,11 +4011,12 @@ input.size-116, textarea.size-120, input.size-117, input.size-111 {
 
 .inline-search-mobile {
   position: absolute;
-  left: 20px;
-  right: 20px;
+  left: 15px !important;
+  right: 15px !important;
   height: 40px;
-  background: rgba(113, 127, 224, 0.05);
-  border: 1px solid rgba(113, 127, 224, 0.15);
+  background: rgba(113, 127, 224, 0.05) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid #717fe0;
   border-radius: 20px;
   display: flex;
   align-items: center;
@@ -4032,8 +4025,9 @@ input.size-116, textarea.size-120, input.size-117, input.size-111 {
   pointer-events: none;
   transform: scale(0.96) translateY(-50%);
   top: 50%;
+  box-shadow: 0 8px 25px rgba(113, 127, 224, 0.12);
   transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-  z-index: 100;
+  z-index: 1000 !important;
 }
 
 .inline-search-mobile input {

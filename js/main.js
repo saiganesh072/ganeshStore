@@ -757,17 +757,233 @@
         }
     }
 
+    // Swap Filter & Search buttons and implement inline-expanding catalog search
+    function initCatalogFilters() {
+        // 1. Swap Search & Filter Buttons
+        $('.js-show-search').each(function() {
+            var $searchBtn = $(this);
+            var $filterBtn = $searchBtn.siblings('.js-show-filter');
+            if ($filterBtn.length) {
+                $searchBtn.insertBefore($filterBtn);
+                $searchBtn.addClass('m-r-8').removeClass('m-l-8');
+                $filterBtn.removeClass('m-r-8');
+            }
+        });
+
+        // 2. Inject Inline Catalog Search Input
+        var $searchBtn = $('.js-show-search');
+        if ($searchBtn.length) {
+            var $parent = $searchBtn.parent();
+            if ($parent.length && !$parent.find('.inline-catalog-search').length) {
+                // Create capsule container
+                var $inlineSearch = $(
+                    '<div class="inline-catalog-search" style="margin-right: 0px;">' +
+                    '  <input type="text" placeholder="Search..." class="inline-catalog-search-input" ' +
+                    '         style="border: none; outline: none; background: transparent; width: 100%; font-size: 14px;" />' +
+                    '  <i class="zmdi zmdi-close js-clear-catalog-search" ' +
+                    '     style="cursor: pointer; color: #999; margin-left: 5px; font-size: 16px; transition: color 0.3s;"></i>' +
+                    '</div>'
+                );
+                
+                $inlineSearch.insertBefore($searchBtn);
+                
+                // Override search button click to toggle inline search instead of panel-search slide
+                $searchBtn.off('click').on('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Close panel-filter if open
+                    $('.js-show-filter').removeClass('show-filter');
+                    $('.panel-filter').slideUp(400);
+                    
+                    $inlineSearch.toggleClass('active-search');
+                    if ($inlineSearch.hasClass('active-search')) {
+                        $inlineSearch.find('input').focus();
+                    } else {
+                        $inlineSearch.find('input').blur();
+                    }
+                });
+                
+                // Bind real-time input keyup filtering
+                var $input = $inlineSearch.find('.inline-catalog-search-input');
+                var $topeContainer = $('.isotope-grid');
+                
+                $input.on('keyup', function() {
+                    var query = $(this).val().toLowerCase().trim();
+                    if ($topeContainer.length) {
+                        $('.filter-tope-group button').removeClass('how-active1');
+                        
+                        $topeContainer.isotope({
+                            filter: function() {
+                                var name = $(this).find('.js-name-b2').text().toLowerCase();
+                                return name.indexOf(query) > -1;
+                            }
+                        });
+                    }
+                });
+                
+                // Bind clear catalog search trigger
+                $(document).off('click', '.js-clear-catalog-search').on('click', '.js-clear-catalog-search', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    $input.val('');
+                    $inlineSearch.removeClass('active-search');
+                    
+                    // Show all items again
+                    if ($topeContainer.length) {
+                        $('.filter-tope-group button').removeClass('how-active1');
+                        $('.filter-tope-group button[data-filter="*"]').addClass('how-active1');
+                        $topeContainer.isotope({ filter: '*' });
+                    }
+                });
+            }
+        }
+    }
+
+    // Dynamic Product Detail Page (PDP) reviews, rating persistence, and tab synchronization
+    function initPDPReviews() {
+        var productName = $('.js-name-detail').first().text().trim();
+        if (!productName) return; // Not on a product detail page
+        
+        var reviewsKey = 'reviews_' + productName.replace(/\s+/g, '_');
+        var reviews = [];
+        try {
+            reviews = JSON.parse(localStorage.getItem(reviewsKey)) || [];
+        } catch (e) {
+            reviews = [];
+        }
+        
+        // 1. Pre-populate high-quality mock reviews if none exist
+        if (reviews.length === 0) {
+            reviews = [
+                {
+                    name: "Sai Ganesh",
+                    email: "sai@ganeshstore.com",
+                    rating: 5,
+                    review: "This product exceeds all my expectations! The fabric is incredibly premium, stitching is spotless, and the fit is absolutely perfect. A true masterpiece!",
+                    date: "May 20, 2026"
+                },
+                {
+                    name: "Olivia Vance",
+                    email: "olivia@vance.net",
+                    rating: 4,
+                    review: "Excellent design and very comfortable. Perfect for standard daily wear. Shipping was remarkably fast too! Strongly recommended.",
+                    date: "May 18, 2026"
+                }
+            ];
+            localStorage.setItem(reviewsKey, JSON.stringify(reviews));
+        }
+
+        // 2. Clear hardcoded reviews and inject dynamic wrapper
+        var $pB30 = $('#reviews').find('.p-b-30.m-lr-15-sm');
+        if ($pB30.length) {
+            $pB30.find('.flex-w.flex-t.p-b-68').remove(); // remove old static block
+            
+            var $list = $pB30.find('.js-reviews-list');
+            if (!$list.length) {
+                $list = $('<div class="js-reviews-list"></div>');
+                $pB30.prepend($list);
+            }
+            
+            // Render function
+            function renderPDPReviews(reviewList) {
+                $list.empty();
+                reviewList.forEach(function(item) {
+                    var starHtml = '';
+                    for (var k = 1; k <= 5; k++) {
+                        if (k <= item.rating) {
+                            starHtml += '<i class="zmdi zmdi-star m-r-2" style="color: #f9ba48;"></i>';
+                        } else {
+                            starHtml += '<i class="zmdi zmdi-star-outline m-r-2" style="color: #ccc;"></i>';
+                        }
+                    }
+                    
+                    var avatarNum = Math.floor(Math.random() * 3) + 1; // mock avatars 1, 2, 3
+                    var itemHtml = 
+                        '<div class="flex-w flex-t p-b-40" style="border-bottom: 1px solid #f2f2f2; margin-bottom: 30px; padding-bottom: 10px; transition: all 0.5s ease;">' +
+                        '  <div class="wrap-pic-s size-109 bor0 of-hidden m-r-18 m-t-6" style="border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">' +
+                        '    <img src="images/avatar-0' + avatarNum + '.jpg" alt="AVATAR" onerror="this.src=\'images/icons/logo-01.png\';">' +
+                        '  </div>' +
+                        '  <div class="size-207">' +
+                        '    <div class="flex-w flex-sb-m p-b-10">' +
+                        '      <span class="mtext-107 cl2 p-r-20" style="font-family: Poppins-Medium; font-size: 15px;">' + item.name + '</span>' +
+                        '      <span class="fs-14 cl11">' + starHtml + '</span>' +
+                        '    </div>' +
+                        '    <span class="stext-102 cl9" style="font-size: 12px; display: block; margin-bottom: 8px;">' + item.date + '</span>' +
+                        '    <p class="stext-102 cl6" style="line-height: 1.6; font-size: 14px;">' + item.review + '</p>' +
+                        '  </div>' +
+                        '</div>';
+                    $list.append(itemHtml);
+                });
+                
+                // Sync tab counts
+                var $reviewTabLink = $('a[href="#reviews"], a[data-toggle="tab"]:contains("Reviews")');
+                if ($reviewTabLink.length) {
+                    $reviewTabLink.text('Reviews (' + reviewList.length + ')');
+                }
+            }
+            
+            // Initial render
+            renderPDPReviews(reviews);
+            
+            // 3. Handle review form submission
+            $(document).off('submit', '#reviews form').on('submit', '#reviews form', function(e) {
+                e.preventDefault();
+                var $form = $(this);
+                var name = $form.find('#name').val().trim();
+                var email = $form.find('#email').val().trim();
+                var reviewText = $form.find('#review').val().trim();
+                var rating = parseInt($form.find('input[name="rating"]').val()) || 0;
+                
+                if (!name || !email || !reviewText || rating === 0) {
+                    if (typeof swal === 'function') {
+                        swal("Incomplete Form", "Please provide your name, email, rating stars, and a review description!", "warning");
+                    } else {
+                        alert("Please complete all review fields and select a star rating!");
+                    }
+                    return;
+                }
+                
+                var newReview = {
+                    name: name,
+                    email: email,
+                    rating: rating,
+                    review: reviewText,
+                    date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                };
+                
+                reviews.unshift(newReview);
+                localStorage.setItem(reviewsKey, JSON.stringify(reviews));
+                
+                // Render and reset form
+                renderPDPReviews(reviews);
+                $form[0].reset();
+                $form.find('.wrap-rating .item-rating').removeClass('zmdi-star').addClass('zmdi-star-outline');
+                $form.find('input[name="rating"]').val(0);
+                
+                if (typeof swal === 'function') {
+                    swal("Review Submitted", "Thank you! Your feedback has been published.", "success");
+                }
+            });
+        }
+    }
+
     // Run initialization on DOM load
     $(document).ready(function() {
         initWishlist();
         initCart();
         syncAuthHeader();
+        initCatalogFilters();
+        initPDPReviews();
         $(window).on('load', function() {
             initWishlist();
             initCart();
             syncAuthHeader();
             initCategoryFilteringRouting();
             initSearchFilteringRouting();
+            initCatalogFilters();
+            initPDPReviews();
         });
     });
 
