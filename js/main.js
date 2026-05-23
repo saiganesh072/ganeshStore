@@ -770,74 +770,24 @@
             }
         });
 
-        // 2. Inject Inline Catalog Search Input
-        var $searchBtn = $('.js-show-search');
-        if ($searchBtn.length) {
-            var $parent = $searchBtn.parent();
-            if ($parent.length && !$parent.find('.inline-catalog-search').length) {
-                // Create capsule container
-                var $inlineSearch = $(
-                    '<div class="inline-catalog-search" style="margin-right: 0px;">' +
-                    '  <input type="text" placeholder="Search..." class="inline-catalog-search-input" ' +
-                    '         style="border: none; outline: none; background: transparent; width: 100%; font-size: 14px;" />' +
-                    '  <i class="zmdi zmdi-close js-clear-catalog-search" ' +
-                    '     style="cursor: pointer; color: #999; margin-left: 5px; font-size: 16px; transition: color 0.3s;"></i>' +
-                    '</div>'
-                );
-                
-                $inlineSearch.insertBefore($searchBtn);
-                
-                // Override search button click to toggle inline search instead of panel-search slide
-                $searchBtn.off('click').on('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
+        // 2. Bind real-time input keyup filtering on the standard panel-search input
+        var $input = $('.panel-search input[name="search-product"]');
+        var $topeContainer = $('.isotope-grid');
+        
+        if ($input.length) {
+            $input.off('keyup').on('keyup', function() {
+                var query = $(this).val().toLowerCase().trim();
+                if ($topeContainer.length) {
+                    $('.filter-tope-group button').removeClass('how-active1');
                     
-                    // Close panel-filter if open
-                    $('.js-show-filter').removeClass('show-filter');
-                    $('.panel-filter').slideUp(400);
-                    
-                    $inlineSearch.toggleClass('active-search');
-                    if ($inlineSearch.hasClass('active-search')) {
-                        $inlineSearch.find('input').focus();
-                    } else {
-                        $inlineSearch.find('input').blur();
-                    }
-                });
-                
-                // Bind real-time input keyup filtering
-                var $input = $inlineSearch.find('.inline-catalog-search-input');
-                var $topeContainer = $('.isotope-grid');
-                
-                $input.on('keyup', function() {
-                    var query = $(this).val().toLowerCase().trim();
-                    if ($topeContainer.length) {
-                        $('.filter-tope-group button').removeClass('how-active1');
-                        
-                        $topeContainer.isotope({
-                            filter: function() {
-                                var name = $(this).find('.js-name-b2').text().toLowerCase();
-                                return name.indexOf(query) > -1;
-                            }
-                        });
-                    }
-                });
-                
-                // Bind clear catalog search trigger
-                $(document).off('click', '.js-clear-catalog-search').on('click', '.js-clear-catalog-search', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    $input.val('');
-                    $inlineSearch.removeClass('active-search');
-                    
-                    // Show all items again
-                    if ($topeContainer.length) {
-                        $('.filter-tope-group button').removeClass('how-active1');
-                        $('.filter-tope-group button[data-filter="*"]').addClass('how-active1');
-                        $topeContainer.isotope({ filter: '*' });
-                    }
-                });
-            }
+                    $topeContainer.isotope({
+                        filter: function() {
+                            var name = $(this).find('.js-name-b2').text().toLowerCase();
+                            return name.indexOf(query) > -1;
+                        }
+                    });
+                }
+            });
         }
     }
 
