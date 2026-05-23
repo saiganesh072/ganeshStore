@@ -268,13 +268,77 @@
     });
     
     /*==================================================================
-    [ Show modal1 ]*/
-    $('.js-show-modal1').on('click',function(e){
+    [ Show modal1 (Dynamic Quick View population) ]*/
+    $('.js-show-modal1').on('click', function(e) {
         e.preventDefault();
-        $('.js-modal1').addClass('show-modal1');
+        
+        var $btn = $(this);
+        var $block = $btn.closest('.block2');
+        if (!$block.length) {
+            // Fallback if not inside .block2 card
+            $('.js-modal1').addClass('show-modal1');
+            return;
+        }
+
+        // 1. Scrap product metadata
+        var name = $block.find('.js-name-b2').text().trim();
+        var price = $block.find('.stext-105').text().trim();
+        var img = $block.find('.block2-pic img').attr('src');
+        var link = $block.find('.js-name-b2').attr('href') || $block.find('.block2-pic a').first().attr('href') || 'product-detail.html';
+
+        // 2. Populate modal details
+        var $modal = $('.js-modal1');
+        $modal.find('.js-name-detail').text(name);
+        $modal.find('.mtext-106').text(price);
+        $modal.find('.js-addcart-detail').attr('data-link', link);
+
+        // 3. Populate and re-initialize slick slider inside modal dynamically
+        var $slick3 = $modal.find('.slick3');
+        if ($slick3.hasClass('slick-initialized')) {
+            $slick3.slick('unslick');
+        }
+        
+        $slick3.empty();
+
+        // Add 3 thumbnails for the dynamic product using its primary scraped image
+        var slideHtml = '';
+        for (var i = 0; i < 3; i++) {
+            slideHtml += 
+                '<div class="item-slick3" data-thumb="' + img + '">' +
+                '  <div class="wrap-pic-w pos-relative">' +
+                '    <img src="' + img + '" alt="IMG-PRODUCT" />' +
+                '    <a class="flex-c-m size-108 how-pos1 bor0 fs-16 cl10 bg0 hov-btn3 trans-04" href="' + img + '">' +
+                '      <i class="fa fa-expand"></i>' +
+                '    </a>' +
+                '  </div>' +
+                '</div>';
+        }
+        $slick3.append(slideHtml);
+
+        // Reinitialise Slick gallery inside modal
+        $slick3.slick({
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            fade: true,
+            infinite: true,
+            arrows: true,
+            appendArrows: $modal.find('.wrap-slick3-arrows'),
+            prevArrow: '<button class="arrow-slick3 prev-slick3"><i class="fa fa-angle-left" aria-hidden="true"></i></button>',
+            nextArrow: '<button class="arrow-slick3 next-slick3"><i class="fa fa-angle-right" aria-hidden="true"></i></button>',
+            dots: true,
+            appendDots: $modal.find('.wrap-slick3-dots'),
+            dotsClass: 'slick3-dots',
+            customPaging: function(slick, index) {
+                var portrait = $(slick.$slides[index]).data('thumb');
+                return '<img src="' + portrait + '"/><div class="slick3-dot-overlay"></div>';
+            }
+        });
+
+        // 4. Open modal
+        $modal.addClass('show-modal1');
     });
 
-    $('.js-hide-modal1').on('click',function(){
+    $('.js-hide-modal1').on('click', function() {
         $('.js-modal1').removeClass('show-modal1');
     });
 
@@ -415,13 +479,72 @@
         });
     }
 
+    // Helper to get cookies by name
+    function getCookieValue(name) {
+        var result = document.cookie.match("(^|[^;]+)\\s*" + name + "\\s*=\\s*([^;]+)");
+        return result ? decodeURIComponent(result.pop()) : "";
+    }
+
+    // Dynamic session and authentication sync across all headers and top bars
+    function syncAuthHeader() {
+        var userState = localStorage.getItem("user");
+        var customerName = getCookieValue("CustomerName");
+        
+        // 1. Identify active authentication menus and top bar elements
+        var $loginLinks = $('.main-menu a:contains("Sign In"), .main-menu a:contains("Login"), .main-menu a:contains("Sign IN"), .main-menu a:contains("Contact")');
+        var $mobileLoginLinks = $('.main-menu-m a:contains("Sign In"), .main-menu-m a:contains("Login"), .main-menu-m a:contains("Sign IN"), .main-menu-m a:contains("Contact")');
+        var $topBarLeft = $('.left-top-bar');
+
+        if (userState === "loggedin" && customerName) {
+            // 2. Personalize the desktop topbar
+            if ($topBarLeft.length) {
+                $topBarLeft.html('Welcome back, <strong style="color: #fff; font-family: Poppins-Medium;">' + customerName + '</strong>! | <a href="#" class="js-global-logout" style="color: #6c7ae0; text-decoration: underline; margin-left: 5px;">Logout</a>');
+            }
+
+            // 3. Rewrite header navigation links to go to account center
+            $loginLinks.each(function() {
+                $(this).text("My Account");
+                $(this).attr("href", "contact.html");
+                $(this).closest('li').addClass('active-menu');
+            });
+            
+            $mobileLoginLinks.each(function() {
+                $(this).text("My Account");
+                $(this).attr("href", "contact.html");
+            });
+
+            // 4. Bind dynamic Logout action in header
+            $(document).off('click', '.js-global-logout').on('click', '.js-global-logout', function(e) {
+                e.preventDefault();
+                localStorage.setItem("user", "loggedout");
+                // Clear cookies
+                document.cookie = "CustomerName=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+                document.cookie = "CustomerNumber=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+                
+                if (typeof swal === 'function') {
+                    swal("Logged Out", "You have been successfully logged out.", "success");
+                }
+                setTimeout(function() {
+                    window.location.reload();
+                }, 1000);
+            });
+        } else {
+            // Restore default topbar left text
+            if ($topBarLeft.length && !$topBarLeft.find('.js-global-logout').length) {
+                $topBarLeft.text('Free shipping for standard order over $100');
+            }
+        }
+    }
+
     // Run initialization on DOM load
     $(document).ready(function() {
         initWishlist();
         initCart();
+        syncAuthHeader();
         $(window).on('load', function() {
             initWishlist();
             initCart();
+            syncAuthHeader();
         });
     });
 
@@ -611,7 +734,7 @@
 
     // Initialize all cart interactions on load
     function initCart() {
-        // 1. Rewrite all header/mobile-header cart icons to point directly to shoping-cart.html
+        // 1. Rewrite all header/mobile-header cart icons to point directly to shoping-cart.html but open drawer dynamically
         $('.js-show-cart').each(function() {
             $(this).attr('href', 'shoping-cart.html');
         });
@@ -619,11 +742,13 @@
         $('.js-show-cart').off('click').on('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            window.location.href = 'shoping-cart.html';
+            $('.js-panel-cart').addClass('show-header-cart');
+            renderSideDrawerCart();
         });
 
-        // 2. Update badges immediately
+        // 2. Update badges and render panels immediately
         updateCartBadges();
+        renderSideDrawerCart();
 
         // 3. Clear existing inline click handlers that would double-fire
         setTimeout(function() {
@@ -633,6 +758,91 @@
         // 4. Render shopping cart page if on shoping-cart.html
         renderCartPage();
     }
+
+    // Dynamic rendering of the side drawer cart panel
+    function renderSideDrawerCart() {
+        var cart = getCart();
+        var $cartWrap = $('.header-cart-wrapitem');
+        var $cartTotal = $('.header-cart-total');
+        
+        if (!$cartWrap.length) return; // Cart drawer elements not present
+
+        $cartWrap.empty();
+        
+        if (cart.length === 0) {
+            $cartWrap.append('<li class="flex-col-c-m p-t-40 p-b-40 w-full text-center" style="list-style-type: none;"><i class="zmdi zmdi-shopping-cart-off m-b-15" style="font-size: 40px; color: #ccc;"></i><span class="stext-115 cl6">Your cart is empty</span></li>');
+            $cartTotal.text('Total: $0.00');
+            return;
+        }
+
+        var subtotal = 0;
+        cart.forEach(function(item) {
+            var priceNum = parseFloat(item.price.replace(/[^\d.]/g, '')) || 0;
+            var qty = parseInt(item.quantity) || 1;
+            subtotal += priceNum * qty;
+            
+            var itemHtml = 
+                '<li class="header-cart-item flex-w flex-t m-b-12" style="transition: all 0.5s ease; list-style-type: none;">' +
+                '  <div class="header-cart-item-img js-remove-side-cart-item" title="Remove from Cart" ' +
+                '       data-name="' + item.name + '" ' +
+                '       data-size="' + item.size + '" ' +
+                '       data-color="' + item.color + '">' +
+                '    <img src="' + item.image + '" alt="IMG" />' +
+                '  </div>' +
+                '  <div class="header-cart-item-txt p-t-8">' +
+                '    <a href="' + (item.link || 'product-detail.html') + '" class="header-cart-item-name m-b-8 hov-cl1 trans-04">' +
+                '      ' + item.name +
+                '    </a>' +
+                '    <span class="header-cart-item-info" style="font-size: 12px; color: #888; display: block; margin-bottom: 4px;">' +
+                '      ' + item.size + ' | ' + item.color +
+                '    </span>' +
+                '    <span class="header-cart-item-info">' +
+                '      ' + qty + ' x ' + item.price +
+                '    </span>' +
+                '  </div>' +
+                '</li>';
+            $cartWrap.append(itemHtml);
+        });
+
+        $cartTotal.text('Total: $' + subtotal.toFixed(2));
+    }
+
+    // Handle dynamic side drawer item removal click
+    $(document).on('click', '.js-remove-side-cart-item', function(e) {
+        e.preventDefault();
+        var $item = $(this).closest('.header-cart-item');
+        var name = $(this).attr('data-name');
+        var size = $(this).attr('data-size');
+        var color = $(this).attr('data-color');
+        
+        var cart = getCart();
+        var itemIndex = cart.findIndex(function(i) {
+            return i.name === name && i.size === size && i.color === color;
+        });
+
+        if (itemIndex > -1) {
+            cart.splice(itemIndex, 1);
+            saveCart(cart);
+            
+            // Sync dynamic components
+            renderCartPage();
+            
+            // Animating removal
+            $item.css({
+                'opacity': '0',
+                'transform': 'translateX(30px)'
+            });
+            
+            setTimeout(function() {
+                $item.remove();
+                renderSideDrawerCart();
+            }, 500);
+
+            if (typeof swal === 'function') {
+                swal(name, "has been removed from your cart.", "info");
+            }
+        }
+    });
 
     // Shopping Cart page dynamic rendering
     function renderCartPage() {
