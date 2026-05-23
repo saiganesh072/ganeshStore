@@ -4083,3 +4083,152 @@ input.size-116, textarea.size-120, input.size-117, input.size-111 {
   box-shadow: 0 6px 15px rgba(113, 127, 224, 0.10);
 }
 
+/*==================================================================
+[ Premium Storefront-Wide Visual Design Upgrades ]*/
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtext-101, .ltext-101, .stext-102, .mtext-102, .ltext-102 {
+  font-family: 'Outfit', sans-serif !important;
+}
+
+/* 1. Desktop Navigation Menu self-centering sliding underline micro-animations */
+.main-menu > li > a {
+  position: relative;
+  transition: color 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+.main-menu > li > a::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -4px;
+  width: 0;
+  height: 2px;
+  background: #717fe0;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transform: translateX(-50%);
+}
+
+.main-menu > li:hover > a::after {
+  width: 100%;
+}
+
+.main-menu > li.active-menu > a::after {
+  width: 100%;
+  background: #717fe0;
+}
+
+.active-menu a {
+  text-shadow: 0 0 10px rgba(113, 127, 224, 0.2);
+}
+
+/* 2. Custom clean SVG drop-down arrow for all Select forms */
+.size-203 select, select.size-111, .size-204 select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 18px center !important;
+  background-size: 14px !important;
+  padding-right: 40px !important;
+  border: 1px solid #e6e6e6 !important;
+  border-radius: 8px !important;
+  font-size: 14px;
+  background-color: #fff;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.02) !important;
+}
+
+.size-203 select:focus, select.size-111:focus, .size-204 select:focus {
+  border-color: #717fe0 !important;
+  box-shadow: 0 0 10px rgba(113, 127, 224, 0.15) !important;
+  outline: none !important;
+}
+
+/* 3. Premium vibrant HSL linear gradient Capsule Buttons & dynamic elevation transitions */
+.bg1, .js-addcart-detail, .bg3, .bg7 {
+  background: linear-gradient(135deg, #717fe0, #ec38bc) !important;
+  border: none !important;
+  color: #fff !important;
+  box-shadow: 0 4px 12px rgba(113, 127, 224, 0.2) !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.bg1:hover, .js-addcart-detail:hover, .bg3:hover, .bg7:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 20px rgba(113, 127, 224, 0.35), 0 4px 10px rgba(236, 56, 188, 0.25) !important;
+  filter: brightness(1.05);
+}
+
+/* 4. PLP Category Filters Active Capsule Pill highlight indicators */
+.filter-tope-group button {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  border-radius: 20px !important;
+  padding: 8px 16px !important;
+  border: 1px solid transparent !important;
+  margin-right: 4px;
+}
+
+.filter-tope-group button:hover {
+  background: rgba(113, 127, 224, 0.05) !important;
+  color: #717fe0 !important;
+}
+
+.filter-tope-group button.how-active1 {
+  background: #717fe0 !important;
+  color: #fff !important;
+  box-shadow: 0 4px 12px rgba(113, 127, 224, 0.2) !important;
+  border-color: #717fe0 !important;
+}
+
+/* 5. Micro-interactive Native Brand Colors on Social Share icons */
+.fs-14.cl3.hov-cl1.trans-04.lh-10.p-lr-5.p-tb-2 {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+.fs-14.cl3.hov-cl1.trans-04.lh-10.p-lr-5.p-tb-2:hover {
+  transform: scale(1.25) !important;
+}
+
+.fa-facebook:hover, .zmdi-facebook:hover {
+  color: #1877f2 !important;
+  text-shadow: 0 0 10px rgba(24, 119, 242, 0.3) !important;
+}
+
+.fa-twitter:hover, .zmdi-twitter:hover {
+  color: #1da1f2 !important;
+  text-shadow: 0 0 10px rgba(29, 161, 242, 0.3) !important;
+}
+
+.fa-google-plus:hover, .zmdi-google:hover {
+  color: #db4437 !important;
+  text-shadow: 0 0 10px rgba(219, 68, 55, 0.3) !important;
+}
+
+.fa-pinterest:hover, .zmdi-pinterest:hover {
+  color: #bd081c !important;
+  text-shadow: 0 0 10px rgba(189, 8, 28, 0.3) !important;
+}
+
+.fa-instagram:hover, .zmdi-instagram:hover {
+  color: #e1306c !important;
+  text-shadow: 0 0 10px rgba(225, 48, 108, 0.3) !important;
+}
+
+/* 6. GPU-Accelerated Product Card Frame elevations and shadows */
+.block2-pic {
+  border-radius: 8px !important;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.02) !important;
+}
+
+.block2:hover .block2-pic {
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08) !important;
+  transform: translateY(-4px) !important;
+}
+
+
