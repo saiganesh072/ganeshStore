@@ -4,8 +4,8 @@
 // To enable full-stack secure databases, user logins, cart/wishlist
 // persistence, and shared PDP reviews, populate your credentials below:
 // ====================================================================
-var SUPABASE_URL = "";       // E.g. "https://your-project-id.supabase.co"
-var SUPABASE_ANON_KEY = "";  // E.g. "eyJhbGciOi..."
+var SUPABASE_URL = "https://urglyumucxvnszyyrdiv.supabase.co";       
+var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVyZ2x5dW11Y3h2bnN6eXlyZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MjIxMTksImV4cCI6MjA5NTA5ODExOX0.Fuw5FNHXw_rGoxfeVW8sjCT_DO0lDsOKPJ-wQ2-JV70";
 
 var supabaseClient = null;
 
