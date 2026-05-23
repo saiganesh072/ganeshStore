@@ -912,7 +912,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                         '    <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;">' +
                         '      <span style="width: 50px; font-family: Poppins-Medium; color: #555; text-align: left;">' + star + ' Star</span>' +
                         '      <div style="flex: 1; height: 8px; background: rgba(0,0,0,0.04); border-radius: 4px; overflow: hidden;">' +
-                        '        <div style="width: ' + pct + '%; height: 100%; background: linear-gradient(90deg, #1d1d1f, #0066cc); border-radius: 4px; transition: width 1s cubic-bezier(0.25, 0.8, 0.25, 1);"></div>' +
+                        '        <div style="width: ' + pct + '%; height: 100%; background: linear-gradient(90deg, #9b51e0, #3081ed); border-radius: 4px; transition: width 1s cubic-bezier(0.25, 0.8, 0.25, 1);"></div>' +
                         '      </div>' +
                         '      <span style="width: 35px; text-align: right; color: #888; font-family: Poppins-Regular;">' + pct + '%</span>' +
                         '    </div>';
@@ -1866,7 +1866,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             '      <span style="font-family: Poppins-Regular; font-size: 11px; color: #888;">' + productPrice + '</span>' +
             '    </div>' +
             '  </div>' +
-            '  <button class="js-sticky-buy-trigger" style="background: linear-gradient(135deg, #1d1d1f, #0066cc); border: none; color: #fff; padding: 8px 16px; border-radius: 20px; font-family: Poppins-Medium; font-size: 12px; cursor: pointer; box-shadow: 0 4px 10px rgba(0, 102, 204, 0.2); outline: none;">Add to Cart</button>' +
+            '  <button class="js-sticky-buy-trigger" style="background: linear-gradient(135deg, #9b51e0, #3081ed); border: none; color: #fff; padding: 8px 16px; border-radius: 20px; font-family: Poppins-Medium; font-size: 12px; cursor: pointer; box-shadow: 0 4px 10px rgba(155, 81, 224, 0.2); outline: none;">Add to Cart</button>' +
             '</div>';
         
         $('body').append(stickyBarHtml);

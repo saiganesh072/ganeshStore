@@ -4232,7 +4232,7 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
 }
 
 /*==================================================================
-[ Premium Apple-Inspired Animated Accent Bars & Overlays ]*/
+[ Premium Gemini Animated Glow Footer & Accent Topbar ]*/
 
 /* 1. Viewport Top Glowing Accent Bar */
 body::before {
@@ -4242,11 +4242,11 @@ body::before {
   left: 0;
   width: 100%;
   height: 3px;
-  background: linear-gradient(90deg, #1d1d1f, #8e8e93, #0066cc, #f5f5f7, #1d1d1f);
+  background: linear-gradient(90deg, #9b51e0, #3081ed, #00e5ff, #e040fb, #9b51e0);
   background-size: 400% 100%;
   animation: gemini-gradient-flow 8s ease infinite;
   z-index: 99999;
-  box-shadow: 0 0 10px rgba(0, 102, 204, 0.3);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
 }
 
 /* 2. Pure Black Footer and Upper Border Accent Bar */
@@ -4264,32 +4264,32 @@ footer.bg3::before {
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(90deg, #1d1d1f, #8e8e93, #0066cc, #f5f5f7, #1d1d1f);
+  background: linear-gradient(90deg, #9b51e0, #3081ed, #00e5ff, #e040fb, #9b51e0);
   background-size: 400% 100%;
   animation: gemini-gradient-flow 8s ease infinite;
-  box-shadow: 0 0 15px rgba(0, 102, 204, 0.35), 0 0 30px rgba(142, 142, 147, 0.15);
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.4), 0 0 30px rgba(224, 64, 251, 0.3);
   z-index: 10;
 }
 
 /* 3. Glowing Interactive Focus Inputs */
 footer.bg3 .focus-input1 {
-  background: #0066cc !important;
+  background: linear-gradient(90deg, #9b51e0, #00e5ff, #e040fb) !important;
 }
 
 /* 4. restyle Newsletter Button */
 footer.bg3 form button {
-  background: linear-gradient(90deg, #1d1d1f, #0066cc) !important;
+  background: linear-gradient(90deg, #9b51e0, #3081ed, #e040fb) !important;
   background-size: 200% 100% !important;
   border: none !important;
   color: #fff !important;
   transition: all 0.4s ease !important;
-  box-shadow: 0 4px 15px rgba(0, 102, 204, 0.25) !important;
+  box-shadow: 0 4px 15px rgba(155, 81, 224, 0.3) !important;
   border-radius: 4px !important;
 }
 
 footer.bg3 form button:hover {
   background-position: 100% 0 !important;
-  box-shadow: 0 6px 20px rgba(0, 102, 204, 0.45) !important;
+  box-shadow: 0 6px 20px rgba(224, 64, 251, 0.5) !important;
   transform: translateY(-2px) !important;
 }
 
@@ -4343,10 +4343,10 @@ footer.bg3 form button:hover {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #1d1d1f, #0066cc, #8e8e93);
+  background: linear-gradient(135deg, #9b51e0, #3081ed, #e040fb);
   background-size: 200% 200%;
   animation: gemini-gradient-flow 6s ease infinite;
-  box-shadow: 0 8px 24px rgba(0, 102, 204, 0.3);
+  box-shadow: 0 8px 24px rgba(155, 81, 224, 0.4);
   z-index: 9999;
   border: 2px solid rgba(255, 255, 255, 0.8);
   display: flex;
@@ -4361,7 +4361,7 @@ footer.bg3 form button:hover {
 
 #gemini-chat-trigger:hover {
   transform: scale(1.1) rotate(10deg);
-  box-shadow: 0 12px 30px rgba(0, 102, 204, 0.5);
+  box-shadow: 0 12px 30px rgba(224, 64, 251, 0.6);
 }
 
 /* Chat Container Window */
@@ -4395,7 +4395,7 @@ footer.bg3 form button:hover {
 
 /* Chat Header */
 .gemini-chat-header {
-  background: linear-gradient(90deg, rgba(29, 29, 31, 0.95), rgba(0, 102, 204, 0.95)) !important;
+  background: linear-gradient(90deg, rgba(155, 81, 224, 0.85), rgba(48, 129, 237, 0.85));
   backdrop-filter: blur(10px);
   padding: 15px 20px;
   color: #fff;
@@ -4457,15 +4457,15 @@ footer.bg3 form button:hover {
   color: #1a202c;
   align-self: flex-start;
   border-bottom-left-radius: 4px;
-  border: 1px solid rgba(0, 102, 204, 0.1);
+  border: 1px solid rgba(155, 81, 224, 0.1);
 }
 
 .gemini-message.user {
-  background: linear-gradient(135deg, #0066cc, #004499) !important;
+  background: linear-gradient(135deg, #9b51e0, #3081ed);
   color: #fff;
   align-self: flex-end;
   border-bottom-right-radius: 4px;
-  box-shadow: 0 4px 10px rgba(0, 102, 204, 0.15);
+  box-shadow: 0 4px 10px rgba(155, 81, 224, 0.15);
 }
 
 /* Typing Indicator */
@@ -4509,8 +4509,8 @@ footer.bg3 form button:hover {
 }
 
 .gemini-chat-input:focus {
-  border-color: #0066cc;
-  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.1);
+  border-color: #9b51e0;
+  box-shadow: 0 0 0 2px rgba(155, 81, 224, 0.1);
   background: #fff;
 }
 
@@ -4518,7 +4518,7 @@ footer.bg3 form button:hover {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #0066cc, #004499) !important;
+  background: linear-gradient(135deg, #9b51e0, #3081ed);
   border: none;
   color: #fff;
   display: flex;
@@ -4526,13 +4526,13 @@ footer.bg3 form button:hover {
   align-items: center;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 4px 10px rgba(0, 102, 204, 0.2);
+  box-shadow: 0 4px 10px rgba(155, 81, 224, 0.2);
   outline: none;
 }
 
 .gemini-chat-send:hover {
   transform: scale(1.05);
-  box-shadow: 0 6px 14px rgba(0, 102, 204, 0.3);
+  box-shadow: 0 6px 14px rgba(155, 81, 224, 0.3);
 }
 
 /* Chat Recommended Product Cards */
@@ -4550,8 +4550,8 @@ footer.bg3 form button:hover {
 }
 
 .gemini-chat-product-card:hover {
-  border-color: #0066cc;
-  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.08);
+  border-color: #9b51e0;
+  box-shadow: 0 4px 12px rgba(155, 81, 224, 0.08);
   transform: translateY(-2px);
 }
 
