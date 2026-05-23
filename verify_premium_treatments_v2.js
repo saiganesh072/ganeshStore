@@ -95,6 +95,38 @@ try {
         'Header icons rotate and scale slightly on hover for tactile physical feedback.'
     );
 
+    // Check search modal glassmorphic transitions and styles
+    assert(
+        cssContent.includes('.modal-search-header') && cssContent.includes('backdrop-filter: blur(25px)') && cssContent.includes('background: rgba(10, 10, 20, 0.75)'),
+        'Search overlay (.modal-search-header) uses premium dark-hued glassmorphism with a 25px blur filter.'
+    );
+
+    assert(
+        cssContent.includes('.btn-hide-modal-search') && cssContent.includes('border-radius: 50%') && cssContent.includes('filter: invert(1) brightness(2)'),
+        'Close search button is circular and utilizes high-contrast invert/brightness image filtering.'
+    );
+
+    assert(
+        cssContent.includes('.wrap-search-header') && cssContent.includes('border-radius: 50px') && cssContent.includes('box-shadow: 0 30px 70px rgba(0, 0, 0, 0.4)'),
+        'Search box container (.wrap-search-header) has a fully rounded 50px pill shape and deep shadows.'
+    );
+
+    assert(
+        cssContent.includes('.wrap-search-header:focus-within') && cssContent.includes('border-color: #ec38bc') && cssContent.includes('transform: scale(1.02)'),
+        'Search box container scale-zooms and transitions to high-end hot pink focus outlines.'
+    );
+
+    // Check catalog filter search pill design
+    assert(
+        cssContent.includes('.panel-search .bor8') && cssContent.includes('border-radius: 30px') && cssContent.includes('box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.03)'),
+        'Catalog search container (.bor8 under .panel-search) has a fully rounded 30px capsule shape and inner depth.'
+    );
+
+    assert(
+        cssContent.includes('.panel-search .bor8:focus-within') && cssContent.includes('transform: translateY(-3px)'),
+        'Catalog search container elevates vertically on focus to provide dynamic physical feedback.'
+    );
+
     console.log();
 } catch (e) {
     console.error('[ERROR] Failed to read or parse css/main.css:', e.message);
