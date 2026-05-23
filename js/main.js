@@ -1,4 +1,27 @@
 
+// ====================================================================
+// GANESHSTORE CLOUD DATABASE CONFIGURATION (SUPABASE)
+// To enable full-stack secure databases, user logins, cart/wishlist
+// persistence, and shared PDP reviews, populate your credentials below:
+// ====================================================================
+var SUPABASE_URL = "";       // E.g. "https://your-project-id.supabase.co"
+var SUPABASE_ANON_KEY = "";  // E.g. "eyJhbGciOi..."
+
+var supabaseClient = null;
+
+// Programmatically load Supabase browser client SDK via CDN
+if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+    var script = document.createElement('script');
+    script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+    script.onload = function() {
+        if (typeof supabase !== 'undefined') {
+            window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log("Supabase Client initialized successfully!");
+        }
+    };
+    document.head.appendChild(script);
+}
+
 (function ($) {
     "use strict";
 
@@ -516,6 +539,9 @@
     function saveWishlist(wishlist) {
         localStorage.setItem('wishlist', JSON.stringify(wishlist));
         updateWishlistBadges();
+        if (typeof syncWishlistToSupabase === 'function') {
+            syncWishlistToSupabase();
+        }
     }
 
     // Helper to update all header wishlist badges
@@ -874,8 +900,32 @@
                 }
             }
             
-            // Initial render
-            renderPDPReviews(reviews);
+            // Supabase Database Integration for PDP Reviews
+            if (window.supabaseClient) {
+                window.supabaseClient
+                    .from('reviews')
+                    .select('*')
+                    .eq('product_name', productName)
+                    .order('created_at', { ascending: false })
+                    .then(function(res) {
+                        if (res.data && res.data.length > 0) {
+                            var dbReviews = res.data.map(function(r) {
+                                return {
+                                    name: r.reviewer_name,
+                                    email: r.email,
+                                    rating: r.rating,
+                                    review: r.comment,
+                                    date: new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                                };
+                            });
+                            renderPDPReviews(dbReviews);
+                        } else {
+                            renderPDPReviews(reviews);
+                        }
+                    });
+            } else {
+                renderPDPReviews(reviews);
+            }
             
             // 3. Handle review form submission
             $(document).off('submit', '#reviews form').on('submit', '#reviews form', function(e) {
@@ -902,18 +952,54 @@
                     review: reviewText,
                     date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
                 };
-                
-                reviews.unshift(newReview);
-                localStorage.setItem(reviewsKey, JSON.stringify(reviews));
-                
-                // Render and reset form
-                renderPDPReviews(reviews);
-                $form[0].reset();
-                $form.find('.wrap-rating .item-rating').removeClass('zmdi-star').addClass('zmdi-star-outline');
-                $form.find('input[name="rating"]').val(0);
-                
-                if (typeof swal === 'function') {
-                    swal("Review Submitted", "Thank you! Your feedback has been published.", "success");
+
+                function completeSubmission() {
+                    $form[0].reset();
+                    $form.find('.wrap-rating .item-rating').removeClass('zmdi-star').addClass('zmdi-star-outline');
+                    $form.find('input[name="rating"]').val(0);
+                    
+                    if (typeof swal === 'function') {
+                        swal("Review Submitted", "Thank you! Your feedback has been published.", "success");
+                    }
+                }
+
+                if (window.supabaseClient) {
+                    window.supabaseClient
+                        .from('reviews')
+                        .insert({
+                            product_name: productName,
+                            reviewer_name: name,
+                            email: email,
+                            rating: rating,
+                            comment: reviewText
+                        })
+                        .then(function(res) {
+                            window.supabaseClient
+                                .from('reviews')
+                                .select('*')
+                                .eq('product_name', productName)
+                                .order('created_at', { ascending: false })
+                                .then(function(updatedRes) {
+                                    if (updatedRes.data) {
+                                        var dbReviews = updatedRes.data.map(function(r) {
+                                            return {
+                                                name: r.reviewer_name,
+                                                email: r.email,
+                                                rating: r.rating,
+                                                review: r.comment,
+                                                date: new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                                            };
+                                        });
+                                        renderPDPReviews(dbReviews);
+                                    }
+                                    completeSubmission();
+                                });
+                        });
+                } else {
+                    reviews.unshift(newReview);
+                    localStorage.setItem(reviewsKey, JSON.stringify(reviews));
+                    renderPDPReviews(reviews);
+                    completeSubmission();
                 }
             });
         }
@@ -1106,6 +1192,9 @@
     function saveCart(cart) {
         localStorage.setItem('cartItems', JSON.stringify(cart));
         updateCartBadges();
+        if (typeof syncCartToSupabase === 'function') {
+            syncCartToSupabase();
+        }
     }
 
     // Helper to update all header cart badges
@@ -1502,41 +1591,197 @@
         }
     });
 
-    // Handle delegated Add to Cart from Wishlist Click
-    $(document).on('click', '.js-add-cart-from-wishlist', function(e) {
-        e.preventDefault();
-        
-        var $btn = $(this);
-        var name = $btn.attr('data-name');
-        var price = $btn.attr('data-price');
-        var img = $btn.attr('data-image');
-        
-        var cart = getCart();
-        var size = "Size M";
-        var color = "White";
-        
-        var existingItem = cart.find(function(item) {
-            return item.name === name && item.size === size && item.color === color;
-        });
+    // Sync cart and wishlist with Supabase database
+    function syncCartToSupabase() {
+        if (!window.supabaseClient) return;
+        var profile = null;
+        try {
+            profile = JSON.parse(localStorage.getItem('userProfile'));
+        } catch(e) {}
+        if (!profile) return;
 
-        if (existingItem) {
-            existingItem.quantity = (existingItem.quantity || 1) + 1;
-        } else {
-            cart.push({
-                name: name,
-                price: price,
-                image: img,
-                quantity: 1,
-                size: size,
-                color: color
+        var cart = JSON.parse(localStorage.getItem('cartItems')) || [];
+        
+        window.supabaseClient
+            .from('carts')
+            .delete()
+            .eq('user_id', profile.id)
+            .then(function() {
+                if (cart.length === 0) return;
+                var rows = cart.map(function(item) {
+                    return {
+                        user_id: profile.id,
+                        product_name: item.name,
+                        price: item.price,
+                        image_url: item.image,
+                        quantity: item.quantity,
+                        size: item.size,
+                        color: item.color,
+                        link: item.link || ''
+                    };
+                });
+                window.supabaseClient.from('carts').insert(rows).then(function(res) {
+                    if (res.error) console.error("Error syncing cart to database:", res.error);
+                });
             });
-        }
+    }
 
-        saveCart(cart);
+    function syncWishlistToSupabase() {
+        if (!window.supabaseClient) return;
+        var profile = null;
+        try {
+            profile = JSON.parse(localStorage.getItem('userProfile'));
+        } catch(e) {}
+        if (!profile) return;
+
+        var wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
         
-        if (typeof swal === 'function') {
-            swal(name, "is added to cart !", "success");
-        }
+        window.supabaseClient
+            .from('wishlists')
+            .delete()
+            .eq('user_id', profile.id)
+            .then(function() {
+                if (wishlist.length === 0) return;
+                var rows = wishlist.map(function(item) {
+                    return {
+                        user_id: profile.id,
+                        product_name: item.name,
+                        price: item.price,
+                        image_url: item.image,
+                        link: item.link || ''
+                    };
+                });
+                window.supabaseClient.from('wishlists').insert(rows).then(function(res) {
+                    if (res.error) console.error("Error syncing wishlist to database:", res.error);
+                });
+            });
+    }
+
+    // Intercept submit form on contact.html
+    $(document).on('click', '.CSubmit', function(e) {
+        if (!window.supabaseClient) return; // fallback to static login
+        
+        var name = $('.CName').val().trim();
+        var phone = $('.CPhNum').val().trim();
+        
+        if (!name || !phone) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        window.supabaseClient
+            .from('profiles')
+            .select('*')
+            .eq('phone_number', phone)
+            .then(function(response) {
+                if (response.error) {
+                    console.error("Supabase Profile Login Error:", response.error);
+                    return;
+                }
+                var profile = response.data && response.data[0];
+                if (profile) {
+                    // Profile exists! Pull cart and wishlist
+                    localStorage.setItem('userProfile', JSON.stringify(profile));
+                    localStorage.setItem('user', 'loggedin');
+                    
+                    // Pull carts
+                    window.supabaseClient
+                        .from('carts')
+                        .select('*')
+                        .eq('user_id', profile.id)
+                        .then(function(cartRes) {
+                            if (cartRes.data) {
+                                var dbCart = cartRes.data.map(function(c) {
+                                    return {
+                                        name: c.product_name,
+                                        price: c.price,
+                                        image: c.image_url,
+                                        quantity: c.quantity,
+                                        size: c.size,
+                                        color: c.color,
+                                        link: c.link || 'product-detail.html'
+                                    };
+                                });
+                                localStorage.setItem('cartItems', JSON.stringify(dbCart));
+                                updateCartBadges();
+                            }
+                            
+                            // Pull wishlists
+                            window.supabaseClient
+                                .from('wishlists')
+                                .select('*')
+                                .eq('user_id', profile.id)
+                                .then(function(wishRes) {
+                                    if (wishRes.data) {
+                                        var dbWish = wishRes.data.map(function(w) {
+                                            return {
+                                                name: w.product_name,
+                                                price: w.price,
+                                                image: w.image_url,
+                                                link: w.link || 'product-detail.html'
+                                            };
+                                        });
+                                        localStorage.setItem('wishlist', JSON.stringify(dbWish));
+                                        updateWishlistBadges();
+                                    }
+                                    
+                                    // Cookie credentials
+                                    document.cookie = "CustomerName=" + encodeURIComponent(profile.full_name) + "; path=/;";
+                                    document.cookie = "CustomerNumber=" + encodeURIComponent(profile.phone_number) + "; path=/;";
+                                    
+                                    if (typeof loginfun === 'function') {
+                                        loginfun();
+                                    }
+                                    window.location.reload();
+                                });
+                        });
+                } else {
+                    // Profile doesn't exist, create a secure profile record
+                    var newProfileId = crypto.randomUUID();
+                    var newProfile = {
+                        id: newProfileId,
+                        full_name: name,
+                        phone_number: phone
+                    };
+                    
+                    window.supabaseClient
+                        .from('profiles')
+                        .insert(newProfile)
+                        .then(function(insertRes) {
+                            if (insertRes.error) {
+                                console.error("Supabase Profile Insert Error:", insertRes.error);
+                                return;
+                            }
+                            localStorage.setItem('userProfile', JSON.stringify(newProfile));
+                            localStorage.setItem('user', 'loggedin');
+                            
+                            // Sync current offline state to database
+                            syncCartToSupabase();
+                            syncWishlistToSupabase();
+                            
+                            // Cookie credentials
+                            document.cookie = "CustomerName=" + encodeURIComponent(name) + "; path=/;";
+                            document.cookie = "CustomerNumber=" + encodeURIComponent(phone) + "; path=/;";
+                            
+                            if (typeof loginfun === 'function') {
+                                loginfun();
+                            }
+                            window.location.reload();
+                        });
+                }
+            });
+    });
+
+    // Intercept logout button
+    $(document).on('click', '.CLogout, .js-global-logout', function(e) {
+        if (!window.supabaseClient) return;
+        localStorage.removeItem('userProfile');
+        localStorage.setItem('user', 'loggedout');
+        localStorage.setItem('cartItems', '[]');
+        localStorage.setItem('wishlist', '[]');
+        document.cookie = "CustomerName=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+        document.cookie = "CustomerNumber=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+        window.location.reload();
     });
 
 })(jQuery);
