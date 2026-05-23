@@ -73,6 +73,103 @@
             $(wrapMenu).css('top',posWrapHeader - $(this).scrollTop()); 
         } 
     });
+    /*==================================================================
+    [ Dynamic Header Submenu Injections ]*/
+    function injectHeaderSubmenus() {
+        // Desktop Shop dropdown
+        var $desktopShopLi = $('.main-menu > li > a').filter(function() {
+            return $(this).text().trim() === 'Shop';
+        }).parent();
+        if ($desktopShopLi.length && !$desktopShopLi.find('.sub-menu').length) {
+            $desktopShopLi.append(
+                '<ul class="sub-menu">' +
+                '  <li><a href="product.html?category=women">Women</a></li>' +
+                '  <li><a href="product.html?category=men">Men</a></li>' +
+                '  <li><a href="product.html?category=bag">Bags</a></li>' +
+                '  <li><a href="product.html?category=shoes">Shoes</a></li>' +
+                '  <li><a href="product.html?category=watches">Watches</a></li>' +
+                '</ul>'
+            );
+        }
+
+        // Desktop Features dropdown
+        var $desktopFeaturesA = $('.main-menu > li > a').filter(function() {
+            return $(this).text().trim() === 'Features';
+        });
+        if ($desktopFeaturesA.length) {
+            $desktopFeaturesA.attr('href', '#');
+            var $desktopFeaturesLi = $desktopFeaturesA.parent();
+            if (!$desktopFeaturesLi.find('.sub-menu').length) {
+                $desktopFeaturesLi.append(
+                    '<ul class="sub-menu">' +
+                    '  <li><a href="#" class="js-trigger-slide-cart">Slide-Out Cart</a></li>' +
+                    '  <li><a href="product.html">Dynamic Quick View</a></li>' +
+                    '  <li><a href="wishlist.html">My Wishlist</a></li>' +
+                    '  <li><a href="contact.html">Account Center</a></li>' +
+                    '</ul>'
+                );
+            }
+        }
+
+        // Mobile Shop dropdown
+        var $mobileShopLi = $('.main-menu-m > li > a').filter(function() {
+            return $(this).text().trim() === 'Shop';
+        }).parent();
+        if ($mobileShopLi.length && !$mobileShopLi.find('.sub-menu-m').length) {
+            $mobileShopLi.append(
+                '<ul class="sub-menu-m">' +
+                '  <li><a href="product.html?category=women">Women</a></li>' +
+                '  <li><a href="product.html?category=men">Men</a></li>' +
+                '  <li><a href="product.html?category=bag">Bags</a></li>' +
+                '  <li><a href="product.html?category=shoes">Shoes</a></li>' +
+                '  <li><a href="product.html?category=watches">Watches</a></li>' +
+                '</ul>' +
+                '<span class="arrow-main-menu-m">' +
+                '  <i class="fa fa-angle-right" aria-hidden="true"></i>' +
+                '</span>'
+            );
+        }
+
+        // Mobile Features dropdown
+        var $mobileFeaturesA = $('.main-menu-m > li > a').filter(function() {
+            return $(this).text().trim() === 'Features';
+        });
+        if ($mobileFeaturesA.length) {
+            $mobileFeaturesA.attr('href', '#');
+            var $mobileFeaturesLi = $mobileFeaturesA.parent();
+            if (!$mobileFeaturesLi.find('.sub-menu-m').length) {
+                $mobileFeaturesLi.append(
+                    '<ul class="sub-menu-m">' +
+                    '  <li><a href="#" class="js-trigger-slide-cart">Slide-Out Cart</a></li>' +
+                    '  <li><a href="product.html">Dynamic Quick View</a></li>' +
+                    '  <li><a href="wishlist.html">My Wishlist</a></li>' +
+                    '  <li><a href="contact.html">Account Center</a></li>' +
+                    '</ul>' +
+                    '<span class="arrow-main-menu-m">' +
+                    '  <i class="fa fa-angle-right" aria-hidden="true"></i>' +
+                    '</span>'
+                );
+            }
+        }
+    }
+
+    // Run injection before mobile menu hooks
+    injectHeaderSubmenus();
+
+    // Slide-out cart trigger from submenu
+    $(document).off('click', '.js-trigger-slide-cart').on('click', '.js-trigger-slide-cart', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Close mobile menu if it is open
+        if ($('.menu-mobile').css('display') === 'block') {
+            $('.menu-mobile').slideUp();
+            $('.btn-show-menu-mobile').removeClass('is-active');
+        }
+        
+        // Trigger cart drawer click
+        $('.js-show-cart').first().trigger('click');
+    });
 
 
     /*==================================================================
@@ -536,6 +633,49 @@
         }
     }
 
+    // Intelligent category query routing and automatic isotope filter execution
+    function initCategoryFilteringRouting() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var category = urlParams.get('category');
+        if (category) {
+            var catName = category.toLowerCase().trim();
+            var filterVal = '.' + catName;
+            if (catName === 'bags' || catName === 'bag') {
+                filterVal = '.bag';
+            } else if (catName === 'watches' || catName === 'watch') {
+                filterVal = '.watches';
+            } else if (catName === 'shoes' || catName === 'shoe') {
+                filterVal = '.shoes';
+            } else if (catName === 'men' || catName === 'man') {
+                filterVal = '.men';
+            } else if (catName === 'women' || catName === 'woman') {
+                filterVal = '.women';
+            } else if (catName === 'all') {
+                filterVal = '*';
+            }
+            
+            var $topeContainer = $('.isotope-grid');
+            var $btn = $('.filter-tope-group button[data-filter="' + filterVal + '"]');
+            
+            if ($btn.length && $topeContainer.length) {
+                // Remove active class from all buttons
+                $('.filter-tope-group button').removeClass('how-active1');
+                // Select active category button
+                $btn.addClass('how-active1');
+                // Execute isotope sorting
+                $topeContainer.isotope({ filter: filterVal });
+                
+                // Soft scroll to the filtered storefront section so the user lands straight on the active visual catalogue!
+                var $productCatalog = $('.bg0.m-t-23.p-b-140');
+                if ($productCatalog.length) {
+                    $('html, body').animate({
+                        scrollTop: $productCatalog.offset().top - 85
+                    }, 600);
+                }
+            }
+        }
+    }
+
     // Run initialization on DOM load
     $(document).ready(function() {
         initWishlist();
@@ -545,6 +685,7 @@
             initWishlist();
             initCart();
             syncAuthHeader();
+            initCategoryFilteringRouting();
         });
     });
 

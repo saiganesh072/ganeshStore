@@ -498,25 +498,45 @@ Input, textarea : 14px/1.6 '', Arial, sans-serif;
   font-size: 26px;
   line-height: 1;
   cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.icon-header-item i {
+  display: inline-block;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.icon-header-item:hover i {
+  transform: scale(1.15) rotate(-5deg);
 }
 
 /*---------------------------------------------*/
 .icon-header-noti::after {
   content: attr(data-notify);
-  font-family: Poppins-Regular;
-  font-size: 12px;
+  font-family: Poppins-Bold;
+  font-size: 10px;
   color: #fff;
-  line-height: 15px;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  display: block;
   position: absolute;
-  top: -7px;
-  right: 0;
-  min-width: 15px;
-  height: 15px;
-  padding: 0 3px;
-  background-color: #717fe0;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ec38bc, #717fe0);
+  border: 2px solid #fff;
+  box-shadow: 0 4px 8px rgba(236, 56, 188, 0.3);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+  z-index: 10;
+}
+
+.icon-header-noti:hover::after {
+  transform: scale(1.25);
+  box-shadow: 0 6px 12px rgba(236, 56, 188, 0.5);
 }
 
 /*---------------------------------------------*/
@@ -2132,11 +2152,32 @@ input.num-product::-webkit-inner-spin-button {
   border-radius: 8px;
   background-color: #fff;
   padding: 8px;
+  position: relative;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  will-change: transform, box-shadow;
+}
+
+.block2::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0;
+  pointer-events: none;
+  transition: height 0.4s;
 }
 
 .block2:hover {
   transform: translateY(-8px);
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+}
+
+.block2:hover::after {
+  height: 16px;
+  bottom: -16px;
+  pointer-events: auto;
 }
 
 .block2-pic {
@@ -2147,17 +2188,26 @@ input.num-product::-webkit-inner-spin-button {
 
 .block2-btn {
   position: absolute;
-  bottom: -50px;
+  bottom: 20px;
   left: 50%;
-  -webkit-transform: translateX(-50%);
-  -moz-transform: translateX(-50%);
-  -ms-transform: translateX(-50%);
-  -o-transform: translateX(-50%);
-  transform: translateX(-50%);
+  -webkit-transform: translate(-50%, 30px);
+  -moz-transform: translate(-50%, 30px);
+  -ms-transform: translate(-50%, 30px);
+  -o-transform: translate(-50%, 30px);
+  transform: translate(-50%, 30px);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .block2-pic:hover .block2-btn {
-  bottom: 20px;
+  -webkit-transform: translate(-50%, 0);
+  -moz-transform: translate(-50%, 0);
+  -ms-transform: translate(-50%, 0);
+  -o-transform: translate(-50%, 0);
+  transform: translate(-50%, 0);
+  opacity: 1;
+  pointer-events: auto;
 }
 
 /*---------------------------------------------*/
