@@ -4147,7 +4147,7 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
 }
 
 /* 3. Premium vibrant HSL linear gradient Capsule Buttons & dynamic elevation transitions */
-.bg1, .js-addcart-detail, .bg3, .bg7 {
+.bg1, .js-addcart-detail, .bg7 {
   background: linear-gradient(135deg, #717fe0, #ec38bc) !important;
   border: none !important;
   color: #fff !important;
@@ -4157,7 +4157,7 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   overflow: hidden;
 }
 
-.bg1:hover, .js-addcart-detail:hover, .bg3:hover, .bg7:hover {
+.bg1:hover, .js-addcart-detail:hover, .bg7:hover {
   transform: translateY(-2px) !important;
   box-shadow: 0 8px 20px rgba(113, 127, 224, 0.35), 0 4px 10px rgba(236, 56, 188, 0.25) !important;
   filter: brightness(1.05);
