@@ -865,6 +865,72 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             // Render function
             function renderPDPReviews(reviewList) {
                 $list.empty();
+                
+                // Calculate ratings breakdown dynamically
+                var total = reviewList.length;
+                var avg = 0;
+                var counts = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0};
+                if (total > 0) {
+                    var sum = 0;
+                    reviewList.forEach(function(item) {
+                        var r = Math.round(item.rating);
+                        if (r >= 1 && r <= 5) {
+                            counts[r]++;
+                            sum += item.rating;
+                        }
+                    });
+                    avg = (sum / total).toFixed(1);
+                } else {
+                    avg = "0.0";
+                }
+
+                // Create Summary Breakdown Card
+                var summaryHtml = 
+                    '<div class="row js-reviews-summary" style="background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(0, 0, 0, 0.05); border-radius: 16px; margin-bottom: 40px; padding: 24px; box-shadow: 0 8px 30px rgba(0,0,0,0.02); display: flex; width: 100%;">' +
+                    '  <div class="col-sm-4 text-center d-flex flex-column align-items-center justify-content-center" style="border-right: 1px solid rgba(0,0,0,0.06); padding-right: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center;">' +
+                    '    <h1 style="font-size: 56px; font-family: Poppins-Bold; line-height: 1; margin: 0; color: #222;">' + avg + '</h1>' +
+                    '    <div class="fs-18 cl11 m-t-10 m-b-5" style="margin-top: 10px; margin-bottom: 5px;">';
+                
+                var roundedAvg = Math.round(avg);
+                for (var s = 1; s <= 5; s++) {
+                    if (s <= roundedAvg) {
+                        summaryHtml += '<i class="zmdi zmdi-star m-r-2" style="color: #f9ba48; font-size: 18px;"></i>';
+                    } else {
+                        summaryHtml += '<i class="zmdi zmdi-star-outline m-r-2" style="color: #ccc; font-size: 18px;"></i>';
+                    }
+                }
+                
+                summaryHtml += 
+                    '    </div>' +
+                    '    <span class="stext-102 cl9" style="font-size: 13px; font-family: Poppins-Regular;">' + total + ' Verified Reviews</span>' +
+                    '  </div>' +
+                    '  <div class="col-sm-8 p-l-25" style="display: flex; flex-direction: column; gap: 8px; justify-content: center; flex: 1;">';
+                
+                [5, 4, 3, 2, 1].forEach(function(star) {
+                    var pct = total > 0 ? Math.round((counts[star] / total) * 100) : 0;
+                    summaryHtml += 
+                        '    <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;">' +
+                        '      <span style="width: 50px; font-family: Poppins-Medium; color: #555; text-align: left;">' + star + ' Star</span>' +
+                        '      <div style="flex: 1; height: 8px; background: rgba(0,0,0,0.04); border-radius: 4px; overflow: hidden;">' +
+                        '        <div style="width: ' + pct + '%; height: 100%; background: linear-gradient(90deg, #9b51e0, #3081ed); border-radius: 4px; transition: width 1s cubic-bezier(0.25, 0.8, 0.25, 1);"></div>' +
+                        '      </div>' +
+                        '      <span style="width: 35px; text-align: right; color: #888; font-family: Poppins-Regular;">' + pct + '%</span>' +
+                        '    </div>';
+                });
+                
+                summaryHtml += 
+                    '  </div>' +
+                    '</div>';
+
+                // Prepend or replace summary block
+                var $prevSummary = $pB30.find('.js-reviews-summary');
+                if ($prevSummary.length) {
+                    $prevSummary.replaceWith(summaryHtml);
+                } else {
+                    $pB30.prepend(summaryHtml);
+                }
+
+                // Render reviews logs
                 reviewList.forEach(function(item) {
                     var starHtml = '';
                     for (var k = 1; k <= 5; k++) {
@@ -1782,6 +1848,193 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         document.cookie = "CustomerName=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
         document.cookie = "CustomerNumber=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
         window.location.reload();
+    });
+
+    /*==================================================================
+    [ Sticky Mobile Cart Action Ribbon ]*/
+    if ($('.js-addcart-detail').length > 0 && $(window).width() <= 576) {
+        var productName = $('.js-name-detail').text().trim() || 'Product';
+        var productPrice = $('.mtext-106').text().trim() || '';
+        var productImg = $('.wrap-pic-w img').first().attr('src') || '';
+        
+        var stickyBarHtml = 
+            '<div class="js-sticky-mobile-bar" style="position: fixed; bottom: -80px; left: 0; width: 100%; background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(0,0,0,0.08); box-shadow: 0 -6px 20px rgba(0,0,0,0.06); padding: 10px 20px; z-index: 999; display: flex; justify-content: space-between; align-items: center; transition: all 0.4s ease;">' +
+            '  <div style="display: flex; align-items: center; gap: 10px;">' +
+            '    <img src="' + productImg + '" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">' +
+            '    <div style="display: flex; flex-direction: column;">' +
+            '      <span style="font-family: Poppins-Medium; font-size: 12px; color: #222; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + productName + '</span>' +
+            '      <span style="font-family: Poppins-Regular; font-size: 11px; color: #888;">' + productPrice + '</span>' +
+            '    </div>' +
+            '  </div>' +
+            '  <button class="js-sticky-buy-trigger" style="background: linear-gradient(135deg, #9b51e0, #3081ed); border: none; color: #fff; padding: 8px 16px; border-radius: 20px; font-family: Poppins-Medium; font-size: 12px; cursor: pointer; box-shadow: 0 4px 10px rgba(155, 81, 224, 0.2); outline: none;">Add to Cart</button>' +
+            '</div>';
+        
+        $('body').append(stickyBarHtml);
+        
+        $(window).on('scroll', function() {
+            var $mainBtn = $('.js-addcart-detail');
+            var triggerTop = $mainBtn.offset().top + $mainBtn.outerHeight();
+            if ($(window).scrollTop() > triggerTop) {
+                $('.js-sticky-mobile-bar').css('bottom', '0');
+            } else {
+                $('.js-sticky-mobile-bar').css('bottom', '-80px');
+            }
+        });
+        
+        $(document).on('click', '.js-sticky-buy-trigger', function() {
+            $('.js-addcart-detail').trigger('click');
+        });
+    }
+
+    /*==================================================================
+    [ Google Gemini Floating AI Chat Assistant ]*/
+    var triggerBtn = '<div id="gemini-chat-trigger"><i class="zmdi zmdi-comments"></i></div>';
+    var chatWindow = 
+        '<div id="gemini-chat-container">' +
+        '  <div class="gemini-chat-header">' +
+        '    <h5><i class="zmdi zmdi-flash"></i> Gemini Shopping AI</h5>' +
+        '    <button class="gemini-chat-close"><i class="zmdi zmdi-close"></i></button>' +
+        '  </div>' +
+        '  <div class="gemini-chat-messages">' +
+        '    <div class="gemini-message assistant">' +
+        '      Hi! I\'m Gemini, your premium AI Shopping Assistant. How can I help you find products, styles, or collections today?' +
+        '    </div>' +
+        '  </div>' +
+        '  <div class="gemini-chat-input-container">' +
+        '    <input type="text" class="gemini-chat-input" placeholder="Ask Gemini..." />' +
+        '    <button class="gemini-chat-send"><i class="zmdi zmdi-mail-send"></i></button>' +
+        '  </div>' +
+        '</div>';
+    
+    $('body').append(triggerBtn).append(chatWindow);
+
+    var productDB = [
+        { name: "Esprit Ruffle Shirt", price: "$16.64", image: "images/product-01.jpg", link: "p-Esprit-Ruffle-Shirt.html", category: "women" },
+        { name: "Herschel Supply Backpack", price: "$35.31", image: "images/product-02.jpg", link: "p-Herschel-supply.html", category: "bag" },
+        { name: "Only Check Trouser", price: "$25.50", image: "images/product-03.jpg", link: "p-Only-Check-Trouser.html", category: "women" },
+        { name: "Classic Trench Coat", price: "$75.00", image: "images/product-04.jpg", link: "p-Classic-Trench-Coat.html", category: "women" },
+        { name: "Converse All Star", price: "$60.00", image: "images/product-07.jpg", link: "p-Converse-All-Star-Hi-Plimsolls.html", category: "men" },
+        { name: "Femme T-Shirt in Stripe", price: "$25.85", image: "images/product-06.jpg", link: "p-Femme-T-Shirt-In-Stripe.html", category: "women" },
+        { name: "Front Pocket Jumper", price: "$34.00", image: "images/product-05.jpg", link: "p-Front-Pocket-Jumper.html", category: "men" },
+        { name: "Herschel Backpack (Men)", price: "$54.75", image: "images/product-11.jpg", link: "p-Herschel-supply-men.html", category: "bag" },
+        { name: "Herschel Supply Watch", price: "$63.50", image: "images/product-09.jpg", link: "p-Herschel-supply-watch.html", category: "watches" },
+        { name: "Mini Silver Mesh Watch", price: "$86.25", image: "images/product-15.jpg", link: "p-Mini-Silver-Mesh-Watch.html", category: "watches" },
+        { name: "Pieces Metallic Printed", price: "$18.90", image: "images/product-12.jpg", link: "p-Pieces-Metallic-Printed.html", category: "women" },
+        { name: "Pretty Little Thing", price: "$44.75", image: "images/product-10.jpg", link: "p-Pretty-Little-Thing.html", category: "women" },
+        { name: "Shirt in Stretch Cotton", price: "$52.66", image: "images/product-14.jpg", link: "p-Shirt-in-Stretch-Cotton.html", category: "men" },
+        { name: "Square Neck Back", price: "$29.00", image: "images/product-16.jpg", link: "p-Square-Neck-Back.html", category: "women" },
+        { name: "T-Shirt with Sleeve", price: "$18.49", image: "images/product-13.jpg", link: "p-T-Shirt-with-Sleeve.html", category: "women" },
+        { name: "Vintage Inspired Classic", price: "$93.75", image: "images/product-08.jpg", link: "p-Vintage-Inspired-Classic.html", category: "watches" }
+    ];
+
+    $(document).on('click', '#gemini-chat-trigger', function() {
+        $('#gemini-chat-container').toggleClass('active');
+    });
+
+    $(document).on('click', '.gemini-chat-close', function() {
+        $('#gemini-chat-container').removeClass('active');
+    });
+
+    function scrollChatToBottom() {
+        var $messages = $('.gemini-chat-messages');
+        if ($messages.length) {
+            $messages.animate({ scrollTop: $messages[0].scrollHeight }, 300);
+        }
+    }
+
+    function addMessage(sender, text, isHtml) {
+        var msgClass = sender === 'user' ? 'user' : 'assistant';
+        var content = isHtml ? text : $('<div>').text(text).html();
+        var msgHtml = '<div class="gemini-message ' + msgClass + '">' + content + '</div>';
+        $('.gemini-chat-messages').append(msgHtml);
+        scrollChatToBottom();
+    }
+
+    function showTypingIndicator() {
+        var indicatorHtml = 
+            '<div class="gemini-message assistant typing">' +
+            '  <div class="gemini-dot"></div>' +
+            '  <div class="gemini-dot"></div>' +
+            '  <div class="gemini-dot"></div>' +
+            '</div>';
+        $('.gemini-chat-messages').append(indicatorHtml);
+        scrollChatToBottom();
+    }
+
+    function removeTypingIndicator() {
+        $('.gemini-chat-messages .typing').remove();
+    }
+
+    function handleUserInput() {
+        var $input = $('.gemini-chat-input');
+        var query = $input.val().trim();
+        if (!query) return;
+
+        addMessage('user', query, false);
+        $input.val('');
+
+        showTypingIndicator();
+
+        setTimeout(function() {
+            removeTypingIndicator();
+            var responseText = "";
+            var matches = [];
+            var lowerQuery = query.toLowerCase();
+
+            // Category detection
+            var cat = "";
+            if (lowerQuery.indexOf("women") > -1 || lowerQuery.indexOf("girl") > -1 || lowerQuery.indexOf("dress") > -1) {
+                cat = "women";
+            } else if (lowerQuery.indexOf("men") > -1 || lowerQuery.indexOf("boy") > -1) {
+                cat = "men";
+            } else if (lowerQuery.indexOf("bag") > -1 || lowerQuery.indexOf("backpack") > -1) {
+                cat = "bag";
+            } else if (lowerQuery.indexOf("watch") > -1 || lowerQuery.indexOf("clock") > -1) {
+                cat = "watches";
+            }
+
+            if (cat) {
+                matches = productDB.filter(function(p) { return p.category === cat; });
+                responseText = "I found some exquisite items in our **" + cat.toUpperCase() + "** catalog that match your interest. Check these out:";
+            } else {
+                // Direct keyword matching
+                matches = productDB.filter(function(p) {
+                    return lowerQuery.indexOf(p.name.toLowerCase()) > -1 || 
+                           p.name.toLowerCase().split(' ').some(function(word) {
+                               return word.length > 3 && lowerQuery.indexOf(word) > -1;
+                           });
+                });
+                
+                if (matches.length > 0) {
+                    responseText = "I detected matches for your search in our catalog! Here are my recommendations:";
+                }
+            }
+
+            if (matches.length > 0) {
+                addMessage('assistant', responseText, false);
+                matches.slice(0, 3).forEach(function(p) {
+                    var cardHtml = 
+                        '<a href="' + p.link + '" class="gemini-chat-product-card">' +
+                        '  <img src="' + p.image + '" class="gemini-chat-product-img">' +
+                        '  <div class="gemini-chat-product-info">' +
+                        '    <span class="gemini-chat-product-name">' + p.name + '</span>' +
+                        '    <span class="gemini-chat-product-price">' + p.price + '</span>' +
+                        '  </div>' +
+                        '</a>';
+                    addMessage('assistant', cardHtml, true);
+                });
+            } else {
+                var fallback = "I'm here to guide your shopping journey! I can help you find items in our Men, Women, Bags, or Watches collections. Try typing keywords like **'men clothing'**, **'winter dresses'**, or **'watches'** to see our premium catalog!";
+                addMessage('assistant', fallback, false);
+            }
+        }, 1200);
+    }
+
+    $(document).on('click', '.gemini-chat-send', handleUserInput);
+    $(document).on('keypress', '.gemini-chat-input', function(e) {
+        if (e.which === 13) {
+            handleUserInput();
+        }
     });
 
 })(jQuery);
