@@ -95,25 +95,36 @@ try {
         'Header icons rotate and scale slightly on hover for tactile physical feedback.'
     );
 
-    // Check search modal glassmorphic transitions and styles
+    // Check inline search navigation transitions and styles
     assert(
-        cssContent.includes('.modal-search-header') && cssContent.includes('backdrop-filter: blur(25px)') && cssContent.includes('background: rgba(10, 10, 20, 0.75)'),
-        'Search overlay (.modal-search-header) uses premium dark-hued glassmorphism with a 25px blur filter.'
+        cssContent.includes('.inline-search-nav') && cssContent.includes('position: absolute') && cssContent.includes('border-radius: 24px'),
+        'Desktop inline search container (.inline-search-nav) is a fully rounded absolute-positioned capsule.'
     );
 
     assert(
-        cssContent.includes('.btn-hide-modal-search') && cssContent.includes('border-radius: 50%') && cssContent.includes('filter: invert(1) brightness(2)'),
-        'Close search button is circular and utilizes high-contrast invert/brightness image filtering.'
+        cssContent.includes('.limiter-menu-desktop.show-inline-search .menu-desktop') && cssContent.includes('transform: translateX(-40px)'),
+        'Desktop main menu links slide away gracefully to the left when search expands.'
     );
 
     assert(
-        cssContent.includes('.wrap-search-header') && cssContent.includes('border-radius: 50px') && cssContent.includes('box-shadow: 0 30px 70px rgba(0, 0, 0, 0.4)'),
-        'Search box container (.wrap-search-header) has a fully rounded 50px pill shape and deep shadows.'
+        cssContent.includes('.limiter-menu-desktop.show-inline-search .wrap-icon-header') && cssContent.includes('transform: translateX(40px)'),
+        'Desktop header icons slide away gracefully to the right when search expands.'
     );
 
     assert(
-        cssContent.includes('.wrap-search-header:focus-within') && cssContent.includes('border-color: #ec38bc') && cssContent.includes('transform: scale(1.02)'),
-        'Search box container scale-zooms and transitions to high-end hot pink focus outlines.'
+        cssContent.includes('.limiter-menu-desktop.show-inline-search .inline-search-nav') && cssContent.includes('opacity: 1') && cssContent.includes('border-color: #717fe0'),
+        'Desktop inline search container transitions to fully opaque and glowing white on expansion.'
+    );
+
+    // Check mobile inline search elements
+    assert(
+        cssContent.includes('.inline-search-mobile') && cssContent.includes('border-radius: 20px') && cssContent.includes('background: rgba(113, 127, 224, 0.05)'),
+        'Mobile inline search container (.inline-search-mobile) is a fully rounded mobile-sized capsule.'
+    );
+
+    assert(
+        cssContent.includes('.wrap-header-mobile.show-inline-search .logo-mobile') && cssContent.includes('transform: translateX(-30px)'),
+        'Mobile logo slides away gracefully to the left on active mobile search.'
     );
 
     // Check catalog filter search pill design
@@ -188,6 +199,28 @@ try {
     assert(
         jsContent.includes('animate({') && jsContent.includes('scrollTop:'),
         'Category router triggers smooth scrolling down to the active visual product catalog section.'
+    );
+
+    // Verify inline search injections in JS
+    assert(
+        jsContent.includes('.inline-search-nav') && jsContent.includes('.inline-search-mobile'),
+        'Dynamic search bar injectors successfully insert HTML markup for inline expanding capsules.'
+    );
+
+    // Verify search catalog parameter routing filter execution
+    assert(
+        jsContent.includes('function initSearchFilteringRouting()'),
+        'Intelligent search parameter catalog router (initSearchFilteringRouting) is defined.'
+    );
+
+    assert(
+        jsContent.includes('urlParams.get(\'search\')'),
+        'Search parameter router reads search keywords from URL search parameters.'
+    );
+
+    assert(
+        jsContent.includes('isotope({') && jsContent.includes('name.indexOf(searchVal) > -1'),
+        'Search parameter router triggers dynamic Isotope name searches in the product grid catalogue.'
     );
 
     console.log();

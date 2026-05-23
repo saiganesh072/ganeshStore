@@ -151,6 +151,40 @@
                 );
             }
         }
+
+        // Desktop Inline Search Injection
+        if ($('.limiter-menu-desktop').length && !$('.inline-search-nav').length) {
+            $('.limiter-menu-desktop').append(
+                '<div class="inline-search-nav">' +
+                '  <button class="inline-search-btn-search">' +
+                '    <i class="zmdi zmdi-search" style="font-size: 20px; color: #717fe0;"></i>' +
+                '  </button>' +
+                '  <form class="inline-search-form" action="product.html" method="get" style="flex-grow: 1; height: 100%; display: flex; align-items: center; margin: 0;">' +
+                '    <input type="text" name="search" placeholder="Search products..." class="inline-search-input" />' +
+                '  </form>' +
+                '  <button class="inline-search-btn-close">' +
+                '    <i class="zmdi zmdi-close" style="font-size: 20px; color: #999;"></i>' +
+                '  </button>' +
+                '</div>'
+            );
+        }
+
+        // Mobile Inline Search Injection
+        if ($('.wrap-header-mobile').length && !$('.inline-search-mobile').length) {
+            $('.wrap-header-mobile').append(
+                '<div class="inline-search-mobile">' +
+                '  <button class="inline-search-btn-search-m">' +
+                '    <i class="zmdi zmdi-search" style="font-size: 18px; color: #717fe0;"></i>' +
+                '  </button>' +
+                '  <form class="inline-search-form-m" action="product.html" method="get" style="flex-grow: 1; height: 100%; display: flex; align-items: center; margin: 0;">' +
+                '    <input type="text" name="search" placeholder="Search..." class="inline-search-input-m" />' +
+                '  </form>' +
+                '  <button class="inline-search-btn-close-m">' +
+                '    <i class="zmdi zmdi-close" style="font-size: 18px; color: #999;"></i>' +
+                '  </button>' +
+                '</div>'
+            );
+        }
     }
 
     // Run injection before mobile menu hooks
@@ -207,19 +241,35 @@
 
 
     /*==================================================================
-    [ Show / hide modal search ]*/
-    $('.js-show-modal-search').on('click', function(){
-        $('.modal-search-header').addClass('show-modal-search');
-        $(this).css('opacity','0');
-    });
-
-    $('.js-hide-modal-search').on('click', function(){
-        $('.modal-search-header').removeClass('show-modal-search');
-        $('.js-show-modal-search').css('opacity','1');
-    });
-
-    $('.container-search-header').on('click', function(e){
+    [ Show / hide inline expanding search ]*/
+    $('.js-show-modal-search').off('click').on('click', function(e) {
+        e.preventDefault();
         e.stopPropagation();
+        
+        var isMobile = $(this).closest('.wrap-header-mobile').length > 0;
+        
+        if (isMobile) {
+            $('.wrap-header-mobile').addClass('show-inline-search');
+            $('.inline-search-mobile input').focus();
+        } else {
+            $('.limiter-menu-desktop').addClass('show-inline-search');
+            $('.inline-search-nav input').focus();
+        }
+    });
+
+    $(document).on('click', '.inline-search-btn-close, .inline-search-btn-close-m', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $('.limiter-menu-desktop').removeClass('show-inline-search');
+        $('.wrap-header-mobile').removeClass('show-inline-search');
+    });
+
+    // Close search on Escape key press
+    $(document).on('keydown', function(e) {
+        if (e.key === 'Escape') {
+            $('.limiter-menu-desktop').removeClass('show-inline-search');
+            $('.wrap-header-mobile').removeClass('show-inline-search');
+        }
     });
 
 
@@ -676,6 +726,37 @@
         }
     }
 
+    // Intelligent search query routing and automatic isotope filter execution
+    function initSearchFilteringRouting() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var searchVal = urlParams.get('search');
+        if (searchVal) {
+            searchVal = searchVal.toLowerCase().trim();
+            var $topeContainer = $('.isotope-grid');
+            
+            if ($topeContainer.length) {
+                // Remove active filter highlight from buttons
+                $('.filter-tope-group button').removeClass('how-active1');
+                
+                // Trigger dynamic isotope filter by matched name
+                $topeContainer.isotope({
+                    filter: function() {
+                        var name = $(this).find('.js-name-b2').text().toLowerCase();
+                        return name.indexOf(searchVal) > -1;
+                    }
+                });
+                
+                // Soft scroll to product catalog grid section
+                var $productCatalog = $('.bg0.m-t-23.p-b-140');
+                if ($productCatalog.length) {
+                    $('html, body').animate({
+                        scrollTop: $productCatalog.offset().top - 85
+                    }, 600);
+                }
+            }
+        }
+    }
+
     // Run initialization on DOM load
     $(document).ready(function() {
         initWishlist();
@@ -686,6 +767,7 @@
             initCart();
             syncAuthHeader();
             initCategoryFilteringRouting();
+            initSearchFilteringRouting();
         });
     });
 
