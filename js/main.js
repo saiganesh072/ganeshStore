@@ -1245,6 +1245,8 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
     /*==================================================================
     [ Cart Functionality Integration ]*/
     
+    var activeDiscountPercentage = 0;
+
     // Helper to get cart from localStorage
     function getCart() {
         try {
@@ -1301,6 +1303,97 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
 
         // 4. Render shopping cart page if on shoping-cart.html
         renderCartPage();
+
+        // 5. Handle Coupon Code Submission
+        $(document).on('click', '.size-118', function(e) {
+            e.preventDefault();
+            var $btn = $(this);
+            if ($btn.hasClass('is-loading')) return;
+
+            var $couponInput = $('input[name="coupon"]');
+            var couponCode = $couponInput.val().trim().toUpperCase();
+
+            if (!couponCode) {
+                if (typeof swal === 'function') {
+                    swal("Empty Code", "Please enter a coupon code first.", "warning");
+                }
+                return;
+            }
+
+            $btn.addClass('is-loading');
+
+            setTimeout(function() {
+                $btn.removeClass('is-loading');
+                
+                if (couponCode === 'GEMINI20') {
+                    activeDiscountPercentage = 20;
+                    updateCartPageTotals();
+                    if (typeof swal === 'function') {
+                        swal("Coupon Applied!", "Coupon 'GEMINI20' successfully applied. You received a 20% discount on all items!", "success");
+                    }
+                } else {
+                    if (typeof swal === 'function') {
+                        swal("Invalid Coupon", "The coupon code '" + couponCode + "' is invalid, expired, or does not exist.", "error");
+                    }
+                }
+            }, 1200);
+        });
+
+        // 6. Handle Proceed to Checkout form submission
+        $(document).on('submit', '#cart-form', function(e) {
+            e.preventDefault();
+            
+            var $form = $(this);
+            var $checkoutBtn = $form.find('.size-116');
+            if ($checkoutBtn.hasClass('is-loading')) return;
+
+            // Extract Shipping Variables
+            var country = $form.find('select[name="time"]').val();
+            var state = $form.find('input[name="state"]').val().trim();
+            var postcode = $form.find('input[name="postcode"]').val().trim();
+
+            // Validate Checkout Fields
+            if (!country || country === 'Select a country...' || !state || !postcode) {
+                if (typeof swal === 'function') {
+                    swal("Delivery Details Required", "Please complete all Shipping fields (Country, State, and Postcode) to validate order delivery.", "warning");
+                }
+                return;
+            }
+
+            // Trigger CTA loading spinner
+            $checkoutBtn.addClass('is-loading');
+
+            setTimeout(function() {
+                $checkoutBtn.removeClass('is-loading');
+                
+                // Clear cart from local state
+                saveCart([]);
+                activeDiscountPercentage = 0;
+                
+                // Trigger beautiful SweetAlert purchase success popup
+                if (typeof swal === 'function') {
+                    swal({
+                        title: "Order Placed Successfully!",
+                        text: "Thank you for shopping with Ganesh Store. Your order has been registered, and will ship shortly!",
+                        icon: "success",
+                        buttons: {
+                            confirm: {
+                                text: "Return to Store",
+                                value: true,
+                                visible: true,
+                                className: "sweet-confirm-obsidian"
+                            }
+                        }
+                    }).then(function() {
+                        // Re-render empty cart page state on confirm
+                        renderCartPage();
+                    });
+                } else {
+                    alert("Order Placed Successfully!");
+                    renderCartPage();
+                }
+            }, 1800);
+        });
     }
 
     // Dynamic rendering of the side drawer cart panel
@@ -1455,13 +1548,35 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
     // Function to calculate and update the total amount
     function updateCartPageTotals() {
         var cart = getCart();
-        var total = 0;
+        var subtotal = 0;
         cart.forEach(function(item) {
             var priceNum = parseFloat(item.price.replace(/[^\d.]/g, '')) || 0;
             var qty = parseInt(item.quantity) || 1;
-            total += priceNum * qty;
+            subtotal += priceNum * qty;
         });
         
+        var discountAmount = subtotal * (activeDiscountPercentage / 100);
+        var finalTotal = subtotal - discountAmount;
+        
+        var $totals = $('.mtext-110');
+        if ($totals.length >= 2) {
+            $totals.eq(0).text('$ ' + subtotal.toFixed(2));
+            $totals.eq(1).text('$ ' + finalTotal.toFixed(2));
+        } else {
+            $totals.text('$ ' + finalTotal.toFixed(2));
+        }
+
+        // Render dynamic discount summary item elegantly
+        $('.js-coupon-notice').remove();
+        if (activeDiscountPercentage > 0) {
+            var noticeHtml = 
+                '<div class="flex-w flex-t p-t-8 p-b-8 js-coupon-notice" style="border-top: 1px dashed rgba(15, 118, 110, 0.2); margin-top: 8px;">' +
+                '  <div class="size-208"><span class="stext-110" style="color: #0f766e; font-family: Poppins-Medium;">Discount (20%):</span></div>' +
+                '  <div class="size-209"><span class="stext-110" style="color: #0f766e; font-family: Poppins-Medium;">- $ ' + discountAmount.toFixed(2) + '</span></div>' +
+                '</div>';
+            $('.bor12.p-t-15.p-b-30').first().before(noticeHtml);
+        }
+    });
         var totalStr = '$ ' + total.toFixed(2);
         $('.mtext-110').text(totalStr);
     }
@@ -1471,6 +1586,8 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         e.preventDefault();
         
         var $btn = $(this);
+        if ($btn.hasClass('is-loading')) return; // Prevent duplicate clicks
+        
         var $row = $btn.closest('.row');
         
         // Extract Name
@@ -1491,9 +1608,11 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         // Extract Quantity
         var qty = parseInt($row.find('.num-product').first().val()) || 1;
         
-        // Extract Size & Color
-        var size = "Size M"; // default
-        var color = "White"; // default
+        // Dynamic Variable Selection Validation
+        var size = "";
+        var color = "";
+        var validationFailed = false;
+        var missingAttribute = "";
 
         $row.find('select').each(function() {
             var $select = $(this);
@@ -1513,7 +1632,10 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             }
             
             if (isSize) {
-                if (selectedVal && selectedVal !== 'Choose an option') {
+                if (!selectedVal || selectedVal === 'Choose an option') {
+                    validationFailed = true;
+                    missingAttribute = "Size";
+                } else {
                     size = selectedVal;
                 }
             } else {
@@ -1528,37 +1650,62 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                     isColor = true;
                 }
                 
-                if (isColor && selectedVal && selectedVal !== 'Choose an option') {
+                if (!selectedVal || selectedVal === 'Choose an option') {
+                    validationFailed = true;
+                    missingAttribute = "Color";
+                } else {
                     color = selectedVal;
                 }
             }
         });
 
-        // Add to cart
-        var cart = getCart();
-        var existingItem = cart.find(function(item) {
-            return item.name === name && item.size === size && item.color === color;
-        });
+        // Enforce validations before proceeding
+        if (validationFailed) {
+            if (typeof swal === 'function') {
+                swal("Selection Required", "Please select a valid " + missingAttribute + " option before adding to your cart.", "warning");
+            } else {
+                alert("Please select a valid " + missingAttribute + " option.");
+            }
+            return;
+        }
 
-        if (existingItem) {
-            existingItem.quantity = (parseInt(existingItem.quantity) || 1) + qty;
-        } else {
-            cart.push({
-                name: name,
-                price: price,
-                image: img,
-                quantity: qty,
-                size: size,
-                color: color
+        // Apply fallback if no dropdowns were present (non-configurable items)
+        if (!size) size = "Size M";
+        if (!color) color = "Default Color";
+
+        // Trigger CTA loading spinner interaction
+        $btn.addClass('is-loading');
+
+        setTimeout(function() {
+            $btn.removeClass('is-loading');
+            
+            // Add item to cart state
+            var cart = getCart();
+            var existingItem = cart.find(function(item) {
+                return item.name === name && item.size === size && item.color === color;
             });
-        }
 
-        saveCart(cart);
-        
-        // Trigger SweetAlert
-        if (typeof swal === 'function') {
-            swal(name, "is added to cart !", "success");
-        }
+            if (existingItem) {
+                existingItem.quantity = (parseInt(existingItem.quantity) || 1) + qty;
+            } else {
+                cart.push({
+                    name: name,
+                    price: price,
+                    image: img,
+                    quantity: qty,
+                    size: size,
+                    color: color
+                });
+            }
+
+            saveCart(cart);
+            renderSideDrawerCart();
+            
+            // Trigger beautiful SweetAlert notification
+            if (typeof swal === 'function') {
+                swal(name, "has been successfully added to your cart (" + size + " / " + color + ")!", "success");
+            }
+        }, 1200);
     });
 
     // Handle delegated quantity decrease button click

@@ -1,0 +1,53 @@
+{
+  "theme": "Modern Premium Minimalist & Obsidian Luxury Accent",
+  "comment": "Transitioning CozaStore from old-school rigid grid borders to modern, premium, borderless layout hierarchies with high-contrast luxury accent tokens.",
+  "colors": {
+    "background_main": "#fafafa",
+    "surface_card": "#ffffff",
+    "text_primary": "#111111",
+    "text_secondary": "#555555",
+    "text_muted": "#8c8c8c",
+    "border_light": "rgba(0, 0, 0, 0.04)",
+    "border_focus": "#000000",
+    "accent_primary": "#000000",
+    "accent_hover": "#333333",
+    "accent_muted": "#555555",
+    "accent_luxury": "#0f766e"
+  },
+  "layout_rules": {
+    "borders": {
+      "legacy_style": "1px solid #e6e6e6",
+      "premium_overhaul": "None (Replace legacy borders with generous vertical layout padding: 60px to 80px increments)",
+      "cards": "borderless with smooth margins"
+    },
+    "border_radii": {
+      "legacy_style": "0px (sharp/boxy) or rigid shapes",
+      "premium_overhaul": "8px for product card containers, 24px for pills/capsules/buttons, 12px for modal cards"
+    },
+    "shadows": {
+      "subtle_elevation": "0 2px 8px rgba(0, 0, 0, 0.02)",
+      "hover_elevation": "0 16px 36px rgba(0, 0, 0, 0.06)",
+      "cta_elevation": "0 4px 14px rgba(0, 0, 0, 0.15)"
+    }
+  },
+  "typography": {
+    "font_family": "Outfit, Poppins, sans-serif",
+    "scale": {
+      "h1": "2.25rem",
+      "h2": "1.75rem",
+      "h3": "1.25rem",
+      "body": "0.95rem",
+      "caption": "0.8rem"
+    },
+    "font_weight": {
+      "bold": "700",
+      "medium": "500",
+      "regular": "400"
+    }
+  },
+  "micro_interactions": {
+    "buttons": "transform: translateY(-2px) scale(1.02) with cubic-bezier(0.25, 0.8, 0.25, 1) transition",
+    "product_cards": "transform: translateY(-6px) with dynamic drop-shadow expansion",
+    "nav_links": "after::width transition (0% to 100%) for horizontal underline anchors"
+  }
+}

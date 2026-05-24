@@ -4141,26 +4141,30 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
 }
 
 .size-203 select:focus, select.size-111:focus, .size-204 select:focus {
-  border-color: #717fe0 !important;
-  box-shadow: 0 0 10px rgba(113, 127, 224, 0.15) !important;
+  border-color: #0f766e !important;
+  box-shadow: 0 0 10px rgba(15, 118, 110, 0.15) !important;
   outline: none !important;
 }
 
-/* 3. Premium vibrant HSL linear gradient Capsule Buttons & dynamic elevation transitions */
-.bg1, .js-addcart-detail, .bg7 {
-  background: linear-gradient(135deg, #717fe0, #ec38bc) !important;
-  border: none !important;
+/* 3. Premium minimalist Obsidian Charcoal Buttons & dynamic elevation transitions */
+.bg1, .js-addcart-detail, .bg7, .size-116, .flex-c-m.stext-101.cl2.size-115.bg8.bor13 {
+  background: #111111 !important;
+  border: 1px solid #111111 !important;
   color: #fff !important;
-  box-shadow: 0 4px 12px rgba(113, 127, 224, 0.2) !important;
+  border-radius: 24px !important;
+  letter-spacing: 0.5px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
   position: relative;
   overflow: hidden;
 }
 
-.bg1:hover, .js-addcart-detail:hover, .bg7:hover {
+.bg1:hover, .js-addcart-detail:hover, .bg7:hover, .size-116:hover, .flex-c-m.stext-101.cl2.size-115.bg8.bor13:hover {
+  background: #0f766e !important; /* Premium luxury emerald highlight */
+  border-color: #0f766e !important;
+  color: #fff !important;
   transform: translateY(-2px) !important;
-  box-shadow: 0 8px 20px rgba(113, 127, 224, 0.35), 0 4px 10px rgba(236, 56, 188, 0.25) !important;
-  filter: brightness(1.05);
+  box-shadow: 0 8px 24px rgba(15, 118, 110, 0.25) !important;
 }
 
 /* 4. PLP Category Filters Active Capsule Pill highlight indicators */
@@ -4229,5 +4233,52 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
 .block2:hover .block2-pic {
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08) !important;
   transform: translateY(-4px) !important;
+}
+
+/* 7. Minimalist Luxury Layout Overrides */
+.bor10 {
+  border: none !important;
+  padding-top: 60px !important;
+  padding-bottom: 60px !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.04) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
+}
+
+.bor8 {
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-radius: 8px !important;
+}
+
+.bor8:focus-within {
+  border-color: #0f766e !important;
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1) !important;
+}
+
+/* Premium dynamic loading spinner for CTAs */
+.is-loading {
+  position: relative !important;
+  color: transparent !important;
+  pointer-events: none !important;
+}
+
+.is-loading::after {
+  content: "" !important;
+  position: absolute !important;
+  width: 18px !important;
+  height: 18px !important;
+  top: 50% !important;
+  left: 50% !important;
+  margin-top: -9px !important;
+  margin-left: -9px !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 50% !important;
+  border-top-color: #ffffff !important;
+  animation: spin-loading 0.8s linear infinite !important;
+}
+
+@keyframes spin-loading {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
