@@ -4146,25 +4146,25 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   outline: none !important;
 }
 
-/* 3. Premium minimalist Obsidian Charcoal Buttons & dynamic elevation transitions */
+/* 3. Premium Emerald CTA Buttons & dynamic elevation transitions */
 .bg1, .js-addcart-detail, .bg7, .size-116, .flex-c-m.stext-101.cl2.size-115.bg8.bor13 {
-  background: #111111 !important;
-  border: 1px solid #111111 !important;
+  background: #0f766e !important;
+  border: 1px solid #0f766e !important;
   color: #fff !important;
   border-radius: 24px !important;
   letter-spacing: 0.5px !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+  box-shadow: 0 4px 12px rgba(15, 118, 110, 0.15) !important;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
   position: relative;
   overflow: hidden;
 }
 
 .bg1:hover, .js-addcart-detail:hover, .bg7:hover, .size-116:hover, .flex-c-m.stext-101.cl2.size-115.bg8.bor13:hover {
-  background: #0f766e !important; /* Premium luxury emerald highlight */
-  border-color: #0f766e !important;
+  background: #115e59 !important; /* Darker teal hover */
+  border-color: #115e59 !important;
   color: #fff !important;
   transform: translateY(-2px) !important;
-  box-shadow: 0 8px 24px rgba(15, 118, 110, 0.25) !important;
+  box-shadow: 0 8px 24px rgba(15, 118, 110, 0.35) !important;
 }
 
 /* 4. PLP Category Filters Active Capsule Pill highlight indicators */
@@ -4355,4 +4355,48 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
 
 .input1.input-success {
   border-bottom-color: #0f766e !important;
+}
+
+/*==================================================================
+[ Trust Badges ]*/
+.trust-badges-container {
+  border-top: 1px solid rgba(0,0,0,0.06);
+  margin-top: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 100%;
+  padding-left: 100px;
+}
+
+@media (max-width: 991px) {
+  .trust-badges-container {
+    padding-left: 0;
+  }
+}
+
+.trust-badge-item {
+  gap: 10px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.trust-badge-item i {
+  font-size: 24px;
+}
+
+.trust-badge-item h6 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  margin: 0;
+  color: #222;
+  font-weight: 600;
+}
+
+.trust-badge-item span {
+  font-family: 'Outfit', sans-serif;
+  font-size: 11px;
+  color: #888;
+  display: block;
 }
