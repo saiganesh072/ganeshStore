@@ -1576,9 +1576,6 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 '</div>';
             $('.bor12.p-t-15.p-b-30').first().before(noticeHtml);
         }
-    });
-        var totalStr = '$ ' + total.toFixed(2);
-        $('.mtext-110').text(totalStr);
     }
 
     // Handle click on PDP detail "Add to cart" button contextually
