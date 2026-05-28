@@ -3,11 +3,13 @@
 -- Copy and paste this script directly into the Supabase SQL Editor
 -- ====================================================================
 
--- 1. Create Profiles Table (Direct Name & Phone login mapping)
+-- 1. Create Profiles Table (Direct Name & Phone login mapping / Firebase Sync)
 CREATE TABLE IF NOT EXISTS public.profiles (
     id UUID PRIMARY KEY,
     full_name TEXT NOT NULL,
-    phone_number TEXT NOT NULL UNIQUE,
+    phone_number TEXT,
+    email TEXT UNIQUE,
+    avatar_url TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW())
 );
 
