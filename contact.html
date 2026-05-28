@@ -730,12 +730,12 @@
                 <form id="contact-login-form" onsubmit="handleEmailLogin(event)">
                   <div class="auth-input-group">
                     <label class="auth-input-label" for="c-login-email">Email Address</label>
-                    <input class="auth-input-field CName" type="email" id="c-login-email" required placeholder="name@example.com" />
+                    <input class="auth-input-field auth-email-input" type="email" id="c-login-email" required placeholder="name@example.com" />
                   </div>
 
                   <div class="auth-input-group">
                     <label class="auth-input-label" for="c-login-password">Password</label>
-                    <input class="auth-input-field CPhNum" type="password" id="c-login-password" required placeholder="••••••••" />
+                    <input class="auth-input-field auth-password-input" type="password" id="c-login-password" required placeholder="••••••••" />
                     <i class="zmdi zmdi-eye auth-password-toggle" onclick="toggleContactPassword('c-login-password', this)"></i>
                   </div>
 
@@ -747,7 +747,7 @@
                     <a href="#" class="auth-forgot-link" onclick="handleForgotPassword(event)">Forgot Password?</a>
                   </div>
 
-                  <button type="submit" class="btn-auth-submit CSubmit">
+                  <button type="submit" class="btn-auth-submit btn-auth-submit-action">
                     <span>Sign In</span>
                     <i class="zmdi zmdi-arrow-right"></i>
                   </button>
@@ -1124,156 +1124,6 @@
       
       // Hook login sync directly
       loginfun();
-
-      // Setup custom login actions mapping back to Firebase or local Mock fallback
-      function handleGoogleSignIn() {
-        if (typeof window.firebase !== "undefined" && firebase.apps.length > 0 && firebaseConfig.apiKey !== "YOUR_API_KEY_HERE") {
-          const provider = new firebase.auth.GoogleAuthProvider();
-          firebase.auth().signInWithPopup(provider)
-            .then((result) => {
-              const user = result.user;
-              const name = user.displayName || user.email.split('@')[0];
-              
-              document.cookie = "CustomerName=" + encodeURIComponent(name) + "; path=/";
-              document.cookie = "CustomerNumber=" + encodeURIComponent(user.uid) + "; path=/";
-              localStorage.setItem("user", "loggedin");
-              
-              showContactMessage('success', 'Google Sign-In successful! Logging in...');
-              setTimeout(() => { window.location.reload(); }, 1200);
-            })
-            .catch((error) => {
-              showContactMessage('error', error.message);
-            });
-        } else {
-          // Mock Google Flow
-          const name = "Sai Ganesh";
-          document.cookie = "CustomerName=" + encodeURIComponent(name) + "; path=/";
-          document.cookie = "CustomerNumber=" + encodeURIComponent("mock-uid-google-123") + "; path=/";
-          localStorage.setItem("user", "loggedin");
-          
-          showContactMessage('success', 'Mock Google login simulated! Redirecting...');
-          setTimeout(() => { window.location.reload(); }, 1200);
-        }
-      }
-
-      function handleEmailLogin(event) {
-        event.preventDefault();
-        const email = document.getElementById('c-login-email').value;
-        const pass = document.getElementById('c-login-password').value;
-
-        if (typeof window.firebase !== "undefined" && firebase.apps.length > 0 && firebaseConfig.apiKey !== "YOUR_API_KEY_HERE") {
-          firebase.auth().signInWithEmailAndPassword(email, pass)
-            .then((userCredential) => {
-              const user = userCredential.user;
-              const name = user.displayName || user.email.split('@')[0];
-              
-              document.cookie = "CustomerName=" + encodeURIComponent(name) + "; path=/";
-              document.cookie = "CustomerNumber=" + encodeURIComponent(user.uid) + "; path=/";
-              localStorage.setItem("user", "loggedin");
-              
-              showContactMessage('success', 'Login successful! Entering Account Center...');
-              setTimeout(() => { window.location.reload(); }, 1200);
-            })
-            .catch((error) => {
-              showContactMessage('error', error.message);
-            });
-        } else {
-          // Mock Login Flow
-          if (pass.length < 6) {
-            showContactMessage('error', 'Password must be at least 6 characters long.');
-            return;
-          }
-          const name = email.split('@')[0];
-          document.cookie = "CustomerName=" + encodeURIComponent(name) + "; path=/";
-          document.cookie = "CustomerNumber=" + encodeURIComponent("mock-uid-email-456") + "; path=/";
-          localStorage.setItem("user", "loggedin");
-          
-          showContactMessage('success', 'Mock Sign In simulated! Welcome back.');
-          setTimeout(() => { window.location.reload(); }, 1200);
-        }
-      }
-
-      function handleEmailSignUp(event) {
-        event.preventDefault();
-        const name = document.getElementById('c-signup-name').value;
-        const email = document.getElementById('c-signup-email').value;
-        const pass = document.getElementById('c-signup-password').value;
-
-        if (typeof window.firebase !== "undefined" && firebase.apps.length > 0 && firebaseConfig.apiKey !== "YOUR_API_KEY_HERE") {
-          firebase.auth().createUserWithEmailAndPassword(email, pass)
-            .then((userCredential) => {
-              const user = userCredential.user;
-              return user.updateProfile({ displayName: name }).then(() => {
-                user.sendEmailVerification().catch(e => console.error(e));
-                
-                document.cookie = "CustomerName=" + encodeURIComponent(name) + "; path=/";
-                document.cookie = "CustomerNumber=" + encodeURIComponent(user.uid) + "; path=/";
-                localStorage.setItem("user", "loggedin");
-                
-                showContactMessage('success', 'Account created! Verification email sent.');
-                setTimeout(() => { window.location.reload(); }, 1500);
-              });
-            })
-            .catch((error) => {
-              showContactMessage('error', error.message);
-            });
-        } else {
-          // Mock Sign Up Flow
-          if (pass.length < 6) {
-            showContactMessage('error', 'Password must be at least 6 characters long.');
-            return;
-          }
-          document.cookie = "CustomerName=" + encodeURIComponent(name) + "; path=/";
-          document.cookie = "CustomerNumber=" + encodeURIComponent("mock-uid-signup-789") + "; path=/";
-          localStorage.setItem("user", "loggedin");
-          
-          showContactMessage('success', 'Mock account registration simulated! Welcoming...');
-          setTimeout(() => { window.location.reload(); }, 1200);
-        }
-      }
-
-      function handleForgotPassword(event) {
-        event.preventDefault();
-        const email = document.getElementById('c-login-email').value;
-        if (!email) {
-          showContactMessage('error', 'Please enter your email address first.');
-          return;
-        }
-
-        if (typeof window.firebase !== "undefined" && firebase.apps.length > 0 && firebaseConfig.apiKey !== "YOUR_API_KEY_HERE") {
-          firebase.auth().sendPasswordResetEmail(email)
-            .then(() => {
-              showContactMessage('success', 'Password reset email sent! Check your inbox.');
-            })
-            .catch((error) => {
-              showContactMessage('error', error.message);
-            });
-        } else {
-          showContactMessage('success', 'Simulation: A password reset email has been sent to ' + email);
-        }
-      }
-
-      // Logout handler
-      document.querySelector(".CLogout").onclick = function(e) {
-        e.preventDefault();
-        
-        if (typeof window.firebase !== "undefined" && firebase.apps.length > 0 && firebaseConfig.apiKey !== "YOUR_API_KEY_HERE") {
-          firebase.auth().signOut()
-            .then(() => {
-              document.cookie = "CustomerName=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-              document.cookie = "CustomerNumber=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-              localStorage.setItem("user", "loggedout");
-              window.location.reload();
-            })
-            .catch(err => console.error(err));
-        } else {
-          // Mock Sign Out Flow
-          document.cookie = "CustomerName=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-          document.cookie = "CustomerNumber=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-          localStorage.setItem("user", "loggedout");
-          window.location.reload();
-        }
-      };
     </script>
   
   <!-- Firebase & GaneshStore Auth Engine -->

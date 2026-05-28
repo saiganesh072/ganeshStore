@@ -1,9 +1,12 @@
 // ====================================================================
-// GANESHSTORE - DUAL-MODE AUTHENTICATION ENGINE (FIREBASE + MOCK AUTH)
+// GANESHSTORE - UNIFIED AUTHENTICATION ENGINE (FIREBASE + MOCK + SUPABASE SYNC)
 // ====================================================================
-// This script automatically initializes Firebase Auth if API keys are set.
-// If API keys are placeholders, it seamlessly falls back to a robust Mock Auth mode,
-// allowing the login/signup system to be immediately functional and testable!
+// This file is the single source of truth for GaneshStore auth.
+// It handles:
+// 1. Firebase Auth initialization (if API keys are replaced)
+// 2. Mock Auth fallback (if API keys are placeholders)
+// 3. Dynamic header updates ("My Account" -> Custom user dropdown)
+// 4. Airtight sync with Supabase profiles table for shopping cart & wishlist persistence
 
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY_HERE", // Replace with your actual Firebase API Key
@@ -32,10 +35,10 @@ if (hasRealFirebaseConfig) {
     console.error("❌ Failed to initialize Firebase:", error);
   }
 } else {
-  console.log("ℹ️ Running in Premium Mock Auth mode. (No Firebase credentials detected. Edit js/auth.js to connect real Firebase)");
+  console.log("ℹ️ Running in Premium Mock Auth mode. (Edit js/auth.js to connect real Firebase)");
 }
 
-// Ensure style is injected for the dropdown menu
+// Injects drop-down styling dynamically to head
 const dropdownStyle = document.createElement('style');
 dropdownStyle.innerHTML = `
   .auth-dropdown {
@@ -79,6 +82,98 @@ dropdownStyle.innerHTML = `
 `;
 document.head.appendChild(dropdownStyle);
 
+// Helper to get cookies by name
+function getCookieValue(name) {
+  let result = document.cookie.match(
+    "(^|[^;]+)\\s*" + name + "\\s*=\\s*([^;]+)"
+  );
+  return result ? decodeURIComponent(result.pop()) : "";
+}
+
+// Syncs user profile with Supabase to make cart/wishlist features fully operational
+function syncUserProfileWithSupabase(uid, name, email) {
+  if (window.supabaseClient) {
+    console.log("🔄 Syncing user profile with Supabase...", email);
+    return window.supabaseClient
+      .from('profiles')
+      .select('*')
+      .eq('email', email)
+      .then(response => {
+        let profile = response.data && response.data[0];
+        if (profile) {
+          console.log("✅ Supabase profile loaded:", profile);
+          localStorage.setItem('userProfile', JSON.stringify(profile));
+          localStorage.setItem('user', 'loggedin');
+          return profile;
+        } else {
+          // Check by ID as fallback
+          return window.supabaseClient
+            .from('profiles')
+            .select('*')
+            .eq('id', uid)
+            .then(idResponse => {
+              let idProfile = idResponse.data && idResponse.data[0];
+              if (idProfile) {
+                console.log("✅ Supabase profile loaded by ID:", idProfile);
+                localStorage.setItem('userProfile', JSON.stringify(idProfile));
+                localStorage.setItem('user', 'loggedin');
+                return idProfile;
+              } else {
+                // Profile doesn't exist, create a new record!
+                const newProfileId = (uid && uid.includes('-') && uid.length === 36) ? uid : crypto.randomUUID();
+                const newProfile = {
+                  id: newProfileId,
+                  full_name: name || email.split('@')[0],
+                  email: email,
+                  phone_number: "1234567890" // default placeholder phone to avoid non-null constraint on old database schemas
+                };
+                
+                return window.supabaseClient
+                  .from('profiles')
+                  .insert(newProfile)
+                  .then(insertRes => {
+                    if (insertRes.error) {
+                      console.warn("⚠️ Supabase email insert failed (old schema without email column), trying fallback profile...", insertRes.error);
+                      // Fallback profile matching the original profiles schema
+                      const fallbackProfile = {
+                        id: newProfileId,
+                        full_name: newProfile.full_name,
+                        phone_number: "1234567890"
+                      };
+                      return window.supabaseClient
+                        .from('profiles')
+                        .insert(fallbackProfile)
+                        .then(() => {
+                          localStorage.setItem('userProfile', JSON.stringify(fallbackProfile));
+                          localStorage.setItem('user', 'loggedin');
+                          return fallbackProfile;
+                        });
+                    }
+                    localStorage.setItem('userProfile', JSON.stringify(newProfile));
+                    localStorage.setItem('user', 'loggedin');
+                    return newProfile;
+                  });
+              }
+            });
+        }
+      })
+      .catch(err => {
+        console.error("❌ Supabase sync error:", err);
+        // Fail-safe local backup profile
+        const localProfile = { id: uid, full_name: name, email: email, phone_number: "1234567890" };
+        localStorage.setItem('userProfile', JSON.stringify(localProfile));
+        localStorage.setItem('user', 'loggedin');
+        return localProfile;
+      });
+  } else {
+    // Supabase not loaded, keep local profile
+    const localProfile = { id: uid, full_name: name, email: email, phone_number: "1234567890" };
+    localStorage.setItem('userProfile', JSON.stringify(localProfile));
+    localStorage.setItem('user', 'loggedin');
+    return Promise.resolve(localProfile);
+  }
+}
+
 // Main auth observer / startup checker
 document.addEventListener("DOMContentLoaded", () => {
   if (hasRealFirebaseConfig) {
@@ -92,7 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   } else {
-    // Mock Auth logic
+    // Mock Auth observer
     const mockUser = getMockUser();
     if (mockUser) {
       console.log("👤 User logged in (Mock):", mockUser.email);
@@ -108,7 +203,6 @@ document.addEventListener("DOMContentLoaded", () => {
 function updateHeaderUI(user) {
   const accountLinks = findMyAccountLinks();
   
-  // Also sync the local session state so existing scripts detect it
   if (user) {
     const displayName = user.displayName || user.email.split('@')[0];
     const userUid = user.uid || "mock-uid-123";
@@ -116,8 +210,6 @@ function updateHeaderUI(user) {
     document.cookie = "CustomerName=" + encodeURIComponent(displayName) + "; path=/";
     document.cookie = "CustomerNumber=" + encodeURIComponent(userUid) + "; path=/";
     localStorage.setItem("user", "loggedin");
-  } else {
-    // Keep it if it's already loggedout or null, do not forcefully clear unless explicitly signing out
   }
   
   accountLinks.forEach(link => {
@@ -125,7 +217,6 @@ function updateHeaderUI(user) {
       const displayName = user.displayName || user.email.split('@')[0];
       const initials = displayName.substring(0, 2).toUpperCase();
       
-      // Create a premium dropdown instead of the plain link
       const dropdownContainer = document.createElement("div");
       dropdownContainer.className = "auth-dropdown flex-c-m trans-04 p-lr-25";
       dropdownContainer.style.cursor = "pointer";
@@ -146,10 +237,8 @@ function updateHeaderUI(user) {
       
       link.parentNode.replaceChild(dropdownContainer, link);
     } else {
-      // Logged out - link goes to contact.html
       link.setAttribute("href", "contact.html");
       link.innerHTML = "My Account";
-      // Remove dropdown wrapper if previously created
       if (link.parentNode && link.parentNode.classList.contains("auth-dropdown")) {
         const newLink = document.createElement("a");
         newLink.className = "flex-c-m trans-04 p-lr-25";
@@ -161,7 +250,6 @@ function updateHeaderUI(user) {
   });
 }
 
-// Find all elements containing "My Account"
 function findMyAccountLinks() {
   const links = document.querySelectorAll("a");
   const matches = [];
@@ -174,14 +262,16 @@ function findMyAccountLinks() {
   return matches;
 }
 
-// Logout action
+// Global Logout action
 function logoutUser(e) {
   if (e) e.preventDefault();
   
-  // Clear local cookies and sessions
   document.cookie = "CustomerName=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
   document.cookie = "CustomerNumber=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
   localStorage.setItem("user", "loggedout");
+  localStorage.removeItem('userProfile');
+  localStorage.setItem('cartItems', '[]');
+  localStorage.setItem('wishlist', '[]');
   
   if (hasRealFirebaseConfig) {
     firebase.auth().signOut()
@@ -191,109 +281,181 @@ function logoutUser(e) {
       })
       .catch(err => console.error("Error signing out:", err));
   } else {
-    // Mock Logout
     localStorage.removeItem('ganeshStore_user_mock');
     window.location.reload();
   }
 }
-
-// ====================================================================
-// MOCK AUTH IMPLEMENTATION (FOR INSTANT PREVIEW & OFFLINE TESTING)
-// ====================================================================
 
 function getMockUser() {
   const user = localStorage.getItem('ganeshStore_user_mock');
   return user ? JSON.parse(user) : null;
 }
 
-// Add Mock functions to window context if Firebase is not active
-if (!hasRealFirebaseConfig) {
-  window.handleGoogleSignIn = function() {
-    const mockUser = {
-      uid: "mock-google-id-12345",
-      email: "saiganesh@gmail.com",
-      displayName: "Sai Ganesh",
-      photoURL: null
-    };
+// Helper to display warning/success alerts dynamically on both interfaces
+function triggerDisplayMessage(type, message) {
+  if (typeof showContactMessage === "function") {
+    showContactMessage(type, message);
+  } else if (typeof showMessage === "function") {
+    showMessage(type, message);
+  } else {
+    alert(message);
+  }
+}
+
+// ====================================================================
+// CONSOLIDATED AUTH ACTION HANDLERS (SUPPORTS BOTH REAL & MOCK MODES)
+// ====================================================================
+
+window.handleGoogleSignIn = function() {
+  if (hasRealFirebaseConfig) {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(provider)
+      .then((result) => {
+        const user = result.user;
+        const name = user.displayName || user.email.split('@')[0];
+        
+        triggerDisplayMessage('success', 'Google Sign-In successful! Syncing profile...');
+        
+        syncUserProfileWithSupabase(user.uid, name, user.email).then(() => {
+          setTimeout(() => { window.location.reload(); }, 1200);
+        });
+      })
+      .catch((error) => {
+        triggerDisplayMessage('error', error.message);
+      });
+  } else {
+    // Mock Google Sign In
+    const name = "Sai Ganesh";
+    const email = "saiganesh@gmail.com";
+    const uid = "mock-uid-google-123";
+    
+    const mockUser = { uid, email, displayName: name, photoURL: null };
     localStorage.setItem('ganeshStore_user_mock', JSON.stringify(mockUser));
     
-    // Trigger Success Banner in login.html if it's open
-    if (typeof showMessage === "function") {
-      showMessage('success', 'Google Sign-In simulated! Redirecting...');
-    }
-    setTimeout(() => {
-      window.location.href = 'index.html';
-    }, 1200);
-  };
+    triggerDisplayMessage('success', 'Google Sign-In simulated! Syncing profile...');
+    
+    syncUserProfileWithSupabase(uid, name, email).then(() => {
+      setTimeout(() => { window.location.reload(); }, 1200);
+    });
+  }
+};
 
-  window.handleEmailLogin = function(event) {
-    event.preventDefault();
-    const email = document.getElementById('login-email').value;
-    const pass = document.getElementById('login-password').value;
+window.handleEmailLogin = function(event) {
+  if (event) event.preventDefault();
+  
+  // Dynamic lookup of inputs to support both prefixed and flat IDs
+  const emailInput = document.getElementById('c-login-email') || document.getElementById('login-email');
+  const passInput = document.getElementById('c-login-password') || document.getElementById('login-password');
+  
+  if (!emailInput || !passInput) return;
+  
+  const email = emailInput.value.trim();
+  const pass = passInput.value;
 
+  if (hasRealFirebaseConfig) {
+    firebase.auth().signInWithEmailAndPassword(email, pass)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        const name = user.displayName || user.email.split('@')[0];
+        
+        triggerDisplayMessage('success', 'Login successful! Syncing profile...');
+        
+        syncUserProfileWithSupabase(user.uid, name, user.email).then(() => {
+          setTimeout(() => { window.location.reload(); }, 1200);
+        });
+      })
+      .catch((error) => {
+        triggerDisplayMessage('error', error.message);
+      });
+  } else {
+    // Mock Login
     if (pass.length < 6) {
-      if (typeof showMessage === "function") {
-        showMessage('error', 'Password must be at least 6 characters long.');
-      }
+      triggerDisplayMessage('error', 'Password must be at least 6 characters long.');
       return;
     }
-
-    const mockUser = {
-      uid: "mock-email-id-998877",
-      email: email,
-      displayName: email.split('@')[0],
-      photoURL: null
-    };
+    const name = email.split('@')[0];
+    const uid = "mock-uid-email-456";
+    
+    const mockUser = { uid, email, displayName: name, photoURL: null };
     localStorage.setItem('ganeshStore_user_mock', JSON.stringify(mockUser));
+    
+    triggerDisplayMessage('success', 'Welcome back! Syncing profile...');
+    
+    syncUserProfileWithSupabase(uid, name, email).then(() => {
+      setTimeout(() => { window.location.reload(); }, 1200);
+    });
+  }
+};
 
-    if (typeof showMessage === "function") {
-      showMessage('success', 'Sign In simulated! Welcome to GaneshStore.');
-    }
-    setTimeout(() => {
-      window.location.href = 'index.html';
-    }, 1200);
-  };
+window.handleEmailSignUp = function(event) {
+  if (event) event.preventDefault();
+  
+  const nameInput = document.getElementById('c-signup-name') || document.getElementById('signup-name');
+  const emailInput = document.getElementById('c-signup-email') || document.getElementById('signup-email');
+  const passInput = document.getElementById('c-signup-password') || document.getElementById('signup-password');
+  
+  if (!nameInput || !emailInput || !passInput) return;
+  
+  const name = nameInput.value.trim();
+  const email = emailInput.value.trim();
+  const pass = passInput.value;
 
-  window.handleEmailSignUp = function(event) {
-    event.preventDefault();
-    const name = document.getElementById('signup-name').value;
-    const email = document.getElementById('signup-email').value;
-    const pass = document.getElementById('signup-password').value;
+  if (pass.length < 6) {
+    triggerDisplayMessage('error', 'Password must be at least 6 characters long.');
+    return;
+  }
 
-    if (pass.length < 6) {
-      if (typeof showMessage === "function") {
-        showMessage('error', 'Password must be at least 6 characters long.');
-      }
-      return;
-    }
-
-    const mockUser = {
-      uid: "mock-signup-id-554433",
-      email: email,
-      displayName: name,
-      photoURL: null
-    };
+  if (hasRealFirebaseConfig) {
+    firebase.auth().createUserWithEmailAndPassword(email, pass)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        return user.updateProfile({ displayName: name }).then(() => {
+          user.sendEmailVerification().catch(e => console.error(e));
+          
+          triggerDisplayMessage('success', 'Account created! Syncing profile...');
+          
+          syncUserProfileWithSupabase(user.uid, name, user.email).then(() => {
+            setTimeout(() => { window.location.reload(); }, 1500);
+          });
+        });
+      })
+      .catch((error) => {
+        triggerDisplayMessage('error', error.message);
+      });
+  } else {
+    // Mock Sign Up
+    const uid = "mock-uid-signup-789";
+    const mockUser = { uid, email, displayName: name, photoURL: null };
     localStorage.setItem('ganeshStore_user_mock', JSON.stringify(mockUser));
+    
+    triggerDisplayMessage('success', 'Registration simulated! Syncing profile...');
+    
+    syncUserProfileWithSupabase(uid, name, email).then(() => {
+      setTimeout(() => { window.location.reload(); }, 1200);
+    });
+  }
+};
 
-    if (typeof showMessage === "function") {
-      showMessage('success', 'Account registration simulated! Redirecting...');
-    }
-    setTimeout(() => {
-      window.location.href = 'index.html';
-    }, 1200);
-  };
+window.handleForgotPassword = function(event) {
+  if (event) event.preventDefault();
+  
+  const emailInput = document.getElementById('c-login-email') || document.getElementById('login-email');
+  if (!emailInput || !emailInput.value) {
+    triggerDisplayMessage('error', 'Please enter your email address in the Sign In form first.');
+    return;
+  }
+  
+  const email = emailInput.value.trim();
 
-  window.handleForgotPassword = function(event) {
-    event.preventDefault();
-    const email = document.getElementById('login-email').value;
-    if (!email) {
-      if (typeof showMessage === "function") {
-        showMessage('error', 'Please enter your email address first.');
-      }
-      return;
-    }
-    if (typeof showMessage === "function") {
-      showMessage('success', 'Simulation: A password reset email has been sent to ' + email);
-    }
-  };
-}
+  if (hasRealFirebaseConfig) {
+    firebase.auth().sendPasswordResetEmail(email)
+      .then(() => {
+        triggerDisplayMessage('success', 'Password reset email sent! Check your inbox.');
+      })
+      .catch((error) => {
+        triggerDisplayMessage('error', error.message);
+      });
+  } else {
+    triggerDisplayMessage('success', 'Simulation: A password reset email has been sent to ' + email);
+  }
+};
