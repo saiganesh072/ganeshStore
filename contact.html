@@ -64,57 +64,290 @@
       src="https://assets.adobedtm.com/6268dc4b6b26/a79c12535bfd/launch-6b416d57c554-development.min.js"
       async
     ></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <style>
+      :root {
+        --primary-color: #222222;
+        --accent-color: #717fe0;
+        --accent-hover: #5b69c5;
+        --glass-bg: rgba(255, 255, 255, 0.9);
+        --glass-border: rgba(0, 0, 0, 0.05);
+        --text-muted: #888888;
+      }
+
+      .Loginmain, .Logoutmain {
+        font-family: 'Inter', sans-serif;
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 10px 5px;
+        transition: all 0.3s ease;
+      }
+
       .Logouthead {
-        font-family: Poppins-Regular;
         font-size: 24px;
-        line-height: 1.5;
-        color: #333;
+        font-weight: 700;
+        color: var(--primary-color);
         text-align: center;
-        padding-bottom: 30px;
-        font-weight: bold;
+        padding-bottom: 25px;
+        letter-spacing: -0.5px;
       }
-      .LogoutName {
-        font-family: Poppins-Regular;
-        font-size: 22px;
-        line-height: 1.5;
-        color: #333;
-        padding-bottom: 30px;
+
+      .LogoutName, .LogoutNumber {
+        font-size: 16px;
+        font-weight: 500;
+        color: #555555;
+        padding-bottom: 18px;
+        border-bottom: 1px solid #f2f2f2;
+        margin-bottom: 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
       }
-      .LogoutName {
-        font-family: Poppins-Regular;
-        font-size: 22px;
-        line-height: 1.5;
-        color: #3c3c3c;
-        padding-bottom: 30px;
+
+      .AccountName, .AccountNumber {
+        color: var(--primary-color);
+        font-weight: 600;
+        font-family: 'Inter', sans-serif;
       }
-      .AccountName {
-        color: #000;
-        padding: 0 0 0 10px;
-        font-family: cursive;
-      }
-      .LogoutNumber {
-        font-family: Poppins-Regular;
-        font-size: 22px;
-        line-height: 1.5;
-        color: #333;
-        padding-bottom: 50px;
-      }
-      .AccountNumber {
-        color: #000;
-        padding: 0 0 0 10px;
-        font-family: cursive;
-      }
+
       button.CLogout {
-        color: #fff;
-        font-family: Poppins-Medium;
+        color: #ffffff;
+        font-weight: 600;
         font-size: 15px;
-        line-height: 1.466667;
         text-transform: uppercase;
         width: 100%;
-        height: 46px;
-        background-color: #222;
-        border-radius: 23px;
+        height: 48px;
+        background-color: var(--primary-color);
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      }
+
+      button.CLogout:hover {
+        background-color: #333333;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+      }
+
+      /* Premium Login Redesign styling */
+      .auth-tabs {
+        display: flex;
+        border-bottom: 2px solid #f0f0f0;
+        margin-bottom: 30px;
+      }
+
+      .auth-tab-btn {
+        flex: 1;
+        text-align: center;
+        padding: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text-muted);
+        cursor: pointer;
+        border: none;
+        background: none;
+        outline: none;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .auth-tab-btn:hover {
+        color: var(--primary-color);
+      }
+
+      .auth-tab-btn.active {
+        color: var(--accent-color);
+      }
+
+      .auth-tab-btn.active::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background-color: var(--accent-color);
+      }
+
+      .btn-google-login {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        background-color: #ffffff;
+        color: #333333;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 25px;
+      }
+
+      .btn-google-login:hover {
+        background-color: #f9f9f9;
+        border-color: #cccccc;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      }
+
+      .btn-google-login img {
+        width: 20px;
+        height: 20px;
+      }
+
+      .auth-divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 12px;
+        margin-bottom: 25px;
+      }
+
+      .auth-divider::before,
+      .auth-divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid #eeeeee;
+      }
+
+      .auth-divider:not(:empty)::before {
+        margin-right: .5em;
+      }
+
+      .auth-divider:not(:empty)::after {
+        margin-left: .5em;
+      }
+
+      .auth-input-group {
+        position: relative;
+        margin-bottom: 20px;
+      }
+
+      .auth-input-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 6px;
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .auth-input-field {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1.5px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 14px;
+        color: var(--primary-color);
+        transition: all 0.3s ease;
+        outline: none;
+      }
+
+      .auth-input-field:focus {
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 3px rgba(113, 127, 224, 0.15);
+      }
+
+      .auth-password-toggle {
+        position: absolute;
+        right: 16px;
+        top: 38px;
+        cursor: pointer;
+        color: var(--text-muted);
+        transition: color 0.2s ease;
+      }
+
+      .auth-password-toggle:hover {
+        color: var(--primary-color);
+      }
+
+      .auth-options {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+        margin-bottom: 25px;
+      }
+
+      .auth-remember {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+      }
+
+      .auth-remember input {
+        cursor: pointer;
+      }
+
+      .auth-forgot-link {
+        color: var(--accent-color);
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .auth-forgot-link:hover {
+        text-decoration: underline;
+      }
+
+      .btn-auth-submit {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 10px;
+        background-color: var(--primary-color);
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      }
+
+      .btn-auth-submit:hover {
+        background-color: #333333;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+      }
+
+      .auth-alert-banner {
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        margin-bottom: 25px;
+        display: none;
+        align-items: center;
+        gap: 10px;
+        animation: authFadeIn 0.3s ease;
+      }
+
+      .auth-alert-banner.success {
+        background-color: #e6f6ee;
+        color: #178a53;
+        border: 1px solid #b8ebcd;
+        display: flex;
+      }
+
+      .auth-alert-banner.error {
+        background-color: #fdeded;
+        color: #c92c2c;
+        border: 1px solid #f9c7c7;
+        display: flex;
+      }
+
+      @keyframes authFadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
       }
     </style>
     <style>
@@ -451,68 +684,109 @@
       <div class="container">
         <div class="flex-w flex-tr">
           <div
-            class="size-210 bor10 p-lr-70 p-t-55 p-b-70 p-lr-15-lg w-full-md"
+            class="size-210 bor10 p-lr-50 p-t-55 p-b-70 p-lr-15-lg w-full-md" style="background-color: #ffffff; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.02);"
           >
+            <!-- Account Profile Panel (Shown when logged in) -->
             <div class="Logoutmain">
-              <div class="Logouthead">Account Details</div>
+              <div style="width: 70px; height: 70px; border-radius: 50%; background: #717fe0; color: white; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; margin: 0 auto 20px auto; text-transform: uppercase; box-shadow: 0 4px 10px rgba(113, 127, 224, 0.3);" class="js-logout-avatar">
+                U
+              </div>
+              <div class="Logouthead">Account Center</div>
+              
               <div class="LogoutName">
-                Name : <span class="AccountName"></span>
+                <span>Name</span>
+                <span class="AccountName">Sai Ganesh</span>
               </div>
               <div class="LogoutNumber">
-                Phone Number : <span class="AccountNumber"></span>
+                <span>Details / ID</span>
+                <span class="AccountNumber">Not Logged In</span>
               </div>
-              <button class="CLogout">Logout</button>
+              <button class="CLogout flex-c-m"><i class="zmdi zmdi-power" style="margin-right: 8px; font-size: 18px;"></i> Logout</button>
             </div>
-            <form class="Loginmain">
-              <h4 class="mtext-105 cl2 txt-center p-b-30">Sign In</h4>
 
-              <div class="bor8 m-b-20 how-pos4-parent">
-                <input
-                  required
-                  class="stext-111 cl2 plh3 size-116 p-l-62 p-r-30 CName"
-                  type="text"
-                  name="email"
-                  placeholder="Name"
-                />
-                <img
-                  class="how-pos4 pointer-none"
-                  src="images/icons/icon-email.png"
-                  alt="ICON"
-                  style="display: none"
-                />
-              </div>
-              <div class="bor8 m-b-20 how-pos4-parent">
-                <input
-                  required
-                  class="stext-111 cl2 plh3 size-116 p-l-62 p-r-30 CPhNum"
-                  name="email"
-                  placeholder="Phone Number"
-                  oninput="javascript: if (this.value.length > this.maxLength) this.value =this.value.slice(0, this.maxLength);"
-                  type="number"
-                  maxlength="10"
-                />
-                <img
-                  class="how-pos4 pointer-none"
-                  src="images/icons/icon-email.png"
-                  alt="ICON"
-                  style="display: none"
-                />
+            <!-- Auth Forms Panel (Shown when logged out) -->
+            <div class="Loginmain">
+              <div class="auth-tabs">
+                <button type="button" class="auth-tab-btn active" id="btn-tab-signin" onclick="switchContactTab('signin')">Sign In</button>
+                <button type="button" class="auth-tab-btn" id="btn-tab-signup" onclick="switchContactTab('signup')">Create Account</button>
               </div>
 
-              <div class="bor8 m-b-30" style="display: none">
-                <textarea
-                  class="stext-111 cl2 plh3 size-120 p-lr-28 p-tb-25"
-                  name="msg"
-                  placeholder="How Can We Help?"
-                ></textarea>
+              <!-- Inline Alert Feedback Banner -->
+              <div class="auth-alert-banner" id="contact-auth-banner">
+                <i class="zmdi zmdi-info-outline" id="c-banner-icon"></i>
+                <span id="c-banner-text">Welcome back!</span>
               </div>
 
-              <button
-                class="flex-c-m stext-101 cl0 size-121 bg3 bor1 hov-btn3 p-lr-15 trans-04 pointer CSubmit"
-              >
-                Submit
+              <!-- Google Authentication Trigger -->
+              <button type="button" class="btn-google-login" onclick="handleGoogleSignIn()">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/button/google.svg" alt="Google" />
+                <span>Continue with Google</span>
               </button>
-            </form>
+
+              <div class="auth-divider">or use email address</div>
+
+              <!-- ================= Sign In Mode ================= -->
+              <div id="contact-signin-section">
+                <form id="contact-login-form" onsubmit="handleEmailLogin(event)">
+                  <div class="auth-input-group">
+                    <label class="auth-input-label" for="c-login-email">Email Address</label>
+                    <input class="auth-input-field CName" type="email" id="c-login-email" required placeholder="name@example.com" />
+                  </div>
+
+                  <div class="auth-input-group">
+                    <label class="auth-input-label" for="c-login-password">Password</label>
+                    <input class="auth-input-field CPhNum" type="password" id="c-login-password" required placeholder="••••••••" />
+                    <i class="zmdi zmdi-eye auth-password-toggle" onclick="toggleContactPassword('c-login-password', this)"></i>
+                  </div>
+
+                  <div class="auth-options">
+                    <label class="auth-remember">
+                      <input type="checkbox" id="c-login-remember" checked />
+                      <span>Remember me</span>
+                    </label>
+                    <a href="#" class="auth-forgot-link" onclick="handleForgotPassword(event)">Forgot Password?</a>
+                  </div>
+
+                  <button type="submit" class="btn-auth-submit CSubmit">
+                    <span>Sign In</span>
+                    <i class="zmdi zmdi-arrow-right"></i>
+                  </button>
+                </form>
+              </div>
+
+              <!-- ================= Sign Up Mode ================= -->
+              <div id="contact-signup-section" style="display: none;">
+                <form id="contact-register-form" onsubmit="handleEmailSignUp(event)">
+                  <div class="auth-input-group">
+                    <label class="auth-input-label" for="c-signup-name">Full Name</label>
+                    <input class="auth-input-field" type="text" id="c-signup-name" required placeholder="Sai Ganesh" />
+                  </div>
+
+                  <div class="auth-input-group">
+                    <label class="auth-input-label" for="c-signup-email">Email Address</label>
+                    <input class="auth-input-field" type="email" id="c-signup-email" required placeholder="name@example.com" />
+                  </div>
+
+                  <div class="auth-input-group">
+                    <label class="auth-input-label" for="c-signup-password">Password</label>
+                    <input class="auth-input-field" type="password" id="c-signup-password" required placeholder="Min 6 characters" minlength="6" />
+                    <i class="zmdi zmdi-eye auth-password-toggle" onclick="toggleContactPassword('c-signup-password', this)"></i>
+                  </div>
+
+                  <div class="auth-options">
+                    <label class="auth-remember" style="font-size: 12px; line-height: 1.4;">
+                      <input type="checkbox" id="c-signup-agree" required />
+                      <span>I agree to the Terms of Service & Privacy Policy</span>
+                    </label>
+                  </div>
+
+                  <button type="submit" class="btn-auth-submit">
+                    <span>Create Account</span>
+                    <i class="zmdi zmdi-assignment-account"></i>
+                  </button>
+                </form>
+              </div>
+            </div>
           </div>
 
           <div
@@ -764,72 +1038,241 @@
     <!--===============================================================================================-->
     <script src="js/main.js"></script>
     <script>
+      function switchContactTab(tab) {
+        const loginTab = document.getElementById('btn-tab-signin');
+        const signupTab = document.getElementById('btn-tab-signup');
+        const loginSec = document.getElementById('contact-signin-section');
+        const signupSec = document.getElementById('contact-signup-section');
+        const banner = document.getElementById('contact-auth-banner');
+
+        banner.style.display = 'none';
+
+        if (tab === 'signin') {
+          loginTab.classList.add('active');
+          signupTab.classList.remove('active');
+          loginSec.style.display = 'block';
+          signupSec.style.display = 'none';
+        } else {
+          loginTab.classList.remove('active');
+          signupTab.classList.add('active');
+          loginSec.style.display = 'none';
+          signupSec.style.display = 'block';
+        }
+      }
+
+      function toggleContactPassword(id, icon) {
+        const input = document.getElementById(id);
+        if (input.type === 'password') {
+          input.type = 'text';
+          icon.classList.remove('zmdi-eye');
+          icon.classList.add('zmdi-eye-off');
+        } else {
+          input.type = 'password';
+          icon.classList.remove('zmdi-eye-off');
+          icon.classList.add('zmdi-eye');
+        }
+      }
+
+      function showContactMessage(type, message) {
+        const banner = document.getElementById('contact-auth-banner');
+        const textSpan = document.getElementById('c-banner-text');
+        const icon = document.getElementById('c-banner-icon');
+
+        banner.className = 'auth-alert-banner ' + type;
+        textSpan.textContent = message;
+        banner.style.display = 'flex';
+
+        if (type === 'success') {
+          icon.className = 'zmdi zmdi-check-circle';
+        } else {
+          icon.className = 'zmdi zmdi-alert-circle-o';
+        }
+      }
+
       function getCookieValue(name) {
         let result = document.cookie.match(
-          "(^|[^;]+)\s*" + name + "\s*=\s*([^;]+)"
+          "(^|[^;]+)\\s*" + name + "\\s*=\\s*([^;]+)"
         );
-        return result ? result.pop() : "";
+        return result ? decodeURIComponent(result.pop()) : "";
       }
 
+      // Check current login state and show appropriate UI panel
       function loginfun() {
-        if (
-          localStorage.getItem("user") == null ||
-          localStorage.getItem("user") == "loggedout"
-        ) {
-          document.getElementsByClassName("Loginmain")[0].style.display =
-            "block";
-          document.getElementsByClassName("Logoutmain")[0].style.display =
-            "none";
-        }
-        if (localStorage.getItem("user") == "loggedin") {
-          document.getElementsByClassName("Loginmain")[0].style.display =
-            "none";
-          document.getElementsByClassName("Logoutmain")[0].style.display =
-            "block";
-          document.getElementsByClassName("AccountName")[0].innerText =
-            getCookieValue("CustomerName");
-          document.getElementsByClassName("AccountNumber")[0].innerText =
-            getCookieValue("CustomerNumber");
+        const userState = localStorage.getItem("user");
+        const customerName = getCookieValue("CustomerName");
+        
+        if (userState === "loggedin" && customerName) {
+          document.getElementsByClassName("Loginmain")[0].style.display = "none";
+          document.getElementsByClassName("Logoutmain")[0].style.display = "block";
+          
+          document.getElementsByClassName("AccountName")[0].innerText = customerName;
+          
+          const customerNum = getCookieValue("CustomerNumber");
+          document.getElementsByClassName("AccountNumber")[0].innerText = customerNum || "Member";
+          
+          // Generate user avatar initials dynamically
+          const initials = customerName.substring(0, 2).toUpperCase();
+          const avatarElement = document.querySelector(".js-logout-avatar");
+          if (avatarElement) {
+            avatarElement.innerText = initials;
+          }
+        } else {
+          document.getElementsByClassName("Loginmain")[0].style.display = "block";
+          document.getElementsByClassName("Logoutmain")[0].style.display = "none";
         }
       }
+      
+      // Hook login sync directly
       loginfun();
 
-      document.getElementsByClassName("CSubmit")[0].onclick = function () {
-        if (
-          document.getElementsByClassName("CName")[0].value.length > 0 &&
-          document.getElementsByClassName("CPhNum")[0].value.length > 0
-        ) {
-          if (document.getElementsByClassName("CName")[0].value.length > 0) {
-            var CustomerName =
-              document.getElementsByClassName("CName")[0].value;
-            document.cookie = "CustomerName=" + CustomerName + "; path=/";
-          }
-          if (document.getElementsByClassName("CPhNum")[0].value.length > 0) {
-            var CustomerNum =
-              document.getElementsByClassName("CPhNum")[0].value;
-            document.cookie = "CustomerNumber=" + CustomerNum + "; path=/";
-          }
-          document.getElementsByClassName("AccountName")[0].innerText =
-            getCookieValue("CustomerName");
-          document.getElementsByClassName("AccountNumber")[0].innerText =
-            getCookieValue("CustomerNumber");
-
-          document.getElementsByClassName("Loginmain")[0].style.display =
-            "none";
-          document.getElementsByClassName("Logoutmain")[0].style.display =
-            "block";
-
+      // Setup custom login actions mapping back to Firebase or local Mock fallback
+      function handleGoogleSignIn() {
+        if (typeof window.firebase !== "undefined" && firebase.apps.length > 0 && firebaseConfig.apiKey !== "YOUR_API_KEY_HERE") {
+          const provider = new firebase.auth.GoogleAuthProvider();
+          firebase.auth().signInWithPopup(provider)
+            .then((result) => {
+              const user = result.user;
+              const name = user.displayName || user.email.split('@')[0];
+              
+              document.cookie = "CustomerName=" + encodeURIComponent(name) + "; path=/";
+              document.cookie = "CustomerNumber=" + encodeURIComponent(user.uid) + "; path=/";
+              localStorage.setItem("user", "loggedin");
+              
+              showContactMessage('success', 'Google Sign-In successful! Logging in...');
+              setTimeout(() => { window.location.reload(); }, 1200);
+            })
+            .catch((error) => {
+              showContactMessage('error', error.message);
+            });
+        } else {
+          // Mock Google Flow
+          const name = "Sai Ganesh";
+          document.cookie = "CustomerName=" + encodeURIComponent(name) + "; path=/";
+          document.cookie = "CustomerNumber=" + encodeURIComponent("mock-uid-google-123") + "; path=/";
           localStorage.setItem("user", "loggedin");
-          //loginfun();
+          
+          showContactMessage('success', 'Mock Google login simulated! Redirecting...');
+          setTimeout(() => { window.location.reload(); }, 1200);
         }
-      };
+      }
 
-      document.getElementsByClassName("CLogout")[0].onclick = function () {
-        document.getElementsByClassName("Loginmain")[0].style.display = "block";
-        document.getElementsByClassName("Logoutmain")[0].style.display = "none";
-        loginfun();
+      function handleEmailLogin(event) {
+        event.preventDefault();
+        const email = document.getElementById('c-login-email').value;
+        const pass = document.getElementById('c-login-password').value;
 
-        localStorage.setItem("user", "loggedout");
+        if (typeof window.firebase !== "undefined" && firebase.apps.length > 0 && firebaseConfig.apiKey !== "YOUR_API_KEY_HERE") {
+          firebase.auth().signInWithEmailAndPassword(email, pass)
+            .then((userCredential) => {
+              const user = userCredential.user;
+              const name = user.displayName || user.email.split('@')[0];
+              
+              document.cookie = "CustomerName=" + encodeURIComponent(name) + "; path=/";
+              document.cookie = "CustomerNumber=" + encodeURIComponent(user.uid) + "; path=/";
+              localStorage.setItem("user", "loggedin");
+              
+              showContactMessage('success', 'Login successful! Entering Account Center...');
+              setTimeout(() => { window.location.reload(); }, 1200);
+            })
+            .catch((error) => {
+              showContactMessage('error', error.message);
+            });
+        } else {
+          // Mock Login Flow
+          if (pass.length < 6) {
+            showContactMessage('error', 'Password must be at least 6 characters long.');
+            return;
+          }
+          const name = email.split('@')[0];
+          document.cookie = "CustomerName=" + encodeURIComponent(name) + "; path=/";
+          document.cookie = "CustomerNumber=" + encodeURIComponent("mock-uid-email-456") + "; path=/";
+          localStorage.setItem("user", "loggedin");
+          
+          showContactMessage('success', 'Mock Sign In simulated! Welcome back.');
+          setTimeout(() => { window.location.reload(); }, 1200);
+        }
+      }
+
+      function handleEmailSignUp(event) {
+        event.preventDefault();
+        const name = document.getElementById('c-signup-name').value;
+        const email = document.getElementById('c-signup-email').value;
+        const pass = document.getElementById('c-signup-password').value;
+
+        if (typeof window.firebase !== "undefined" && firebase.apps.length > 0 && firebaseConfig.apiKey !== "YOUR_API_KEY_HERE") {
+          firebase.auth().createUserWithEmailAndPassword(email, pass)
+            .then((userCredential) => {
+              const user = userCredential.user;
+              return user.updateProfile({ displayName: name }).then(() => {
+                user.sendEmailVerification().catch(e => console.error(e));
+                
+                document.cookie = "CustomerName=" + encodeURIComponent(name) + "; path=/";
+                document.cookie = "CustomerNumber=" + encodeURIComponent(user.uid) + "; path=/";
+                localStorage.setItem("user", "loggedin");
+                
+                showContactMessage('success', 'Account created! Verification email sent.');
+                setTimeout(() => { window.location.reload(); }, 1500);
+              });
+            })
+            .catch((error) => {
+              showContactMessage('error', error.message);
+            });
+        } else {
+          // Mock Sign Up Flow
+          if (pass.length < 6) {
+            showContactMessage('error', 'Password must be at least 6 characters long.');
+            return;
+          }
+          document.cookie = "CustomerName=" + encodeURIComponent(name) + "; path=/";
+          document.cookie = "CustomerNumber=" + encodeURIComponent("mock-uid-signup-789") + "; path=/";
+          localStorage.setItem("user", "loggedin");
+          
+          showContactMessage('success', 'Mock account registration simulated! Welcoming...');
+          setTimeout(() => { window.location.reload(); }, 1200);
+        }
+      }
+
+      function handleForgotPassword(event) {
+        event.preventDefault();
+        const email = document.getElementById('c-login-email').value;
+        if (!email) {
+          showContactMessage('error', 'Please enter your email address first.');
+          return;
+        }
+
+        if (typeof window.firebase !== "undefined" && firebase.apps.length > 0 && firebaseConfig.apiKey !== "YOUR_API_KEY_HERE") {
+          firebase.auth().sendPasswordResetEmail(email)
+            .then(() => {
+              showContactMessage('success', 'Password reset email sent! Check your inbox.');
+            })
+            .catch((error) => {
+              showContactMessage('error', error.message);
+            });
+        } else {
+          showContactMessage('success', 'Simulation: A password reset email has been sent to ' + email);
+        }
+      }
+
+      // Logout handler
+      document.querySelector(".CLogout").onclick = function(e) {
+        e.preventDefault();
+        
+        if (typeof window.firebase !== "undefined" && firebase.apps.length > 0 && firebaseConfig.apiKey !== "YOUR_API_KEY_HERE") {
+          firebase.auth().signOut()
+            .then(() => {
+              document.cookie = "CustomerName=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+              document.cookie = "CustomerNumber=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+              localStorage.setItem("user", "loggedout");
+              window.location.reload();
+            })
+            .catch(err => console.error(err));
+        } else {
+          // Mock Sign Out Flow
+          document.cookie = "CustomerName=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+          document.cookie = "CustomerNumber=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+          localStorage.setItem("user", "loggedout");
+          window.location.reload();
+        }
       };
     </script>
   

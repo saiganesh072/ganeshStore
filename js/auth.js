@@ -108,6 +108,18 @@ document.addEventListener("DOMContentLoaded", () => {
 function updateHeaderUI(user) {
   const accountLinks = findMyAccountLinks();
   
+  // Also sync the local session state so existing scripts detect it
+  if (user) {
+    const displayName = user.displayName || user.email.split('@')[0];
+    const userUid = user.uid || "mock-uid-123";
+    
+    document.cookie = "CustomerName=" + encodeURIComponent(displayName) + "; path=/";
+    document.cookie = "CustomerNumber=" + encodeURIComponent(userUid) + "; path=/";
+    localStorage.setItem("user", "loggedin");
+  } else {
+    // Keep it if it's already loggedout or null, do not forcefully clear unless explicitly signing out
+  }
+  
   accountLinks.forEach(link => {
     if (user) {
       const displayName = user.displayName || user.email.split('@')[0];
@@ -134,14 +146,14 @@ function updateHeaderUI(user) {
       
       link.parentNode.replaceChild(dropdownContainer, link);
     } else {
-      // Logged out - link goes to login page
-      link.setAttribute("href", "login.html");
+      // Logged out - link goes to contact.html
+      link.setAttribute("href", "contact.html");
       link.innerHTML = "My Account";
       // Remove dropdown wrapper if previously created
       if (link.parentNode && link.parentNode.classList.contains("auth-dropdown")) {
         const newLink = document.createElement("a");
         newLink.className = "flex-c-m trans-04 p-lr-25";
-        newLink.setAttribute("href", "login.html");
+        newLink.setAttribute("href", "contact.html");
         newLink.innerHTML = "My Account";
         link.parentNode.parentNode.replaceChild(newLink, link.parentNode);
       }
@@ -165,6 +177,11 @@ function findMyAccountLinks() {
 // Logout action
 function logoutUser(e) {
   if (e) e.preventDefault();
+  
+  // Clear local cookies and sessions
+  document.cookie = "CustomerName=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+  document.cookie = "CustomerNumber=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+  localStorage.setItem("user", "loggedout");
   
   if (hasRealFirebaseConfig) {
     firebase.auth().signOut()
