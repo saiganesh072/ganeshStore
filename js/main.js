@@ -2573,16 +2573,18 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         // 2. Quantity & Add to Cart Action Row Alignment
         $('.wrap-num-product').each(function() {
             var $numProduct = $(this);
+            
+            // Guard against duplicate runs on load vs ready
+            if ($numProduct.parent().hasClass('premium-qty-wrapper')) return;
+            
             var $row = $numProduct.closest('.flex-r-m');
             var $innerWrapper = $numProduct.parent();
             
-            // Wrap the quantity block in a labeled wrapper if not already done
-            if (!$numProduct.parent().hasClass('premium-qty-wrapper')) {
-                var $qtyWrapper = $('<div class="premium-qty-wrapper"></div>');
-                var $qtyLabel = $('<span class="premium-option-label">QTY</span>');
-                $numProduct.before($qtyWrapper);
-                $qtyWrapper.append($qtyLabel).append($numProduct);
-            }
+            // Wrap the quantity block in a labeled wrapper
+            var $qtyWrapper = $('<div class="premium-qty-wrapper"></div>');
+            var $qtyLabel = $('<span class="premium-option-label">QTY</span>');
+            $numProduct.before($qtyWrapper);
+            $qtyWrapper.append($qtyLabel).append($numProduct);
             
             // Shift classes to premium capsule action row
             $row.addClass('premium-action-outer-row').removeClass('flex-w flex-r-m p-b-10');
