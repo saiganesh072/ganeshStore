@@ -1915,19 +1915,49 @@ button.mfp-close {
 }
 
 /*---------------------------------------------*/
+/* Spring-interactive filter links */
 .filter-link {
-  color: #aaa;
-  border-bottom: 1px solid transparent;
+  color: #888 !important;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  display: inline-block;
+  border-bottom: none !important;
 }
-
 .filter-link:hover {
-  color: #6c7ae0;
-  border-bottom: 1px solid #6c7ae0;
+  transform: translateX(5px);
+  color: #6c7ae0 !important;
+}
+.filter-link-active {
+  color: #6c7ae0 !important;
+  font-family: Poppins-Medium;
+  transform: translateX(5px);
 }
 
-.filter-link-active {
-  color: #6c7ae0;
-  border-bottom: 1px solid #6c7ae0;
+/* Premium Glassmorphic Floating Filter Panel */
+.wrap-filter {
+  background: rgba(242, 242, 242, 0.72) !important;
+  backdrop-filter: blur(12px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05) !important;
+  margin-top: 15px;
+  padding: 30px !important;
+  transition: all 0.4s ease;
+}
+
+/* Premium Glassmorphic Search Input Capsule */
+.panel-search .bor8 {
+  background: rgba(255, 255, 255, 0.65) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  border-radius: 30px !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02), inset 0 2px 4px rgba(0, 0, 0, 0.03) !important;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease !important;
+}
+.panel-search .bor8:focus-within {
+  border-color: #717fe0 !important;
+  box-shadow: 0 8px 25px rgba(113, 127, 224, 0.15) !important;
 }
 
 @media (max-width: 767px) {

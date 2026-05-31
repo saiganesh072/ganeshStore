@@ -25,6 +25,14 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
 (function ($) {
     "use strict";
 
+    window.activeFilters = {
+        category: '*',
+        priceRange: 'all',
+        color: 'all',
+        tag: 'all',
+        searchQuery: ''
+    };
+
     /*[ Load page ]
     ===========================================================*/
     $(".animsition").animsition({
@@ -318,6 +326,12 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 layoutMode: 'fitRows',
                 percentPosition: true,
                 animationEngine : 'best-available',
+                getSortData: {
+                    price: function(itemElem) {
+                        var priceText = $(itemElem).find('.stext-105').text().trim();
+                        return parseFloat(priceText.replace(/[^0-9.]/g, '')) || 0;
+                    }
+                },
                 masonry: {
                     columnWidth: '.isotope-item'
                 }
@@ -796,8 +810,14 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 $('.filter-tope-group button').removeClass('how-active1');
                 // Select active category button
                 $btn.addClass('how-active1');
-                // Execute isotope sorting
-                $topeContainer.isotope({ filter: filterVal });
+                
+                // Sync with combined filter state
+                window.activeFilters.category = filterVal;
+                if (typeof window.executeCombinedFilters === 'function') {
+                    window.executeCombinedFilters();
+                } else {
+                    $topeContainer.isotope({ filter: filterVal });
+                }
                 
                 // Soft scroll to the filtered storefront section so the user lands straight on the active visual catalogue!
                 var $productCatalog = $('.bg0.m-t-23.p-b-140');
@@ -822,13 +842,18 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 // Remove active filter highlight from buttons
                 $('.filter-tope-group button').removeClass('how-active1');
                 
-                // Trigger dynamic isotope filter by matched name
-                $topeContainer.isotope({
-                    filter: function() {
-                        var name = $(this).find('.js-name-b2').text().toLowerCase();
-                        return name.indexOf(searchVal) > -1;
-                    }
-                });
+                // Sync with combined filter state
+                window.activeFilters.searchQuery = searchVal;
+                if (typeof window.executeCombinedFilters === 'function') {
+                    window.executeCombinedFilters();
+                } else {
+                    $topeContainer.isotope({
+                        filter: function() {
+                            var name = $(this).find('.js-name-b2').text().toLowerCase();
+                            return name.indexOf(searchVal) > -1;
+                        }
+                    });
+                }
                 
                 // Soft scroll to product catalog grid section
                 var $productCatalog = $('.bg0.m-t-23.p-b-140');
@@ -858,21 +883,216 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         var $input = $('.panel-search input[name="search-product"]');
         var $topeContainer = $('.isotope-grid');
         
-        if ($input.length) {
-            $input.off('keyup').on('keyup', function() {
-                var query = $(this).val().toLowerCase().trim();
-                if ($topeContainer.length) {
-                    $('.filter-tope-group button').removeClass('how-active1');
+        // Map dynamic metadata color & tag classes to isotope items
+        $('.isotope-item').each(function() {
+            var $item = $(this);
+            var name = $item.find('.js-name-b2').text().toLowerCase();
+            
+            // Dynamic mappings for colors
+            if (name.indexOf('ruffle') > -1 || name.indexOf('mesh') > -1 || name.indexOf('cotton') > -1) {
+                $item.addClass('color-white');
+            }
+            if (name.indexOf('trench') > -1 || name.indexOf('check') > -1 || name.indexOf('converse') > -1) {
+                $item.addClass('color-grey');
+            }
+            if (name.indexOf('shirt') > -1 || name.indexOf('trouser') > -1 || name.indexOf('pocket') > -1) {
+                $item.addClass('color-blue');
+            }
+            if (name.indexOf('herschel') > -1 || name.indexOf('pretty') > -1 || name.indexOf('square') > -1) {
+                $item.addClass('color-black');
+            }
+            if (name.indexOf('watch') > -1 || name.indexOf('jacket') > -1) {
+                $item.addClass('color-green');
+            }
+            if (name.indexOf('converse') > -1 || name.indexOf('metallic') > -1 || name.indexOf('stripe') > -1) {
+                $item.addClass('color-red');
+            }
+            
+            // Fallback color
+            if (!$item.hasClass('color-black') && !$item.hasClass('color-blue') && !$item.hasClass('color-grey') && !$item.hasClass('color-green') && !$item.hasClass('color-red') && !$item.hasClass('color-white')) {
+                $item.addClass('color-black');
+            }
+            
+            // Dynamic mappings for tags
+            if (name.indexOf('shirt') > -1 || name.indexOf('t-shirt') > -1 || name.indexOf('ruffle') > -1) {
+                $item.addClass('tag-fashion');
+            }
+            if (name.indexOf('herschel') > -1 || name.indexOf('watch') > -1 || name.indexOf('silver') > -1) {
+                $item.addClass('tag-lifestyle');
+            }
+            if (name.indexOf('trouser') > -1 || name.indexOf('denim') > -1 || name.indexOf('coat') > -1) {
+                $item.addClass('tag-denim');
+            }
+            if (name.indexOf('converse') > -1 || name.indexOf('pocket') > -1 || name.indexOf('stripe') > -1) {
+                $item.addClass('tag-streetstyle');
+            }
+            if (name.indexOf('metallic') > -1 || name.indexOf('pretty') > -1 || name.indexOf('classic') > -1) {
+                $item.addClass('tag-crafts');
+            }
+            
+            // Fallback tag
+            if (!$item.hasClass('tag-fashion') && !$item.hasClass('tag-lifestyle') && !$item.hasClass('tag-denim') && !$item.hasClass('tag-streetstyle') && !$item.hasClass('tag-crafts')) {
+                $item.addClass('tag-fashion');
+            }
+        });
+
+        // Combined filtering executor
+        window.executeCombinedFilters = function() {
+            if (!$topeContainer.length) return;
+            
+            $topeContainer.isotope({
+                filter: function() {
+                    var $item = $(this);
                     
-                    $topeContainer.isotope({
-                        filter: function() {
-                            var name = $(this).find('.js-name-b2').text().toLowerCase();
-                            return name.indexOf(query) > -1;
+                    // 1. Category Filter
+                    if (window.activeFilters.category !== '*') {
+                        if (!$item.hasClass(window.activeFilters.category.replace('.', ''))) {
+                            return false;
                         }
-                    });
+                    }
+                    
+                    // 2. Price Range Filter
+                    var priceText = $item.find('.stext-105').text().trim();
+                    var priceVal = parseFloat(priceText.replace(/[^0-9.]/g, '')) || 0;
+                    
+                    if (window.activeFilters.priceRange !== 'all') {
+                        if (window.activeFilters.priceRange === '0-50') {
+                            if (priceVal < 0 || priceVal > 50) return false;
+                        } else if (window.activeFilters.priceRange === '50-100') {
+                            if (priceVal < 50 || priceVal > 100) return false;
+                        } else if (window.activeFilters.priceRange === '100-150') {
+                            if (priceVal < 100 || priceVal > 150) return false;
+                        } else if (window.activeFilters.priceRange === '150-200') {
+                            if (priceVal < 150 || priceVal > 200) return false;
+                        } else if (window.activeFilters.priceRange === '200+') {
+                            if (priceVal < 200) return false;
+                        }
+                    }
+                    
+                    // 3. Color Filter
+                    if (window.activeFilters.color !== 'all') {
+                        if (!$item.hasClass('color-' + window.activeFilters.color)) {
+                            return false;
+                        }
+                    }
+                    
+                    // 4. Tag Filter
+                    if (window.activeFilters.tag !== 'all') {
+                        if (!$item.hasClass('tag-' + window.activeFilters.tag)) {
+                            return false;
+                        }
+                    }
+                    
+                    // 5. Search Query Filter
+                    if (window.activeFilters.searchQuery !== '') {
+                        var name = $item.find('.js-name-b2').text().toLowerCase();
+                        if (name.indexOf(window.activeFilters.searchQuery) === -1) {
+                            return false;
+                        }
+                    }
+                    
+                    return true;
                 }
             });
+        };
+
+        // 3. Keyup Search listener
+        if ($input.length) {
+            $input.off('keyup').on('keyup', function() {
+                window.activeFilters.searchQuery = $(this).val().toLowerCase().trim();
+                $('.filter-tope-group button').removeClass('how-active1');
+                window.executeCombinedFilters();
+            });
         }
+
+        // 4. Sort By Column Click Handlers (Col 1)
+        $('.filter-col1 a').off('click').on('click', function(e) {
+            e.preventDefault();
+            var $link = $(this);
+            var text = $link.text().trim().toLowerCase();
+            
+            $('.filter-col1 a').removeClass('filter-link-active');
+            $link.addClass('filter-link-active');
+            
+            if (text.indexOf('low to high') > -1) {
+                $topeContainer.isotope({ sortBy: 'price', sortAscending: true });
+            } else if (text.indexOf('high to low') > -1) {
+                $topeContainer.isotope({ sortBy: 'price', sortAscending: false });
+            } else {
+                $topeContainer.isotope({ sortBy: 'original-order' });
+            }
+        });
+
+        // 5. Price Column Click Handlers (Col 2)
+        $('.filter-col2 a').off('click').on('click', function(e) {
+            e.preventDefault();
+            var $link = $(this);
+            var text = $link.text().trim().toLowerCase();
+            
+            $('.filter-col2 a').removeClass('filter-link-active');
+            $link.addClass('filter-link-active');
+            
+            if (text.indexOf('all') > -1) {
+                window.activeFilters.priceRange = 'all';
+            } else if (text.indexOf('0.00') > -1) {
+                window.activeFilters.priceRange = '0-50';
+            } else if (text.indexOf('50.00 - $100.00') > -1 || text.indexOf('50.00') > -1) {
+                window.activeFilters.priceRange = '50-100';
+            } else if (text.indexOf('100.00 - $150.00') > -1 || text.indexOf('100.00') > -1) {
+                window.activeFilters.priceRange = '100-150';
+            } else if (text.indexOf('150.00 - $200.00') > -1 || text.indexOf('150.00') > -1) {
+                window.activeFilters.priceRange = '150-200';
+            } else if (text.indexOf('200.00+') > -1 || text.indexOf('200+') > -1) {
+                window.activeFilters.priceRange = '200+';
+            }
+            
+            window.executeCombinedFilters();
+        });
+
+        // 6. Color Column Click Handlers (Col 3)
+        $('.filter-col3 a').off('click').on('click', function(e) {
+            e.preventDefault();
+            var $link = $(this);
+            var text = $link.text().trim().toLowerCase();
+            
+            $('.filter-col3 a').removeClass('filter-link-active');
+            $link.addClass('filter-link-active');
+            
+            window.activeFilters.color = text;
+            window.executeCombinedFilters();
+        });
+
+        // 7. Tags Column Click Handlers (Col 4)
+        $("<style>.active-tag-premium { border-color: #717fe0 !important; color: #717fe0 !important; font-family: Poppins-Medium; }</style>").appendTo("head");
+        $('.filter-col4 a').off('click').on('click', function(e) {
+            e.preventDefault();
+            var $link = $(this);
+            var text = $link.text().trim().toLowerCase();
+            
+            if ($link.hasClass('active-tag-premium')) {
+                // Toggle off if clicked again!
+                $link.removeClass('active-tag-premium');
+                window.activeFilters.tag = 'all';
+            } else {
+                $('.filter-col4 a').removeClass('active-tag-premium');
+                $link.addClass('active-tag-premium');
+                window.activeFilters.tag = text;
+            }
+            
+            window.executeCombinedFilters();
+        });
+
+        // 8. Integrate with Category Tope Group buttons so they update the activeFilters state too!
+        $('.filter-tope-group button').off('click').on('click', function() {
+            var $btn = $(this);
+            var filterValue = $btn.attr('data-filter');
+            
+            $('.filter-tope-group button').removeClass('how-active1');
+            $btn.addClass('how-active1');
+            
+            window.activeFilters.category = filterValue;
+            window.executeCombinedFilters();
+        });
     }
 
     // Dynamic Product Detail Page (PDP) reviews, rating persistence, and tab synchronization
