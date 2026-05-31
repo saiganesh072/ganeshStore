@@ -1593,30 +1593,42 @@ Input, textarea : 14px/1.6 '', Arial, sans-serif;
 }
 
 .arrow-slick3 {
-  font-size: 25px;
-  color: #fff;
+  font-size: 18px !important;
+  color: #333 !important;
 
   position: absolute;
   top: 0;
-  width: 40px;
-  height: 40px;
-  background-color: rgba(0, 0, 0, 0.5);
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  background-color: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
 
-  -webkit-transition: all 0.4s;
-  -o-transition: all 0.4s;
-  -moz-transition: all 0.4s;
-  transition: all 0.4s;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  -webkit-transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  -o-transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  -moz-transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
 }
 
 .arrow-slick3:hover {
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: #ffffff !important;
+  color: #ff3366 !important;
+  transform: scale(1.1) !important;
+  box-shadow: 0 6px 16px rgba(255, 51, 102, 0.15) !important;
 }
 
 .prev-slick3 {
-  left: 0px;
+  left: 15px !important;
 }
 .next-slick3 {
-  right: 0px;
+  right: 15px !important;
 }
 
 /*---------------------------------------------*/
@@ -4966,6 +4978,13 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
 }
 
 /* 4. Frosted Glass Trust badge Container */
+.premium-pdp-description-col {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  min-height: 100% !important;
+}
+
 .trust-badges-container {
   display: flex !important;
   align-items: center;
@@ -4978,7 +4997,8 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04) !important;
   border-radius: 12px;
   padding: 16px 20px !important;
-  margin-top: 30px;
+  margin-top: auto !important; /* Dynamically pushes trust cards to the very bottom to align with left-hand image! */
+  margin-bottom: 5px !important;
   flex-wrap: wrap;
 }
 
@@ -5058,14 +5078,22 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
 }
 
 /* 2. Unified Capsule Action Row (Quantity + Add to Cart + Wishlist) */
+.premium-qty-wrapper {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+  flex-shrink: 0 !important;
+}
+
 .premium-action-row {
   display: flex !important;
   flex-direction: row !important;
-  align-items: center !important;
+  align-items: flex-end !important; /* Bottom-aligned to match the labels */
   justify-content: flex-start !important;
   gap: 15px !important;
   width: 100% !important;
-  margin-top: 25px !important;
+  margin-top: 15px !important; /* Balanced gap under swatches */
   margin-bottom: 30px !important;
   flex-wrap: nowrap !important; /* Locked on a single line! */
 }
@@ -5073,8 +5101,8 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
 /* Lock Quantity dimensions and prevent flex wrapping */
 .premium-action-row .wrap-num-product {
   height: 46px !important;
-  width: 140px !important; /* Expanded and locked */
-  min-width: 140px !important;
+  width: 120px !important; /* Sleek, compact width */
+  min-width: 120px !important;
   border-radius: 23px !important;
   border: 1px solid rgba(0, 0, 0, 0.12) !important;
   overflow: hidden !important;
@@ -5095,8 +5123,8 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
 
 .premium-action-row .btn-num-product-down,
 .premium-action-row .btn-num-product-up {
-  width: 40px !important;
-  min-width: 40px !important;
+  width: 35px !important;
+  min-width: 35px !important;
   height: 100% !important;
   cursor: pointer !important;
   color: #555 !important;
@@ -5110,12 +5138,17 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
 .premium-action-row .btn-num-product-down:hover,
 .premium-action-row .btn-num-product-up:hover {
   background: #f5f5f7 !important;
-  color: #111 !important;
+}
+
+.premium-action-row .btn-num-product-down:hover i,
+.premium-action-row .btn-num-product-up:hover i {
+  color: #ff3366 !important; /* Beautiful premium cherry-red glow on hover */
+  transform: scale(1.1) !important;
 }
 
 .premium-action-row .num-product {
-  width: 60px !important;
-  min-width: 60px !important;
+  width: 50px !important;
+  min-width: 50px !important;
   height: 100% !important;
   border-left: 1px solid rgba(0, 0, 0, 0.08) !important;
   border-right: 1px solid rgba(0, 0, 0, 0.08) !important;
