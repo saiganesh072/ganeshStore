@@ -248,6 +248,10 @@ function updateHeaderUI(user) {
       }
     }
   });
+
+  if (typeof loginfun === "function") {
+    loginfun();
+  }
 }
 
 function findMyAccountLinks() {
@@ -284,6 +288,15 @@ function logoutUser(e) {
     localStorage.removeItem('ganeshStore_user_mock');
     window.location.reload();
   }
+}
+
+function generateCustomerId(email) {
+  let hash = 0;
+  for (let i = 0; i < email.length; i++) {
+    hash = email.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const id = Math.abs(hash % 90000) + 10000;
+  return `GS-${id}`;
 }
 
 function getRegisteredUsers() {
@@ -335,10 +348,11 @@ window.handleGoogleSignIn = function() {
         triggerDisplayMessage('error', error.message);
       });
   } else {
-    // Mock Google Sign In
-    const name = "Sai Ganesh";
-    const email = "saiganesh@gmail.com";
-    const uid = "mock-uid-google-123";
+    // Mock Google Sign In with dynamic user generation
+    const randomSuffix = Math.floor(100 + Math.random() * 900);
+    const name = `Google User ${randomSuffix}`;
+    const email = `google.user.${randomSuffix}@gmail.com`;
+    const uid = generateCustomerId(email);
     
     const mockUser = { uid, email, displayName: name, photoURL: null };
     localStorage.setItem('ganeshStore_user_mock', JSON.stringify(mockUser));
@@ -397,7 +411,7 @@ window.handleEmailLogin = function(event) {
       }
       
       const name = existingUser.name || email.split('@')[0];
-      const uid = existingUser.uid || "mock-uid-email-456";
+      const uid = existingUser.uid || generateCustomerId(email);
       
       const mockUser = { uid, email, displayName: name, photoURL: null };
       localStorage.setItem('ganeshStore_user_mock', JSON.stringify(mockUser));
@@ -487,7 +501,7 @@ window.handleEmailSignUp = function(event) {
       return;
     }
     
-    const uid = "mock-uid-" + Math.random().toString(36).substr(2, 9);
+    const uid = generateCustomerId(email);
     const mockUser = { uid, email, displayName: name, photoURL: null };
     
     // Save new user profile locally (in localStorage)
