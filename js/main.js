@@ -2573,16 +2573,16 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         // 2. Quantity & Add to Cart Action Row Alignment
         $('.wrap-num-product').each(function() {
             var $numProduct = $(this);
-            var $row = $numProduct.closest('.flex-w');
+            var $row = $numProduct.closest('.flex-r-m');
             var $innerWrapper = $numProduct.parent();
             
             // Shift classes to premium capsule action row
-            $row.addClass('premium-action-row').removeClass('flex-w flex-r-m p-b-10');
-            $innerWrapper.removeClass('size-204 flex-w flex-m respon6-next');
+            $row.addClass('premium-action-outer-row').removeClass('flex-w flex-r-m p-b-10');
+            $innerWrapper.addClass('premium-action-row').removeClass('size-204 flex-w flex-m respon6-next');
             
             // Relocate Wishlist CTA to be next to Add to Cart button as a primary action
             var $originalWish = $('.js-addwish-detail');
-            if ($originalWish.length && !$row.find('.js-addwish-detail-container').length) {
+            if ($originalWish.length && !$innerWrapper.find('.js-addwish-detail-container').length) {
                 var isAlreadyWish = $originalWish.hasClass('js-addedwish-detail');
                 
                 var wishSvg = 

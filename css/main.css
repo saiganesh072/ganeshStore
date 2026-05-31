@@ -5049,6 +5049,14 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   box-shadow: 0 0 0 3px #fff, 0 0 0 5px #222, 0 4px 12px rgba(0, 0, 0, 0.15) !important;
 }
 
+.premium-action-outer-row {
+  display: block !important;
+  width: 100% !important;
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
 /* 2. Unified Capsule Action Row (Quantity + Add to Cart + Wishlist) */
 .premium-action-row {
   display: flex !important;
