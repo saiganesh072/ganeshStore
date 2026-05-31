@@ -4100,21 +4100,22 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
 .main-menu > li > a::after {
   content: '';
   position: absolute;
-  left: 50%;
+  left: 0;
   bottom: -2px;
-  width: 0;
+  width: 100%;
   height: 2px;
   background: #717fe0;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  transform: translateX(-50%);
+  transform: scaleX(0);
+  transform-origin: center !important;
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
 }
 
 .main-menu > li:hover > a::after {
-  width: 100%;
+  transform: scaleX(1) !important;
 }
 
 .main-menu > li.active-menu > a::after {
-  width: 100%;
+  transform: scaleX(1) !important;
   background: #717fe0;
 }
 
