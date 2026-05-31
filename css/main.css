@@ -5065,8 +5065,8 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   justify-content: flex-start !important;
   gap: 15px !important;
   width: 100% !important;
-  margin-top: 15px !important;
-  margin-bottom: 25px !important;
+  margin-top: 25px !important;
+  margin-bottom: 30px !important;
   flex-wrap: nowrap !important; /* Locked on a single line! */
 }
 
@@ -5224,30 +5224,31 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   display: flex !important;
   align-items: center !important;
   justify-content: flex-start !important;
-  gap: 15px !important;
+  gap: 20px !important;
   width: 100% !important;
-  margin-top: 20px !important;
-  margin-bottom: 20px !important;
+  margin-top: 25px !important;
+  margin-bottom: 25px !important;
   padding: 0 !important;
 }
 
 .premium-share-row a {
-  display: flex !important;
+  display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  width: 32px !important;
-  height: 32px !important;
-  border-radius: 50% !important;
-  background: #f5f5f7 !important;
-  color: #666 !important;
-  font-size: 12px !important;
-  transition: all 0.2s ease !important;
+  color: #555 !important;
+  font-size: 16px !important;
+  transition: color 0.25s, transform 0.25s !important;
+  background: transparent !important;
+  width: auto !important;
+  height: auto !important;
+  border-radius: 0 !important;
+  padding: 5px !important;
 }
 
 .premium-share-row a:hover {
-  background: #222 !important;
-  color: #fff !important;
-  transform: translateY(-2px) !important;
+  background: transparent !important;
+  color: #ff3366 !important;
+  transform: scale(1.18) translateY(-1px) !important;
 }
 
 

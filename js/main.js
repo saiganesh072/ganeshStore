@@ -2603,7 +2603,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 $newWishBtn.on('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    $originalWish.trigger('click');
+                    $originalWish.first().trigger('click');
                     
                     // Sync active status after animation/state update
                     setTimeout(function() {
