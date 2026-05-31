@@ -879,18 +879,18 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             }
         });
 
-        // 1b. Inject the premium inline sliding search capsule directly inside actions row (only once)
-        var $actions = $('.js-show-search').parent();
-        if ($actions.length && !$actions.find('.js-inline-search-capsule').length) {
-            $actions.prepend(
-                '<div class="js-inline-search-capsule" style="width: 0; opacity: 0; overflow: hidden; display: flex; align-items: center; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">' +
-                '  <div class="bor8 dis-flex p-l-15" style="width: 100%; height: 40px; background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(12px) saturate(140%); -webkit-backdrop-filter: blur(12px) saturate(140%); border: 1px solid rgba(255, 255, 255, 0.45); border-radius: 20px; align-items: center; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02); transition: all 0.3s ease;">' +
-                '    <i class="zmdi zmdi-search m-r-8" style="color: #666; font-size: 15px;"></i>' +
-                '    <input class="mtext-107 cl2 size-114 plh2 p-r-15 js-inline-search-input" type="text" placeholder="Type to search..." style="border: none; background: transparent; height: 100%; outline: none; font-size: 14px; width: 100%; color: #333;" />' +
-                '  </div>' +
-                '</div>'
-            );
-        }
+        // 1b. Morph the search button into a self-contained expanding glass search capsule
+        $('.js-show-search').each(function() {
+            var $btn = $(this);
+            if (!$btn.find('.js-search-input-field').length) {
+                $btn.html(
+                    '<i class="zmdi zmdi-search m-r-6 js-search-icon" style="transition: transform 0.4s; font-size: 15px; display: flex; align-items: center;"></i>' +
+                    '<span class="js-search-label">Search</span>' +
+                    '<input class="js-search-input-field" type="text" placeholder="Type to search..." autocomplete="off" />' +
+                    '<div class="js-search-close-btn"><i class="zmdi zmdi-close"></i></div>'
+                );
+            }
+        });
 
         // 2. Bind real-time input keyup filtering on the standard panel-search input
         var $input = $('.panel-search input[name="search-product"]');
@@ -1010,7 +1010,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         };
 
         // 3. Keyup Search listener (Synchronized across responsive inputs)
-        var $inlineInput = $('.js-inline-search-input');
+        var $inlineInput = $('.js-search-input-field');
         
         function handleSearchKeyup(query) {
             window.activeFilters.searchQuery = query;
@@ -1032,10 +1032,8 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             });
         }
 
-        // Intercept and toggle search trigger with sliding capsule micro-animations
+        // Intercept and toggle search trigger with self-contained expanding capsule micro-animations
         $('.js-show-search').off('click').on('click', function(e) {
-            e.preventDefault();
-            var $btn = $(this);
             var isMobile = $(window).width() < 768;
             
             // Check if filter is open and close it
@@ -1045,28 +1043,47 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             }
             
             if (isMobile) {
+                e.preventDefault();
+                var $btn = $(this);
                 // Mobile behavior: toggle standard panel-search dropdown
-                $('.js-inline-search-capsule').removeClass('active');
+                $btn.removeClass('js-search-active');
                 $btn.toggleClass('show-search');
                 $('.panel-search').slideToggle(400);
             } else {
-                // Desktop behavior: toggle inline expanding capsule springy!
-                var $capsule = $('.js-inline-search-capsule');
-                $capsule.toggleClass('active');
-                $btn.toggleClass('show-search');
-                
-                // Hide standard dropdown if open
-                $('.panel-search').hide();
-                
-                if ($capsule.hasClass('active')) {
+                // Desktop behavior: expand this capsule inline!
+                var $btn = $(this);
+                if (!$btn.hasClass('js-search-active')) {
+                    e.preventDefault();
+                    $btn.addClass('js-search-active');
+                    
+                    // Hide standard dropdown if open
+                    $('.panel-search').hide();
+                    
                     setTimeout(function() {
-                        $capsule.find('input').focus();
+                        $btn.find('.js-search-input-field').focus();
                     }, 50);
-                } else {
-                    // Reset input on close
-                    $capsule.find('input').val('').trigger('keyup');
                 }
+                // If already expanded, let click pass inside input (prevent default close)
             }
+        });
+
+        // Prevent click events inside input from collapsing the capsule
+        $(document).on('click', '.js-search-input-field', function(e) {
+            e.stopPropagation();
+        });
+
+        // Handle close button action specifically
+        $(document).on('click', '.js-search-close-btn', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            var $btn = $(this).closest('.js-show-search');
+            $btn.removeClass('js-search-active');
+            $btn.removeClass('show-search');
+            
+            var $inputField = $btn.find('.js-search-input-field');
+            $inputField.val('').blur();
+            handleSearchKeyup('');
         });
 
         // 4. Sort By Column Click Handlers (Col 1)

@@ -4522,13 +4522,15 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
 .js-show-filter, .js-show-search {
   border-radius: 23px !important; /* Perfect smooth pill shape */
   font-family: Poppins-Medium;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.3s, border-color 0.3s, box-shadow 0.3s !important;
   background: rgba(255, 255, 255, 0.45) !important;
   backdrop-filter: blur(12px) saturate(140%) !important;
   -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
   border: 1px solid rgba(255, 255, 255, 0.45) !important;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03) !important;
   color: #333 !important;
+  position: relative !important;
+  height: 40px !important;
 }
 
 /* Elegant hover states with spring translate upward */
@@ -4544,38 +4546,117 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
 }
 
 /* Active open states (Minimal Premium Glassmorphism) */
-.js-show-filter.show-filter, .js-show-search.show-search {
+.js-show-filter.show-filter {
   background: rgba(255, 255, 255, 0.9) !important;
   color: #111 !important;
   border-color: rgba(0, 0, 0, 0.15) !important;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06) !important;
 }
-.js-show-filter.show-filter i, .js-show-search.show-search i {
+.js-show-filter.show-filter i {
   color: #111 !important;
 }
 
 /*==================================================================
-[ Premium Sliding Search Input Option A & Micro-Animations ]*/
-.js-inline-search-capsule {
-  margin-right: 0;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-}
-.js-inline-search-capsule.active {
-  width: 250px !important;
-  opacity: 1 !important;
-  margin-right: 12px !important;
-}
-.js-inline-search-capsule .bor8:focus-within {
-  border-color: rgba(0, 0, 0, 0.15) !important;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05), inset 0 2px 4px rgba(255, 255, 255, 0.5) !important;
-  transform: translateY(-1px);
+[ Premium Self-Expanding Search Capsule & Down Arrow Triangles ]*/
+.js-show-search {
+  width: 100px !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+  overflow: hidden !important;
+  justify-content: flex-start !important;
+  display: flex !important;
+  align-items: center !important;
 }
 
-/* Micro-rotations on search and close icons inside Search Trigger */
-.js-show-search i {
+.js-show-search.js-search-active {
+  width: 280px !important;
+  cursor: default !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06) !important;
+}
+
+.js-search-label {
+  transition: opacity 0.25s, width 0.25s;
+  opacity: 1;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.js-search-active .js-search-label {
+  opacity: 0 !important;
+  width: 0 !important;
+  pointer-events: none !important;
+}
+
+.js-search-input-field {
+  border: none !important;
+  background: transparent !important;
+  height: 100% !important;
+  outline: none !important;
+  font-size: 14px !important;
+  color: #333 !important;
+  width: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease, width 0.3s ease;
+  padding-left: 4px !important;
+}
+
+.js-search-active .js-search-input-field {
+  width: 180px !important;
+  opacity: 1 !important;
+}
+
+/* Close icon inside expanded capsule */
+.js-search-close-btn {
+  position: absolute !important;
+  right: 14px !important;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s, transform 0.3s !important;
+  font-size: 14px;
+  color: #888;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.js-search-active .js-search-close-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.js-search-close-btn:hover {
+  color: #111;
+  transform: scale(1.15) rotate(90deg) !important;
+}
+
+/* Micro-rotations on search icon */
+.js-show-search i.js-search-icon {
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
 }
-.js-show-search.show-search i {
+.js-show-search.js-search-active i.js-search-icon {
   transform: rotate(180deg) !important;
+}
+
+/* Eliminate the downward diamond shape for search entirely */
+.js-show-search::after {
+  display: none !important;
+}
+
+/* Glassmorphic down-arrow for Filter trigger */
+.show-filter::after {
+  background-color: rgba(255, 255, 255, 0.45) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.45) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.45) !important;
+}
+
+.show-filter:hover:after {
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  border-color: rgba(255, 255, 255, 0.85) !important;
 }
 
