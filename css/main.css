@@ -2274,7 +2274,22 @@ input.num-product::-webkit-inner-spin-button {
   transform: translate(-50%, 30px) !important;
   opacity: 0;
   pointer-events: none;
-  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease !important;
+  
+  /* Glassmorphism styling overrides */
+  background-color: rgba(255, 255, 255, 0.65) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  color: #222 !important;
+}
+
+.block2-btn:hover {
+  background-color: #222 !important;
+  border-color: #222 !important;
+  color: #fff !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 .block2-pic:hover .block2-btn {
