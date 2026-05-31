@@ -884,9 +884,9 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         if ($actions.length && !$actions.find('.js-inline-search-capsule').length) {
             $actions.prepend(
                 '<div class="js-inline-search-capsule" style="width: 0; opacity: 0; overflow: hidden; display: flex; align-items: center; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">' +
-                '  <div class="bor8 dis-flex p-l-15" style="width: 100%; height: 40px; background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(0, 0, 0, 0.08); border-radius: 20px; align-items: center; box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02); transition: all 0.3s ease;">' +
-                '    <i class="zmdi zmdi-search m-r-8" style="color: #999; font-size: 15px;"></i>' +
-                '    <input class="mtext-107 cl2 size-114 plh2 p-r-15 js-inline-search-input" type="text" placeholder="Type to search..." style="border: none; background: transparent; height: 100%; outline: none; font-size: 14px; width: 100%;" />' +
+                '  <div class="bor8 dis-flex p-l-15" style="width: 100%; height: 40px; background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(12px) saturate(140%); -webkit-backdrop-filter: blur(12px) saturate(140%); border: 1px solid rgba(255, 255, 255, 0.45); border-radius: 20px; align-items: center; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02); transition: all 0.3s ease;">' +
+                '    <i class="zmdi zmdi-search m-r-8" style="color: #666; font-size: 15px;"></i>' +
+                '    <input class="mtext-107 cl2 size-114 plh2 p-r-15 js-inline-search-input" type="text" placeholder="Type to search..." style="border: none; background: transparent; height: 100%; outline: none; font-size: 14px; width: 100%; color: #333;" />' +
                 '  </div>' +
                 '</div>'
             );
