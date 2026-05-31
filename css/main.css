@@ -4822,6 +4822,59 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   transform: scale(1.15) !important;
 }
 
+/* Premium Cart Drop & Drive-Away Animations */
+.premium-cart-svg {
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease !important;
+}
+
+.premium-toast-item:not(.toast-show) .premium-cart-svg {
+  transform: translateX(80px) scale(0.9);
+  opacity: 0;
+}
+
+.premium-cart-package {
+  animation: toastPackageDrop 0.65s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  transform-origin: center;
+}
+
+.premium-cart-body {
+  animation: toastCartBounce 0.65s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  transform-origin: bottom center;
+}
+
+@keyframes toastPackageDrop {
+  0% {
+    transform: translateY(-16px) scale(0.2);
+    opacity: 0;
+  }
+  45% {
+    transform: translateY(-8px) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(6px);
+    opacity: 1;
+  }
+}
+
+@keyframes toastCartBounce {
+  0%, 45% {
+    transform: translateY(0) scaleY(1);
+  }
+  50% {
+    transform: translateY(1.5px) scaleY(0.9);
+  }
+  68% {
+    transform: translateY(-2.5px) scaleY(1.05);
+  }
+  82% {
+    transform: translateY(0.5px) scaleY(0.98);
+  }
+  100% {
+    transform: translateY(0) scaleY(1);
+  }
+}
+
 /*==================================================================
 [ Premium PDP Visual Upgrades ]*/
 
