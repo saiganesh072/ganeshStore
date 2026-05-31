@@ -557,6 +557,20 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
     function initWishlist() {
         var wishlist = getWishlist();
 
+        // 0. Inject premium linear gradient def capsule dynamically to the body
+        if (!$('#heart-gradient-svg').length) {
+            $('body').append(
+                '<svg id="heart-gradient-svg" style="position: absolute; width: 0; height: 0;" width="0" height="0">' +
+                '  <defs>' +
+                '    <linearGradient id="cherry-gradient" x1="0%" y1="0%" x2="100%" y2="100%">' +
+                '      <stop offset="0%" stop-color="#ff3366" />' +
+                '      <stop offset="100%" stop-color="#d91444" />' +
+                '    </linearGradient>' +
+                '  </defs>' +
+                '</svg>'
+            );
+        }
+
         // 1. Rewrite all header/mobile-header favorite icons to point to wishlist.html
         $('.icon-header-item i.zmdi-favorite-outline, .icon-header-item i.zmdi-favorite')
             .parent()
@@ -567,6 +581,30 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
 
         // 3. Clear existing inline click handlers that would double-fire
         $('.js-addwish-b2, .js-addwish-detail').off('click');
+
+        // Inject SVG heart markup into catalog listing items contextually (replaces PNGs)
+        $('.js-addwish-b2').each(function() {
+            var $heartLink = $(this);
+            if (!$heartLink.find('.heart-icon').length) {
+                $heartLink.empty().append(
+                    '<svg class="heart-icon" viewBox="0 0 24 24" width="20" height="20">' +
+                    '  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>' +
+                    '</svg>'
+                );
+            }
+        });
+
+        // Inject SVG heart markup into PDP wishlist buttons (replaces old Iconic font i tag)
+        $('.js-addwish-detail').each(function() {
+            var $heartLink = $(this);
+            if (!$heartLink.find('.heart-icon').length) {
+                $heartLink.empty().append(
+                    '<svg class="heart-icon" viewBox="0 0 24 24" width="18" height="18">' +
+                    '  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>' +
+                    '</svg>'
+                );
+            }
+        });
 
         // 4. Sync active heart visual states for product grid cards
         $('.js-addwish-b2').each(function() {
@@ -594,10 +632,8 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             });
             if (isInWishlist) {
                 $btn.addClass('js-addedwish-detail');
-                $btn.find('i').css('color', '#ec38bc');
             } else {
                 $btn.removeClass('js-addedwish-detail');
-                $btn.find('i').css('color', '');
             }
         });
 
@@ -1174,7 +1210,6 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 if (!btnName) btnName = $('.js-name-detail').first().text().trim();
                 if (btnName === name) {
                     $(this).removeClass('js-addedwish-detail');
-                    $(this).find('i').css('color', '');
                 }
             });
             
@@ -1198,7 +1233,6 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 if (!btnName) btnName = $('.js-name-detail').first().text().trim();
                 if (btnName === name) {
                     $(this).addClass('js-addedwish-detail');
-                    $(this).find('i').css('color', '#ec38bc');
                 }
             });
             

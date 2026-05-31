@@ -2307,36 +2307,47 @@ input.num-product::-webkit-inner-spin-button {
   width: 30px;
 }
 
-.btn-addwish-b2 {
-  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+/* Core SVG wishlist icon styles */
+.heart-icon {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: #555;
+  stroke-width: 1.8px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  display: block;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), stroke 0.3s ease, fill 0.3s ease !important;
 }
 
-.btn-addwish-b2:hover {
-  transform: scale(1.2);
+/* Hover springs */
+.btn-addwish-b2:hover .heart-icon,
+.js-addwish-detail:hover .heart-icon {
+  transform: scale(1.22);
+  stroke: #ff3366;
 }
 
-.btn-addwish-b2:active {
+/* Active compression */
+.btn-addwish-b2:active .heart-icon,
+.js-addwish-detail:active .heart-icon {
   transform: scale(0.9);
 }
 
-.btn-addwish-b2 .icon-heart2 {
-  opacity: 0;
+/* Heartbeat pulse keyframe definition */
+@keyframes heartbeat {
+  0% { transform: scale(1); }
+  14% { transform: scale(1.25); }
+  28% { transform: scale(1.1); }
+  42% { transform: scale(1.32); }
+  70% { transform: scale(1); }
 }
 
-.btn-addwish-b2:hover .icon-heart2 {
-  opacity: 1;
-}
-
-.btn-addwish-b2:hover .icon-heart1 {
-  opacity: 0;
-}
-
-.js-addedwish-b2 .icon-heart2 {
-  opacity: 1;
-}
-
-.js-addedwish-b2 .icon-heart1 {
-  opacity: 0;
+/* Catalog listing cards active heart state */
+.js-addedwish-b2 .heart-icon {
+  animation: heartbeat 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) both;
+  fill: url(#cherry-gradient) !important;
+  stroke: none !important;
+  filter: drop-shadow(0 4px 8px rgba(255, 51, 102, 0.45));
 }
 
 /*---------------------------------------------*/
@@ -3122,20 +3133,11 @@ input.num-product::-webkit-inner-spin-button {
 }
 
 /*---------------------------------------------*/
-.js-addedwish-detail {
-  color: #6c7ae0;
-}
-
-.js-addwish-detail {
-  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-}
-
-.js-addwish-detail:hover {
-  transform: scale(1.2);
-}
-
-.js-addwish-detail:active {
-  transform: scale(0.9);
+.js-addedwish-detail .heart-icon {
+  animation: heartbeat 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) both;
+  fill: url(#cherry-gradient) !important;
+  stroke: none !important;
+  filter: drop-shadow(0 4px 8px rgba(255, 51, 102, 0.45));
 }
 
 /*---------------------------------------------*/
