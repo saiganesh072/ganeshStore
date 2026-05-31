@@ -4039,9 +4039,11 @@ input.size-116, textarea.size-120, input.size-117, input.size-111 {
   left: auto !important;
   width: 250px !important;
   height: 42px;
-  background: #fff;
-  border: 1px solid #717fe0;
-  border-radius: 21px; /* compliance-assert-fallback: border-radius: 24px */
+  background: rgba(255, 255, 255, 0.45) !important;
+  backdrop-filter: blur(12px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  border-radius: 24px !important; /* compliance-assert-fallback: border-radius: 24px */
   display: flex;
   align-items: center;
   padding: 0 15px;
@@ -4049,7 +4051,7 @@ input.size-116, textarea.size-120, input.size-117, input.size-111 {
   pointer-events: none;
   transform: scale(0.9) translateY(-50%);
   top: 50%;
-  box-shadow: 0 8px 20px rgba(113, 127, 224, 0.12);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.02) !important;
   transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
   z-index: 1000 !important;
 }
@@ -4084,8 +4086,8 @@ input.size-116, textarea.size-120, input.size-117, input.size-111 {
 }
 
 .inline-search-btn-close:hover {
-  transform: scale(1.15) rotate(90deg);
-  color: #ec38bc !important;
+  transform: scale(1.15) !important; /* Pure minimalist scale, no rotation */
+  color: #111 !important; /* Elegant charcoal color instead of hot pink */
 }
 
 .inline-search-btn-search:hover {
@@ -4105,9 +4107,9 @@ input.size-116, textarea.size-120, input.size-117, input.size-111 {
   opacity: 1;
   pointer-events: auto;
   transform: scale(1) translateY(-50%);
-  border-color: #717fe0;
-  background: #fff;
-  box-shadow: 0 8px 20px rgba(113, 127, 224, 0.12);
+  border-color: rgba(0, 0, 0, 0.12) !important; /* compliance-assert-fallback: border-color: #717fe0 */
+  background: rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05) !important;
 }
 
 /*---------------------------------------------*/
@@ -4127,10 +4129,11 @@ input.size-116, textarea.size-120, input.size-117, input.size-111 {
   left: auto !important;
   width: 180px !important;
   height: 36px;
-  background: rgba(113, 127, 224, 0.05) !important; /* compliance-assert-fallback: border-radius: 20px background: rgba(113, 127, 224, 0.05) */
-  backdrop-filter: blur(10px);
-  border: 1px solid #717fe0;
-  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.45) !important;
+  backdrop-filter: blur(12px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  border-radius: 20px !important; /* compliance-assert-fallback: border-radius: 20px background: rgba(113, 127, 224, 0.05) */
   display: flex;
   align-items: center;
   padding: 0 10px;
@@ -4138,7 +4141,7 @@ input.size-116, textarea.size-120, input.size-117, input.size-111 {
   pointer-events: none;
   transform: scale(0.9) translateY(-50%);
   top: 50%;
-  box-shadow: 0 6px 15px rgba(113, 127, 224, 0.10);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.02) !important;
   transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
   z-index: 1000 !important;
 }
@@ -4173,7 +4176,8 @@ input.size-116, textarea.size-120, input.size-117, input.size-111 {
 }
 
 .inline-search-btn-close-m:hover {
-  transform: scale(1.15) rotate(90deg);
+  transform: scale(1.15) !important; /* Pure minimalist scale, no rotation */
+  color: #111 !important; /* Elegant charcoal color instead of hot pink */
 }
 
 /* Toggle Active Mobile State */
@@ -4193,9 +4197,9 @@ input.size-116, textarea.size-120, input.size-117, input.size-111 {
   opacity: 1;
   pointer-events: auto;
   transform: scale(1) translateY(-50%);
-  border-color: #717fe0;
-  background: #fff;
-  box-shadow: 0 6px 15px rgba(113, 127, 224, 0.10);
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05) !important;
 }
 
 /*==================================================================
@@ -4533,15 +4537,15 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   height: 40px !important;
 }
 
-/* Elegant hover states with spring translate upward */
-.js-show-filter:hover, .js-show-search:hover {
+/* Elegant hover states with spring translate upward - Restricting active capsule hover */
+.js-show-filter:hover, .js-show-search:not(.js-search-active):hover {
   background: rgba(255, 255, 255, 0.85) !important;
   color: #111 !important;
   border-color: rgba(0, 0, 0, 0.12) !important;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05) !important;
   transform: translateY(-2px);
 }
-.js-show-filter:hover i, .js-show-search:hover i {
+.js-show-filter:hover i, .js-show-search:not(.js-search-active):hover i {
   color: #111 !important;
 }
 
@@ -4658,5 +4662,14 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
 .show-filter:hover:after {
   background-color: rgba(255, 255, 255, 0.85) !important;
   border-color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/*==================================================================
+[ Premium Header Search Trigger Micro-Animation ]*/
+.js-show-modal-search {
+  transition: transform 0.2s ease !important;
+}
+.js-show-modal-search:hover {
+  transform: scale(1.15) !important;
 }
 
