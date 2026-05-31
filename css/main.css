@@ -4810,4 +4810,207 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   transform: scale(1.15) !important;
 }
 
+/*==================================================================
+[ Premium PDP Visual Upgrades ]*/
+
+/* 1. Main Image Cursor Zoom & Glass Expand Button */
+.wrap-pic-w {
+  overflow: hidden !important;
+  border-radius: 12px;
+  position: relative;
+}
+
+.wrap-pic-w img {
+  transition: transform 0.15s ease-out, transform-origin 0.05s ease-out !important;
+  will-change: transform, transform-origin;
+}
+
+.wrap-pic-w:hover img {
+  transform: scale(1.15) !important;
+  cursor: zoom-in;
+}
+
+/* Floating Frosted Expand Button */
+.how-pos1 {
+  width: 44px !important;
+  height: 44px !important;
+  right: 15px !important;
+  top: 15px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(10px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(140%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08) !important;
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.25s !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.how-pos1:hover {
+  transform: scale(1.15) !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #111 !important;
+}
+
+/* 2. Visual Option Swatches (Color & Size) */
+.premium-swatch-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Color Swatches */
+.color-swatch-item {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1), box-shadow 0.2s !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.color-swatch-item:hover {
+  transform: scale(1.15);
+  box-shadow: 0 4px 10px rgba(255, 51, 102, 0.2), inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.color-swatch-item.active {
+  transform: scale(1.15);
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #222, 0 4px 10px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Size Pills */
+.size-pill-item {
+  min-width: 42px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  color: #555;
+  cursor: pointer;
+  padding: 0 10px;
+  transition: all 0.2s ease !important;
+  background: #fff;
+}
+
+.size-pill-item:hover {
+  border-color: #222;
+  color: #111;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.size-pill-item.active {
+  background: #222 !important;
+  border-color: #222 !important;
+  color: #fff !important;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 3. Luxury Typography & Free Shipping Badge */
+.js-name-detail {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #111;
+}
+
+.mtext-106 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  color: #333;
+  font-size: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.free-shipping-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(15, 118, 110, 0.06);
+  border: 1px solid rgba(15, 118, 110, 0.15);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 11px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  color: #0f766e;
+  vertical-align: middle;
+}
+
+.free-shipping-dot {
+  width: 6px;
+  height: 6px;
+  background-color: #0f766e;
+  border-radius: 50%;
+  animation: pulse-badge-dot 1.8s infinite;
+}
+
+@keyframes pulse-badge-dot {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(15, 118, 110, 0.5); }
+  70% { transform: scale(1); box-shadow: 0 0 0 5px rgba(15, 118, 110, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(15, 118, 110, 0); }
+}
+
+/* 4. Frosted Glass Trust badge Container */
+.trust-badges-container {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  background: rgba(255, 255, 255, 0.65) !important;
+  backdrop-filter: blur(12px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04) !important;
+  border-radius: 12px;
+  padding: 16px 20px !important;
+  margin-top: 30px;
+  flex-wrap: wrap;
+}
+
+.trust-badge-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.trust-badge-item i {
+  font-size: 24px;
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+.trust-badge-item:hover i {
+  transform: scale(1.2);
+}
+
+.trust-badge-item div h6 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  color: #222;
+  margin-bottom: 2px;
+}
+
+.trust-badge-item div span {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 11px;
+  color: #666;
+}
+
+
 

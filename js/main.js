@@ -1437,6 +1437,9 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         syncAuthHeader();
         initCatalogFilters();
         initPDPReviews();
+        initPremiumPDPSwatches();
+        initPDPPanZoom();
+        initPDPPricingBadges();
         $(window).on('load', function() {
             initWishlist();
             initCart();
@@ -1445,6 +1448,9 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             initSearchFilteringRouting();
             initCatalogFilters();
             initPDPReviews();
+            initPremiumPDPSwatches();
+            initPDPPanZoom();
+            initPDPPricingBadges();
         });
     });
 
@@ -2447,6 +2453,153 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         
         $(document).on('click', '.js-sticky-buy-trigger', function() {
             $('.js-addcart-detail').trigger('click');
+        });
+    }
+
+    // 1. Dynamic Option Swatches (Color & Size) Builder
+    function initPremiumPDPSwatches() {
+        // Size swatches
+        $('.rs1-select2').each(function() {
+            var $originalContainer = $(this);
+            var $select = $originalContainer.find('select.js-select2');
+            if (!$select.length) return;
+            
+            // Check if this container already has premium swatches built next to it to avoid duplicates
+            if ($originalContainer.next('.premium-swatch-container').length) return;
+            
+            var isSize = false;
+            var isColor = false;
+            var options = [];
+            
+            $select.find('option').each(function() {
+                var text = $(this).text().trim();
+                var val = $(this).val();
+                if (text === 'Choose an option') return;
+                
+                if (text.toLowerCase().indexOf('size') > -1 || text === 'S' || text === 'M' || text === 'L' || text === 'XL') {
+                    isSize = true;
+                } else {
+                    isColor = true;
+                }
+                
+                options.push({ text: text, val: val });
+            });
+            
+            if (options.length === 0) return;
+            
+            if (isSize) {
+                // Build size pills grid
+                $originalContainer.hide(); // Hide the select2 dropdown container
+                
+                var $pillContainer = $('<div class="size-pill-container premium-swatch-container"></div>');
+                options.forEach(function(opt) {
+                    var display = opt.text.replace(/size\s*/i, '').trim();
+                    var $pill = $('<div class="size-pill-item" data-val="' + opt.val + '">' + display + '</div>');
+                    
+                    $pill.on('click', function() {
+                        if ($(this).hasClass('active')) {
+                            $(this).removeClass('active');
+                            $select.val('Choose an option').trigger('change');
+                        } else {
+                            $pillContainer.find('.size-pill-item').removeClass('active');
+                            $(this).addClass('active');
+                            $select.val(opt.val).trigger('change');
+                        }
+                    });
+                    
+                    $pillContainer.append($pill);
+                });
+                
+                $originalContainer.after($pillContainer);
+            } else if (isColor) {
+                // Build color circles swatches
+                $originalContainer.hide(); // Hide select2
+                
+                var $colorContainer = $('<div class="color-swatch-container premium-swatch-container"></div>');
+                
+                // Color hex mapping for high-end aesthetics
+                var colorMap = {
+                    'red': '#ff3366',
+                    'blue': '#3a86ff',
+                    'white': '#ffffff',
+                    'grey': '#8e9aaf',
+                    'gray': '#8e9aaf',
+                    'black': '#1a1a1a',
+                    'green': '#0f766e'
+                };
+                
+                options.forEach(function(opt) {
+                    var colorKey = opt.text.toLowerCase().trim();
+                    var hex = colorMap[colorKey] || '#cccccc';
+                    
+                    var style = 'background-color: ' + hex + ';';
+                    if (colorKey === 'white') {
+                        style += ' border: 1px solid rgba(0,0,0,0.1);';
+                    }
+                    
+                    var $swatch = $('<div class="color-swatch-item" style="' + style + '" data-val="' + opt.val + '" title="' + opt.text + '"></div>');
+                    
+                    $swatch.on('click', function() {
+                        if ($(this).hasClass('active')) {
+                            $(this).removeClass('active');
+                            $select.val('Choose an option').trigger('change');
+                        } else {
+                            $colorContainer.find('.color-swatch-item').removeClass('active');
+                            $(this).addClass('active');
+                            $select.val(opt.val).trigger('change');
+                        }
+                    });
+                    
+                    $colorContainer.append($swatch);
+                });
+                
+                $originalContainer.after($colorContainer);
+            }
+        });
+    }
+
+    // 2. Interactive Cursor Pan-Zoom on Main Images
+    function initPDPPanZoom() {
+        $('.wrap-pic-w').each(function() {
+            var $container = $(this);
+            var $img = $container.find('img');
+            if (!$img.length) return;
+            
+            $container.off('mousemove.pdpzoom mouseleave.pdpzoom');
+            
+            $container.on('mousemove.pdpzoom', function(e) {
+                var width = $container.width();
+                var height = $container.height();
+                
+                var rect = this.getBoundingClientRect();
+                var x = e.clientX - rect.left;
+                var y = e.clientY - rect.top;
+                
+                var xPercent = (x / width) * 100;
+                var yPercent = (y / height) * 100;
+                
+                $img.css('transform-origin', xPercent + '% ' + yPercent + '%');
+            });
+            
+            $container.on('mouseleave.pdpzoom', function() {
+                $img.css('transform-origin', 'center center');
+            });
+        });
+    }
+
+    // 3. Dynamic Free Shipping Badge Injection
+    function initPDPPricingBadges() {
+        $('.mtext-106').each(function() {
+            var $price = $(this);
+            if ($price.find('.free-shipping-badge').length) return;
+            
+            var badgeHtml = 
+                '<span class="free-shipping-badge">' +
+                '  <span class="free-shipping-dot"></span>' +
+                '  Free Shipping Eligible' +
+                '</span>';
+                
+            $price.append(badgeHtml);
         });
     }
 
