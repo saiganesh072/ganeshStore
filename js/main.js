@@ -879,6 +879,19 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             }
         });
 
+        // 1b. Inject the premium inline sliding search capsule directly inside actions row (only once)
+        var $actions = $('.js-show-search').parent();
+        if ($actions.length && !$actions.find('.js-inline-search-capsule').length) {
+            $actions.prepend(
+                '<div class="js-inline-search-capsule" style="width: 0; opacity: 0; overflow: hidden; display: flex; align-items: center; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">' +
+                '  <div class="bor8 dis-flex p-l-15" style="width: 100%; height: 40px; background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(0, 0, 0, 0.08); border-radius: 20px; align-items: center; box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02); transition: all 0.3s ease;">' +
+                '    <i class="zmdi zmdi-search m-r-8" style="color: #999; font-size: 15px;"></i>' +
+                '    <input class="mtext-107 cl2 size-114 plh2 p-r-15 js-inline-search-input" type="text" placeholder="Type to search..." style="border: none; background: transparent; height: 100%; outline: none; font-size: 14px; width: 100%;" />' +
+                '  </div>' +
+                '</div>'
+            );
+        }
+
         // 2. Bind real-time input keyup filtering on the standard panel-search input
         var $input = $('.panel-search input[name="search-product"]');
         var $topeContainer = $('.isotope-grid');
@@ -996,14 +1009,65 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             });
         };
 
-        // 3. Keyup Search listener
+        // 3. Keyup Search listener (Synchronized across responsive inputs)
+        var $inlineInput = $('.js-inline-search-input');
+        
+        function handleSearchKeyup(query) {
+            window.activeFilters.searchQuery = query;
+            $('.filter-tope-group button').removeClass('how-active1');
+            window.executeCombinedFilters();
+        }
+        
         if ($input.length) {
             $input.off('keyup').on('keyup', function() {
-                window.activeFilters.searchQuery = $(this).val().toLowerCase().trim();
-                $('.filter-tope-group button').removeClass('how-active1');
-                window.executeCombinedFilters();
+                var query = $(this).val().toLowerCase().trim();
+                handleSearchKeyup(query);
             });
         }
+        
+        if ($inlineInput.length) {
+            $inlineInput.off('keyup').on('keyup', function() {
+                var query = $(this).val().toLowerCase().trim();
+                handleSearchKeyup(query);
+            });
+        }
+
+        // Intercept and toggle search trigger with sliding capsule micro-animations
+        $('.js-show-search').off('click').on('click', function(e) {
+            e.preventDefault();
+            var $btn = $(this);
+            var isMobile = $(window).width() < 768;
+            
+            // Check if filter is open and close it
+            if ($('.js-show-filter').hasClass('show-filter')) {
+                $('.js-show-filter').removeClass('show-filter');
+                $('.panel-filter').slideUp(400);
+            }
+            
+            if (isMobile) {
+                // Mobile behavior: toggle standard panel-search dropdown
+                $('.js-inline-search-capsule').removeClass('active');
+                $btn.toggleClass('show-search');
+                $('.panel-search').slideToggle(400);
+            } else {
+                // Desktop behavior: toggle inline expanding capsule springy!
+                var $capsule = $('.js-inline-search-capsule');
+                $capsule.toggleClass('active');
+                $btn.toggleClass('show-search');
+                
+                // Hide standard dropdown if open
+                $('.panel-search').hide();
+                
+                if ($capsule.hasClass('active')) {
+                    setTimeout(function() {
+                        $capsule.find('input').focus();
+                    }, 50);
+                } else {
+                    // Reset input on close
+                    $capsule.find('input').val('').trigger('keyup');
+                }
+            }
+        });
 
         // 4. Sort By Column Click Handlers (Col 1)
         $('.filter-col1 a').off('click').on('click', function(e) {

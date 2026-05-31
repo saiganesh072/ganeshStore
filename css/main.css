@@ -4551,3 +4551,28 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   color: #fff !important;
 }
 
+/*==================================================================
+[ Premium Sliding Search Input Option A & Micro-Animations ]*/
+.js-inline-search-capsule {
+  margin-right: 0;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+.js-inline-search-capsule.active {
+  width: 250px !important;
+  opacity: 1 !important;
+  margin-right: 12px !important;
+}
+.js-inline-search-capsule .bor8:focus-within {
+  border-color: #717fe0 !important;
+  box-shadow: 0 4px 15px rgba(113, 127, 224, 0.15), inset 0 2px 4px rgba(0, 0, 0, 0.01) !important;
+  transform: translateY(-1px);
+}
+
+/* Micro-rotations on search and close icons inside Search Trigger */
+.js-show-search i {
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+.js-show-search.show-search i {
+  transform: rotate(180deg) !important;
+}
+
