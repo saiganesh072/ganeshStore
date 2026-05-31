@@ -4035,7 +4035,7 @@ input.size-116, textarea.size-120, input.size-117, input.size-111 {
 
 .inline-search-nav {
   position: absolute;
-  right: 170px !important;
+  right: 125px !important; /* Shift further to the right to cover original trigger space and close the empty gap */
   left: auto !important;
   width: 250px !important;
   height: 42px;
@@ -4125,7 +4125,7 @@ input.size-116, textarea.size-120, input.size-117, input.size-111 {
 
 .inline-search-mobile {
   position: absolute;
-  right: 125px !important;
+  right: 80px !important; /* Shift further to the right to cover original trigger space and close the empty gap on mobile */
   left: auto !important;
   width: 180px !important;
   height: 36px;
