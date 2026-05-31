@@ -4667,10 +4667,18 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
 /*==================================================================
 [ Premium Header Search Trigger Micro-Animation ]*/
 .js-show-modal-search {
-  transition: transform 0.2s ease !important;
+  transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
 }
 .js-show-modal-search:hover {
   transform: scale(1.15) !important;
+}
+
+/* Smoothly hide the header search triggers when search is active to create a seamless morphing illusion */
+.limiter-menu-desktop.show-inline-search .js-show-modal-search,
+.wrap-header-mobile.show-inline-search .js-show-modal-search {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: scale(0.8) !important;
 }
 
 /* Prevent the active catalog search capsule from jumping or changing shadow on hover */
@@ -4694,5 +4702,28 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
 .inline-search-btn-close-m:hover i {
   color: #111 !important;
   transform: scale(1.15) !important;
+}
+
+/* Guarantee visibility and prevent squeezing of catalog search capsule icons */
+.js-show-search i.js-search-icon {
+  flex-shrink: 0 !important;
+  color: #555 !important; /* Visible gray */
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 15px !important;
+  height: 15px !important;
+}
+
+.js-search-close-btn {
+  z-index: 10 !important; /* Float above inputs */
+  flex-shrink: 0 !important;
+}
+
+.js-search-close-btn i {
+  color: #888 !important; /* Visible gray */
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
