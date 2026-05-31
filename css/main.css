@@ -4613,7 +4613,7 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   right: 14px !important;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.3s, transform 0.3s !important;
+  transition: opacity 0.3s, transform 0.2s, color 0.2s !important;
   font-size: 14px;
   color: #888;
   cursor: pointer;
@@ -4629,16 +4629,16 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
 }
 
 .js-search-close-btn:hover {
-  color: #111;
-  transform: scale(1.15) rotate(90deg) !important;
+  color: #111 !important;
+  transform: scale(1.15) !important; /* Pure scale zoom, no rotation */
 }
 
-/* Micro-rotations on search icon */
+/* Premium Zoom scale transition for magnifying search icon */
 .js-show-search i.js-search-icon {
-  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
 }
 .js-show-search.js-search-active i.js-search-icon {
-  transform: rotate(180deg) !important;
+  transform: scale(1.15) !important; /* Clean, subtle zoom-in, no rotation */
 }
 
 /* Eliminate the downward diamond shape for search entirely */
