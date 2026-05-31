@@ -4086,7 +4086,7 @@ input.size-116, textarea.size-120, input.size-117, input.size-111 {
 }
 
 .inline-search-btn-close:hover {
-  transform: scale(1.15) !important; /* Pure minimalist scale, no rotation */
+  transform: none !important; /* Pure minimalist transition, no scale on button itself */
   color: #111 !important; /* Elegant charcoal color instead of hot pink */
 }
 
@@ -4176,7 +4176,7 @@ input.size-116, textarea.size-120, input.size-117, input.size-111 {
 }
 
 .inline-search-btn-close-m:hover {
-  transform: scale(1.15) !important; /* Pure minimalist scale, no rotation */
+  transform: none !important; /* Pure minimalist transition, no scale on button itself */
   color: #111 !important; /* Elegant charcoal color instead of hot pink */
 }
 
@@ -4701,7 +4701,7 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
 .inline-search-btn-search-m:hover i,
 .inline-search-btn-close-m:hover i {
   color: #111 !important;
-  transform: scale(1.15) !important;
+  transform: scale(1.06) !important; /* Subtle, minimal premium zoom */
 }
 
 /* Guarantee visibility and prevent squeezing of catalog search capsule icons */
