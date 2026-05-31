@@ -1984,14 +1984,17 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
 
     // Intercept logout button
     $(document).on('click', '.CLogout, .js-global-logout', function(e) {
-        if (!window.supabaseClient) return;
-        localStorage.removeItem('userProfile');
-        localStorage.setItem('user', 'loggedout');
-        localStorage.setItem('cartItems', '[]');
-        localStorage.setItem('wishlist', '[]');
-        document.cookie = "CustomerName=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-        document.cookie = "CustomerNumber=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-        window.location.reload();
+        if (typeof logoutUser === 'function') {
+            logoutUser(e);
+        } else {
+            localStorage.removeItem('userProfile');
+            localStorage.setItem('user', 'loggedout');
+            localStorage.setItem('cartItems', '[]');
+            localStorage.setItem('wishlist', '[]');
+            document.cookie = "CustomerName=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+            document.cookie = "CustomerNumber=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+            window.location.reload();
+        }
     });
 
     /*==================================================================
