@@ -2081,11 +2081,31 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
 
         // Enforce validations before proceeding
         if (validationFailed) {
-            if (typeof swal === 'function') {
-                swal("Selection Required", "Please select a valid " + missingAttribute + " option before adding to your cart.", "warning");
-            } else {
-                alert("Please select a valid " + missingAttribute + " option.");
-            }
+            $row.find('select').each(function() {
+                var $select = $(this);
+                var selectedVal = $select.val();
+                if (!selectedVal || selectedVal === 'Choose an option') {
+                    var $target = $select.closest('.rs1-select2').next('.premium-swatch-container');
+                    if (!$target.length) $target = $select.closest('.rs1-select2');
+                    
+                    var $rowContainer = $select.closest('.premium-option-row');
+                    if (!$rowContainer.length) $rowContainer = $select.closest('.flex-w');
+                    
+                    // Trigger dynamic physical row shake
+                    $rowContainer.addClass('premium-row-error');
+                    setTimeout(function() {
+                        $rowContainer.removeClass('premium-row-error');
+                    }, 500);
+                    
+                    // Trigger glowing red border on missing container
+                    $target.addClass('premium-swatch-error');
+                    
+                    // Remove error styling instantly when selection changes
+                    $select.off('change.pdpvalidation').on('change.pdpvalidation', function() {
+                        $target.removeClass('premium-swatch-error');
+                    });
+                }
+            });
             return;
         }
 
@@ -2510,6 +2530,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                     var $pill = $('<div class="size-pill-item" data-val="' + opt.val + '">' + display + '</div>');
                     
                     $pill.on('click', function() {
+                        $pillContainer.removeClass('premium-swatch-error');
                         if ($(this).hasClass('active')) {
                             $(this).removeClass('active');
                             $select.val('Choose an option').trigger('change');
@@ -2553,6 +2574,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                     var $swatch = $('<div class="color-swatch-item" style="' + style + '" data-val="' + opt.val + '" title="' + opt.text + '"></div>');
                     
                     $swatch.on('click', function() {
+                        $colorContainer.removeClass('premium-swatch-error');
                         if ($(this).hasClass('active')) {
                             $(this).removeClass('active');
                             $select.val('Choose an option').trigger('change');

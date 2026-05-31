@@ -5284,6 +5284,32 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   transform: scale(1.18) translateY(-1px) !important;
 }
 
+/* 5. Premium Option Row Shake & Swatch Error Highlights */
+.premium-swatch-container {
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+  padding: 4px !important;
+  margin: -4px !important; /* Counteracts padding to preserve absolute layout alignments */
+  transition: border-color 0.25s, box-shadow 0.25s !important;
+}
+
+.premium-swatch-error {
+  border-color: rgba(255, 51, 102, 0.35) !important;
+  box-shadow: 0 0 0 4px rgba(255, 51, 102, 0.12) !important;
+}
+
+@keyframes premium-row-shake-keyframes {
+  0%, 100% { transform: translateX(0); }
+  15%, 45%, 75% { transform: translateX(-6px); }
+  30%, 60%, 90% { transform: translateX(6px); }
+}
+
+.premium-row-error {
+  animation: premium-row-shake-keyframes 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both !important;
+  backface-visibility: hidden !important;
+  perspective: 1000px !important;
+}
+
 
 
 
