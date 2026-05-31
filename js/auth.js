@@ -286,6 +286,17 @@ function logoutUser(e) {
   }
 }
 
+function getRegisteredUsers() {
+  const users = localStorage.getItem('ganeshStore_registered_users');
+  return users ? JSON.parse(users) : [];
+}
+
+function saveRegisteredUser(user) {
+  const users = getRegisteredUsers();
+  users.push(user);
+  localStorage.setItem('ganeshStore_registered_users', JSON.stringify(users));
+}
+
 function getMockUser() {
   const user = localStorage.getItem('ganeshStore_user_mock');
   return user ? JSON.parse(user) : null;
@@ -368,22 +379,66 @@ window.handleEmailLogin = function(event) {
         triggerDisplayMessage('error', error.message);
       });
   } else {
-    // Mock Login
+    // Mock Login with strict database check
     if (pass.length < 6) {
       triggerDisplayMessage('error', 'Password must be at least 6 characters long.');
       return;
     }
-    const name = email.split('@')[0];
-    const uid = "mock-uid-email-456";
     
-    const mockUser = { uid, email, displayName: name, photoURL: null };
-    localStorage.setItem('ganeshStore_user_mock', JSON.stringify(mockUser));
+    const checkUserAndLogin = (existingUser) => {
+      if (!existingUser) {
+        triggerDisplayMessage('error', 'No account found with this email. Please Sign Up to create an account first.');
+        return;
+      }
+      
+      if (existingUser.password && existingUser.password !== pass) {
+        triggerDisplayMessage('error', 'Incorrect password. Please try again.');
+        return;
+      }
+      
+      const name = existingUser.name || email.split('@')[0];
+      const uid = existingUser.uid || "mock-uid-email-456";
+      
+      const mockUser = { uid, email, displayName: name, photoURL: null };
+      localStorage.setItem('ganeshStore_user_mock', JSON.stringify(mockUser));
+      
+      triggerDisplayMessage('success', 'Welcome back! Syncing profile...');
+      
+      syncUserProfileWithSupabase(uid, name, email).then(() => {
+        setTimeout(() => { window.location.reload(); }, 1200);
+      });
+    };
+
+    const users = getRegisteredUsers();
+    const localUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
     
-    triggerDisplayMessage('success', 'Welcome back! Syncing profile...');
-    
-    syncUserProfileWithSupabase(uid, name, email).then(() => {
-      setTimeout(() => { window.location.reload(); }, 1200);
-    });
+    if (localUser) {
+      checkUserAndLogin(localUser);
+    } else if (window.supabaseClient) {
+      // Check database (Supabase profiles table)
+      window.supabaseClient
+        .from('profiles')
+        .select('*')
+        .eq('email', email)
+        .then(response => {
+          const profile = response.data && response.data[0];
+          if (profile) {
+            const uid = profile.id;
+            const name = profile.full_name;
+            const newUser = { name, email, password: pass, uid };
+            saveRegisteredUser(newUser);
+            checkUserAndLogin(newUser);
+          } else {
+            checkUserAndLogin(null);
+          }
+        })
+        .catch(err => {
+          console.error("❌ Supabase login check failed:", err);
+          checkUserAndLogin(null);
+        });
+    } else {
+      checkUserAndLogin(null);
+    }
   }
 };
 
@@ -423,12 +478,23 @@ window.handleEmailSignUp = function(event) {
         triggerDisplayMessage('error', error.message);
       });
   } else {
-    // Mock Sign Up
-    const uid = "mock-uid-signup-789";
-    const mockUser = { uid, email, displayName: name, photoURL: null };
-    localStorage.setItem('ganeshStore_user_mock', JSON.stringify(mockUser));
+    // Mock Sign Up with database creation check
+    const users = getRegisteredUsers();
+    const existingUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
     
-    triggerDisplayMessage('success', 'Registration simulated! Syncing profile...');
+    if (existingUser) {
+      triggerDisplayMessage('error', 'An account with this email already exists. Please Sign In instead.');
+      return;
+    }
+    
+    const uid = "mock-uid-" + Math.random().toString(36).substr(2, 9);
+    const mockUser = { uid, email, displayName: name, photoURL: null };
+    
+    // Save new user profile locally (in localStorage)
+    saveRegisteredUser({ name, email, password: pass, uid });
+    
+    localStorage.setItem('ganeshStore_user_mock', JSON.stringify(mockUser));
+    triggerDisplayMessage('success', 'Account created successfully! Syncing profile...');
     
     syncUserProfileWithSupabase(uid, name, email).then(() => {
       setTimeout(() => { window.location.reload(); }, 1200);
