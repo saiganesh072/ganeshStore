@@ -1458,13 +1458,13 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         
         var iconHtml = '';
         if (type === 'success') {
-            // Heart icon with gorgeous custom toast-cherry-gradient matching notification badges
+            // Heart icon with gorgeous custom toast-cherry-gradient matching premium wishlist cherry red
             iconHtml = 
                 '<svg viewBox="0 0 24 24" width="20" height="20" style="margin-right: 12px; flex-shrink: 0; filter: drop-shadow(0 2px 4px rgba(255, 51, 102, 0.15));">' +
                 '  <defs>' +
                 '    <linearGradient id="toast-cherry-gradient" x1="0%" y1="0%" x2="100%" y2="100%">' +
-                '      <stop offset="0%" stop-color="#ec38bc" />' +
-                '      <stop offset="100%" stop-color="#717fe0" />' +
+                '      <stop offset="0%" stop-color="#ff3366" />' +
+                '      <stop offset="100%" stop-color="#d91444" />' +
                 '    </linearGradient>' +
                 '  </defs>' +
                 '  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="url(#toast-cherry-gradient)" />' +
