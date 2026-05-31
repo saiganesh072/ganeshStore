@@ -548,9 +548,28 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
     function updateWishlistBadges() {
         var wishlist = getWishlist();
         var count = wishlist.length;
-        $('.icon-header-noti i.zmdi-favorite-outline, .icon-header-noti i.zmdi-favorite')
+        $('.icon-header-noti i.zmdi-favorite-outline, .icon-header-noti i.zmdi-favorite, .icon-header-noti svg')
             .parent()
             .attr('data-notify', count);
+        
+        // Dynamic header heart fill state depending on count
+        var $svg = $('.heart-icon-header');
+        if ($svg.length) {
+            var $path = $svg.find('path');
+            if (count > 0) {
+                $svg.addClass('js-header-heart-active');
+                $path.css({
+                    'fill': 'url(#cherry-gradient)',
+                    'stroke': 'none'
+                });
+            } else {
+                $svg.removeClass('js-header-heart-active');
+                $path.css({
+                    'fill': 'none',
+                    'stroke': '#222'
+                });
+            }
+        }
     }
 
     // Initialize all wishlist interactions on load
@@ -571,10 +590,21 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             );
         }
 
-        // 1. Rewrite all header/mobile-header favorite icons to point to wishlist.html
-        $('.icon-header-item i.zmdi-favorite-outline, .icon-header-item i.zmdi-favorite')
-            .parent()
-            .attr('href', 'wishlist.html');
+        // 1. Rewrite all header/mobile-header favorite icons to point to wishlist.html and replace with SVG heart
+        var headerHeartSelector = '.icon-header-item i.zmdi-favorite-outline, .icon-header-item i.zmdi-favorite, .wrap-icon-header a i.zmdi-favorite-outline, .wrap-icon-header a i.zmdi-favorite';
+        $(headerHeartSelector).each(function() {
+            var $icon = $(this);
+            var $link = $icon.parent();
+            if (!$link.find('.heart-icon-header').length) {
+                $icon.remove(); // remove old zmdi icon
+                $link.prepend(
+                    '<svg class="heart-icon-header" viewBox="0 0 24 24" width="24" height="24">' +
+                    '  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="#222" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>' +
+                    '</svg>'
+                );
+            }
+            $link.attr('href', 'wishlist.html');
+        });
 
         // 2. Update badges immediately
         updateWishlistBadges();

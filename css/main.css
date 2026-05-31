@@ -2342,12 +2342,18 @@ input.num-product::-webkit-inner-spin-button {
   70% { transform: scale(1); }
 }
 
-/* Catalog listing cards active heart state */
+/* Catalog listing cards active heart state (Resting) */
 .js-addedwish-b2 .heart-icon {
   animation: heartbeat 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) both;
   fill: url(#cherry-gradient) !important;
   stroke: none !important;
-  filter: drop-shadow(0 4px 8px rgba(255, 51, 102, 0.45));
+  filter: drop-shadow(0 2px 4px rgba(255, 51, 102, 0.15)) !important;
+}
+
+/* Escalated glow on active heart hover */
+.js-addedwish-b2:hover .heart-icon,
+.js-addedwish-detail:hover .heart-icon {
+  filter: drop-shadow(0 5px 12px rgba(255, 51, 102, 0.45)) !important;
 }
 
 /*---------------------------------------------*/
@@ -3137,7 +3143,21 @@ input.num-product::-webkit-inner-spin-button {
   animation: heartbeat 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) both;
   fill: url(#cherry-gradient) !important;
   stroke: none !important;
-  filter: drop-shadow(0 4px 8px rgba(255, 51, 102, 0.45));
+  filter: drop-shadow(0 2px 4px rgba(255, 51, 102, 0.15)) !important;
+}
+
+/* Header navigation SVG heart styles */
+.heart-icon-header {
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), stroke 0.3s ease, fill 0.3s ease !important;
+  display: inline-block;
+  vertical-align: middle;
+}
+.icon-header-item:hover .heart-icon-header {
+  transform: scale(1.18);
+}
+.heart-icon-header.js-header-heart-active {
+  animation: heartbeat 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) both;
+  filter: drop-shadow(0 4px 8px rgba(255, 51, 102, 0.35)) !important;
 }
 
 /*---------------------------------------------*/
