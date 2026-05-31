@@ -4526,7 +4526,7 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
 .js-show-filter, .js-show-search {
   border-radius: 23px !important; /* Perfect smooth pill shape */
   font-family: Poppins-Medium;
-  transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.3s, border-color 0.3s, box-shadow 0.3s !important;
+  transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.3s, border-color 0.3s, box-shadow 0.3s, transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
   background: rgba(255, 255, 255, 0.45) !important;
   backdrop-filter: blur(12px) saturate(140%) !important;
   -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
@@ -4670,6 +4670,29 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   transition: transform 0.2s ease !important;
 }
 .js-show-modal-search:hover {
+  transform: scale(1.15) !important;
+}
+
+/* Prevent the active catalog search capsule from jumping or changing shadow on hover */
+.js-show-search.js-search-active:hover {
+  transform: none !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Unify navigation search icon colors and prevent hover opacity issues */
+.inline-search-btn-search i,
+.inline-search-btn-close i,
+.inline-search-btn-search-m i,
+.inline-search-btn-close-m i {
+  color: #555 !important;
+  transition: color 0.25s ease, transform 0.25s ease !important;
+}
+
+.inline-search-btn-search:hover i,
+.inline-search-btn-close:hover i,
+.inline-search-btn-search-m:hover i,
+.inline-search-btn-close-m:hover i {
+  color: #111 !important;
   transform: scale(1.15) !important;
 }
 
