@@ -552,22 +552,14 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             .parent()
             .attr('data-notify', count);
         
-        // Dynamic header heart fill state depending on count
+        // Dynamic header heart filled indicator strictly for the active wishlist.html route
         var $svg = $('.heart-icon-header');
         if ($svg.length) {
-            var $path = $svg.find('path');
-            if (count > 0) {
-                $svg.addClass('js-header-heart-active');
-                $path.css({
-                    'fill': 'url(#cherry-gradient)',
-                    'stroke': 'none'
-                });
+            var isWishlistPage = window.location.pathname.indexOf('wishlist.html') > -1;
+            if (isWishlistPage) {
+                $svg.addClass('js-header-heart-active-route');
             } else {
-                $svg.removeClass('js-header-heart-active');
-                $path.css({
-                    'fill': 'none',
-                    'stroke': '#222'
-                });
+                $svg.removeClass('js-header-heart-active-route');
             }
         }
     }

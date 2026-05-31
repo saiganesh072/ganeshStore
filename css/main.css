@@ -3146,18 +3146,37 @@ input.num-product::-webkit-inner-spin-button {
   filter: drop-shadow(0 2px 4px rgba(255, 51, 102, 0.15)) !important;
 }
 
-/* Header navigation SVG heart styles */
+/* Header navigation SVG heart styles (Default State) */
 .heart-icon-header {
   transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), stroke 0.3s ease, fill 0.3s ease !important;
   display: inline-block;
   vertical-align: middle;
 }
+.heart-icon-header path {
+  fill: none;
+  stroke: #222;
+  stroke-width: 1.8px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.3s ease, fill 0.3s ease !important;
+}
+
+/* Hover scales & stroke color change */
 .icon-header-item:hover .heart-icon-header {
   transform: scale(1.18);
 }
-.heart-icon-header.js-header-heart-active {
+.icon-header-item:hover .heart-icon-header path {
+  stroke: #ff3366;
+}
+
+/* Active Wishlist Page Route State (Fully Filled & Beating) */
+.heart-icon-header.js-header-heart-active-route {
   animation: heartbeat 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) both;
   filter: drop-shadow(0 4px 8px rgba(255, 51, 102, 0.35)) !important;
+}
+.heart-icon-header.js-header-heart-active-route path {
+  fill: url(#cherry-gradient) !important;
+  stroke: none !important;
 }
 
 /*---------------------------------------------*/
