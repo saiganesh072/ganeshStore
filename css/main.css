@@ -4516,3 +4516,38 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   color: #888;
   display: block;
 }
+
+/*==================================================================
+[ Premium Rounded Pill Styling for Search & Filter Trigger Buttons ]*/
+.js-show-filter, .js-show-search {
+  border-radius: 23px !important; /* Perfect smooth pill shape */
+  font-family: Poppins-Medium;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
+}
+
+/* Elegant hover states with spring translate upward */
+.js-show-filter:hover, .js-show-search:hover {
+  background: #717fe0 !important;
+  color: #fff !important;
+  border-color: #717fe0 !important;
+  box-shadow: 0 6px 20px rgba(113, 127, 224, 0.25) !important;
+  transform: translateY(-2px);
+}
+.js-show-filter:hover i, .js-show-search:hover i {
+  color: #fff !important;
+}
+
+/* Active open states (matches JS toggled classes) */
+.js-show-filter.show-filter, .js-show-search.show-search {
+  background: #717fe0 !important;
+  color: #fff !important;
+  border-color: #717fe0 !important;
+  box-shadow: 0 6px 20px rgba(113, 127, 224, 0.25) !important;
+}
+.js-show-filter.show-filter i, .js-show-search.show-search i {
+  color: #fff !important;
+}
+
