@@ -2579,6 +2579,51 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             // Shift classes to premium capsule action row
             $row.addClass('premium-action-row').removeClass('flex-w flex-r-m p-b-10');
             $innerWrapper.removeClass('size-204 flex-w flex-m respon6-next');
+            
+            // Relocate Wishlist CTA to be next to Add to Cart button as a primary action
+            var $originalWish = $('.js-addwish-detail');
+            if ($originalWish.length && !$row.find('.js-addwish-detail-container').length) {
+                var isAlreadyWish = $originalWish.hasClass('js-addedwish-detail');
+                
+                var wishSvg = 
+                    '<svg viewBox="0 0 24 24">' +
+                    '  <defs>' +
+                    '    <linearGradient id="pdp-cherry-gradient" x1="0%" y1="0%" x2="100%" y2="100%">' +
+                    '      <stop offset="0%" stop-color="#ff3366" />' +
+                    '      <stop offset="100%" stop-color="#d91444" />' +
+                    '    </linearGradient>' +
+                    '  </defs>' +
+                    '  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />' +
+                    '</svg>';
+                    
+                var activeClass = isAlreadyWish ? ' wishlisted' : '';
+                var $newWishBtn = $('<div class="js-addwish-detail-container' + activeClass + '" title="Add to Wishlist">' + wishSvg + '</div>');
+                
+                // Clicking the primary action triggers native click handler
+                $newWishBtn.on('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    $originalWish.trigger('click');
+                    
+                    // Sync active status after animation/state update
+                    setTimeout(function() {
+                        var isWish = $originalWish.hasClass('js-addedwish-detail');
+                        $newWishBtn.toggleClass('wishlisted', isWish);
+                    }, 50);
+                });
+                
+                // Add to the end of the action block row
+                $innerWrapper.append($newWishBtn);
+                
+                // Hide the old wishlist divider/element from social bar to avoid duplicates, but preserve in DOM
+                $originalWish.closest('.bor9').hide();
+                
+                // Periodically check/sync class to catch other triggers (like modal closing)
+                setInterval(function() {
+                    var isWish = $originalWish.hasClass('js-addedwish-detail');
+                    $newWishBtn.toggleClass('wishlisted', isWish);
+                }, 300);
+            }
         });
 
         // 3. Social Share & Wishlist Left-Alignment (Remove inline offsets)

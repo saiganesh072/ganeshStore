@@ -5013,9 +5013,9 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
 }
 
 /*==================================================================
-[ Premium PDP Stacking & Left-Alignment Overrides ]*/
+[ Premium PDP Stacking, Swatches & Action Block Refinements ]*/
 
-/* 1. Stacked Option Rows */
+/* 1. Stacked Option Rows & Swatches Spacing */
 .premium-option-row {
   display: flex !important;
   flex-direction: column !important;
@@ -5037,7 +5037,19 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   text-align: left !important;
 }
 
-/* 2. Unified Capsule Action Row (Quantity + Add to Cart) */
+.premium-swatch-container {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 14px !important; /* Increased spacing to prevent active ring overlaps */
+  align-items: center !important;
+}
+
+.color-swatch-item.active {
+  transform: scale(1.15) !important;
+  box-shadow: 0 0 0 3px #fff, 0 0 0 5px #222, 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* 2. Unified Capsule Action Row (Quantity + Add to Cart + Wishlist) */
 .premium-action-row {
   display: flex !important;
   flex-direction: row !important;
@@ -5047,21 +5059,25 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   width: 100% !important;
   margin-top: 15px !important;
   margin-bottom: 25px !important;
-  flex-wrap: wrap !important;
+  flex-wrap: nowrap !important; /* Locked on a single line! */
 }
 
-/* Uniform capsule shapes */
+/* Lock Quantity dimensions and prevent flex wrapping */
 .premium-action-row .wrap-num-product {
   height: 46px !important;
+  width: 140px !important; /* Expanded and locked */
+  min-width: 140px !important;
   border-radius: 23px !important;
   border: 1px solid rgba(0, 0, 0, 0.12) !important;
   overflow: hidden !important;
   background: #fff !important;
   margin: 0 !important;
   display: flex !important;
+  flex-wrap: nowrap !important; /* ABSOLUTE wrap prevention */
   align-items: center !important;
+  justify-content: space-between !important;
   transition: border-color 0.25s, box-shadow 0.25s !important;
-  width: 120px !important;
+  flex-shrink: 0 !important;
 }
 
 .premium-action-row .wrap-num-product:focus-within {
@@ -5071,11 +5087,16 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
 
 .premium-action-row .btn-num-product-down,
 .premium-action-row .btn-num-product-up {
-  width: 35px !important;
+  width: 40px !important;
+  min-width: 40px !important;
   height: 100% !important;
   cursor: pointer !important;
   color: #555 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   transition: background 0.2s, color 0.2s !important;
+  flex-shrink: 0 !important;
 }
 
 .premium-action-row .btn-num-product-down:hover,
@@ -5085,18 +5106,24 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
 }
 
 .premium-action-row .num-product {
-  width: 50px !important;
+  width: 60px !important;
+  min-width: 60px !important;
   height: 100% !important;
-  border: none !important;
+  border-left: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-right: 1px solid rgba(0, 0, 0, 0.08) !important;
   background: transparent !important;
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 600;
-  font-size: 14px;
+  font-family: 'Montserrat', sans-serif !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  text-align: center !important;
+  flex-shrink: 0 !important;
+  padding: 0 !important;
 }
 
 /* Spacious active add-to-cart button */
 .premium-action-row .js-addcart-detail {
   flex-grow: 1 !important;
+  min-width: 160px !important;
   max-width: 280px !important;
   height: 46px !important;
   border-radius: 23px !important;
@@ -5109,6 +5136,7 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   border: none !important;
   background: #0f766e !important;
   color: #fff !important;
+  flex-shrink: 0 !important;
 }
 
 .premium-action-row .js-addcart-detail:hover {
@@ -5121,56 +5149,81 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   transform: scale(0.97) translateY(0) !important;
 }
 
-/* 3. Left-Aligned Social & Favorite Bar */
+/* Primary Wishlist Capsule Button in Action Row */
+.js-addwish-detail-container {
+  width: 46px !important;
+  height: 46px !important;
+  min-width: 46px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  flex-shrink: 0 !important;
+  position: relative !important;
+}
+
+.js-addwish-detail-container:hover {
+  transform: scale(1.1) !important;
+  border-color: rgba(255, 51, 102, 0.15) !important;
+  box-shadow: 0 6px 15px rgba(255, 51, 102, 0.12) !important;
+}
+
+.js-addwish-detail-container:active {
+  transform: scale(0.95) !important;
+}
+
+/* Custom heartbeat vector SVG color for Wishlist CTA */
+.js-addwish-detail-container svg {
+  width: 20px !important;
+  height: 20px !important;
+  transition: transform 0.2s ease, filter 0.2s ease !important;
+  display: block !important;
+}
+
+.js-addwish-detail-container.wishlisted {
+  background: #fff !important;
+  border-color: rgba(255, 51, 102, 0.2) !important;
+  box-shadow: 0 6px 20px rgba(255, 51, 102, 0.25) !important;
+}
+
+/* Unwishlisted SVG outline defaults */
+.js-addwish-detail-container svg path {
+  fill: transparent;
+  stroke: #555;
+  stroke-width: 2;
+  transition: fill 0.25s ease, stroke 0.25s ease !important;
+}
+
+.js-addwish-detail-container:hover svg path {
+  stroke: #ff3366;
+}
+
+/* Wishlisted SVG filled defaults */
+.js-addwish-detail-container.wishlisted svg path {
+  fill: url(#pdp-cherry-gradient);
+  stroke: transparent;
+}
+
+/* 3. Left-Aligned Social Share Bar (Without Wishlist heart) */
 .premium-share-row {
   display: flex !important;
   align-items: center !important;
   justify-content: flex-start !important;
   gap: 15px !important;
   width: 100% !important;
-  margin-top: 25px !important;
+  margin-top: 20px !important;
   margin-bottom: 20px !important;
   padding: 0 !important;
 }
 
-.premium-share-row .bor9 {
-  border: none !important;
-  padding-right: 0 !important;
-  margin-right: 0 !important;
-}
-
-/* Make favorite heart circular frosted capsule */
-.premium-share-row .js-addwish-detail {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 38px !important;
-  height: 38px !important;
-  border-radius: 50% !important;
-  background: rgba(255, 255, 255, 0.8) !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03) !important;
-  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-}
-
-.premium-share-row .js-addwish-detail:hover {
-  transform: scale(1.15) !important;
-  border-color: rgba(255, 51, 102, 0.15) !important;
-  box-shadow: 0 6px 15px rgba(255, 51, 102, 0.12) !important;
-}
-
-.premium-share-row .js-addwish-detail i {
-  color: #555 !important;
-  font-size: 16px !important;
-  transition: color 0.2s !important;
-}
-
-.premium-share-row .js-addwish-detail:hover i {
-  color: #ff3366 !important;
-}
-
-/* Sharing icons styling */
-.premium-share-row a:not(.js-addwish-detail) {
+.premium-share-row a {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -5183,11 +5236,12 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   transition: all 0.2s ease !important;
 }
 
-.premium-share-row a:not(.js-addwish-detail):hover {
+.premium-share-row a:hover {
   background: #222 !important;
   color: #fff !important;
   transform: translateY(-2px) !important;
 }
+
 
 
 
