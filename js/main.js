@@ -1448,6 +1448,76 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         });
     });
 
+    // Premium Frosted Glass Toast Notification System
+    function showPremiumToast(message, type) {
+        var $container = $('#premium-toast-container');
+        if (!$container.length) {
+            $container = $('<div id="premium-toast-container"></div>');
+            $('body').append($container);
+        }
+        
+        var iconHtml = '';
+        if (type === 'success') {
+            // Heart icon with gorgeous custom toast-cherry-gradient matching notification badges
+            iconHtml = 
+                '<svg viewBox="0 0 24 24" width="20" height="20" style="margin-right: 12px; flex-shrink: 0; filter: drop-shadow(0 2px 4px rgba(255, 51, 102, 0.15));">' +
+                '  <defs>' +
+                '    <linearGradient id="toast-cherry-gradient" x1="0%" y1="0%" x2="100%" y2="100%">' +
+                '      <stop offset="0%" stop-color="#ec38bc" />' +
+                '      <stop offset="100%" stop-color="#717fe0" />' +
+                '    </linearGradient>' +
+                '  </defs>' +
+                '  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="url(#toast-cherry-gradient)" />' +
+                '</svg>';
+        } else {
+            // Information/Removal circle icon
+            iconHtml = 
+                '<svg viewBox="0 0 24 24" width="20" height="20" style="margin-right: 12px; flex-shrink: 0;" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+                '  <circle cx="12" cy="12" r="10"></circle>' +
+                '  <line x1="12" y1="16" x2="12" y2="12"></line>' +
+                '  <line x1="12" y1="8" x2="12.01" y2="8"></line>' +
+                '</svg>';
+        }
+        
+        var toastId = 'toast-' + Date.now();
+        var toastHtml = 
+            '<div id="' + toastId + '" class="premium-toast-item">' +
+            '  <div class="premium-toast-content">' +
+            iconHtml +
+            '    <span class="premium-toast-message">' + message + '</span>' +
+            '  </div>' +
+            '  <button class="premium-toast-close">&times;</button>' +
+            '</div>';
+            
+        var $toast = $(toastHtml);
+        $container.append($toast);
+        
+        // Entrance transition
+        setTimeout(function() {
+            $toast.addClass('toast-show');
+        }, 10);
+        
+        // Auto dismiss after 3 seconds
+        var autoTimer = setTimeout(function() {
+            closeToast();
+        }, 3000);
+        
+        function closeToast() {
+            clearTimeout(autoTimer);
+            $toast.removeClass('toast-show');
+            setTimeout(function() {
+                $toast.remove();
+            }, 400);
+        }
+        
+        // Manual dismiss on close click
+        $toast.find('.premium-toast-close').on('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeToast();
+        });
+    }
+
     // Handle click on product grid heart icons
     $(document).on('click', '.js-addwish-b2', function(e) {
         e.preventDefault();
@@ -1470,9 +1540,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             wishlist.splice(itemIndex, 1);
             saveWishlist(wishlist);
             $btn.removeClass('js-addedwish-b2');
-            if (typeof swal === 'function') {
-                swal(name, "has been removed from your wishlist.", "info");
-            }
+            showPremiumToast('<strong>' + name + '</strong> has been removed from your wishlist.', 'info');
         } else {
             // Add to wishlist
             var newItem = {
@@ -1484,9 +1552,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             wishlist.push(newItem);
             saveWishlist(wishlist);
             $btn.addClass('js-addedwish-b2');
-            if (typeof swal === 'function') {
-                swal(name, "is added to wishlist !", "success");
-            }
+            showPremiumToast('<strong>' + name + '</strong> has been added to your wishlist.', 'success');
         }
     });
 
@@ -1536,9 +1602,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 }
             });
             
-            if (typeof swal === 'function') {
-                swal(name, "has been removed from your wishlist.", "info");
-            }
+            showPremiumToast('<strong>' + name + '</strong> has been removed from your wishlist.', 'info');
         } else {
             // Add to wishlist
             var newItem = {
@@ -1559,9 +1623,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 }
             });
             
-            if (typeof swal === 'function') {
-                swal(name, "is added to wishlist !", "success");
-            }
+            showPremiumToast('<strong>' + name + '</strong> has been added to your wishlist.', 'success');
         }
     });
 
@@ -1593,9 +1655,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 }
             }, 500);
             
-            if (typeof swal === 'function') {
-                swal(name, "has been removed from your wishlist.", "info");
-            }
+            showPremiumToast('<strong>' + name + '</strong> has been removed from your wishlist.', 'info');
         }
     });
 
