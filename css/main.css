@@ -5012,5 +5012,183 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   color: #666;
 }
 
+/*==================================================================
+[ Premium PDP Stacking & Left-Alignment Overrides ]*/
+
+/* 1. Stacked Option Rows */
+.premium-option-row {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  width: 100% !important;
+  margin-bottom: 22px !important;
+  border: none !important;
+}
+
+.premium-option-label {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1.5px !important;
+  color: #888 !important;
+  margin-bottom: 10px !important;
+  display: block !important;
+  text-align: left !important;
+}
+
+/* 2. Unified Capsule Action Row (Quantity + Add to Cart) */
+.premium-action-row {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 15px !important;
+  width: 100% !important;
+  margin-top: 15px !important;
+  margin-bottom: 25px !important;
+  flex-wrap: wrap !important;
+}
+
+/* Uniform capsule shapes */
+.premium-action-row .wrap-num-product {
+  height: 46px !important;
+  border-radius: 23px !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  overflow: hidden !important;
+  background: #fff !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  transition: border-color 0.25s, box-shadow 0.25s !important;
+  width: 120px !important;
+}
+
+.premium-action-row .wrap-num-product:focus-within {
+  border-color: #222 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+}
+
+.premium-action-row .btn-num-product-down,
+.premium-action-row .btn-num-product-up {
+  width: 35px !important;
+  height: 100% !important;
+  cursor: pointer !important;
+  color: #555 !important;
+  transition: background 0.2s, color 0.2s !important;
+}
+
+.premium-action-row .btn-num-product-down:hover,
+.premium-action-row .btn-num-product-up:hover {
+  background: #f5f5f7 !important;
+  color: #111 !important;
+}
+
+.premium-action-row .num-product {
+  width: 50px !important;
+  height: 100% !important;
+  border: none !important;
+  background: transparent !important;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* Spacious active add-to-cart button */
+.premium-action-row .js-addcart-detail {
+  flex-grow: 1 !important;
+  max-width: 280px !important;
+  height: 46px !important;
+  border-radius: 23px !important;
+  font-family: 'Montserrat', sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.5px !important;
+  font-size: 13px !important;
+  box-shadow: 0 8px 20px rgba(15, 118, 110, 0.15) !important;
+  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
+  border: none !important;
+  background: #0f766e !important;
+  color: #fff !important;
+}
+
+.premium-action-row .js-addcart-detail:hover {
+  background: #0d5c56 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 25px rgba(15, 118, 110, 0.3) !important;
+}
+
+.premium-action-row .js-addcart-detail:active {
+  transform: scale(0.97) translateY(0) !important;
+}
+
+/* 3. Left-Aligned Social & Favorite Bar */
+.premium-share-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 15px !important;
+  width: 100% !important;
+  margin-top: 25px !important;
+  margin-bottom: 20px !important;
+  padding: 0 !important;
+}
+
+.premium-share-row .bor9 {
+  border: none !important;
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* Make favorite heart circular frosted capsule */
+.premium-share-row .js-addwish-detail {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03) !important;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+.premium-share-row .js-addwish-detail:hover {
+  transform: scale(1.15) !important;
+  border-color: rgba(255, 51, 102, 0.15) !important;
+  box-shadow: 0 6px 15px rgba(255, 51, 102, 0.12) !important;
+}
+
+.premium-share-row .js-addwish-detail i {
+  color: #555 !important;
+  font-size: 16px !important;
+  transition: color 0.2s !important;
+}
+
+.premium-share-row .js-addwish-detail:hover i {
+  color: #ff3366 !important;
+}
+
+/* Sharing icons styling */
+.premium-share-row a:not(.js-addwish-detail) {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  background: #f5f5f7 !important;
+  color: #666 !important;
+  font-size: 12px !important;
+  transition: all 0.2s ease !important;
+}
+
+.premium-share-row a:not(.js-addwish-detail):hover {
+  background: #222 !important;
+  color: #fff !important;
+  transform: translateY(-2px) !important;
+}
+
+
 
 

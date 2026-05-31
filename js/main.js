@@ -2458,7 +2458,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
 
     // 1. Dynamic Option Swatches (Color & Size) Builder
     function initPremiumPDPSwatches() {
-        // Size swatches
+        // Size and Color swatches
         $('.rs1-select2').each(function() {
             var $originalContainer = $(this);
             var $select = $originalContainer.find('select.js-select2');
@@ -2487,6 +2487,19 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             
             if (options.length === 0) return;
             
+            var $row = $originalContainer.closest('.flex-w');
+            var $labelCol = $row.find('.size-203');
+            var labelText = $labelCol.text().trim();
+            
+            // Re-style row into stacked option block
+            $row.addClass('premium-option-row').removeClass('flex-w flex-r-m p-b-10');
+            $labelCol.remove(); // Remove the old label column block entirely
+            
+            // Build the clean stacked title
+            var $newLabel = $('<span class="premium-option-label">' + labelText + '</span>');
+            $originalContainer.before($newLabel); // Place label above dropdown container
+            $originalContainer.parent().removeClass('size-204 respon6-next');
+
             if (isSize) {
                 // Build size pills grid
                 $originalContainer.hide(); // Hide the select2 dropdown container
@@ -2555,6 +2568,23 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 
                 $originalContainer.after($colorContainer);
             }
+        });
+
+        // 2. Quantity & Add to Cart Action Row Alignment
+        $('.wrap-num-product').each(function() {
+            var $numProduct = $(this);
+            var $row = $numProduct.closest('.flex-w');
+            var $innerWrapper = $numProduct.parent();
+            
+            // Shift classes to premium capsule action row
+            $row.addClass('premium-action-row').removeClass('flex-w flex-r-m p-b-10');
+            $innerWrapper.removeClass('size-204 flex-w flex-m respon6-next');
+        });
+
+        // 3. Social Share & Wishlist Left-Alignment (Remove inline offsets)
+        $('.respon7').each(function() {
+            var $shareRow = $(this);
+            $shareRow.addClass('premium-share-row').removeClass('flex-w flex-m p-l-100 p-t-40 respon7');
         });
     }
 
