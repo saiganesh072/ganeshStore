@@ -332,18 +332,37 @@
         cursor: pointer;
       }
 
-      .auth-remember input {
+      .auth-remember input[type="checkbox"] {
+        width: 15px;
+        height: 15px;
+        accent-color: var(--accent-color);
         cursor: pointer;
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        margin: 0;
+      }
+
+      .auth-remember:hover input[type="checkbox"] {
+        transform: scale(1.2);
+      }
+
+      .auth-remember input[type="checkbox"]:active {
+        transform: scale(0.9);
       }
 
       .auth-forgot-link {
         color: var(--accent-color);
         text-decoration: none;
         font-weight: 500;
+        transition: color 0.2s ease;
       }
 
       .auth-forgot-link:hover {
         text-decoration: underline;
+        color: var(--accent-hover);
+      }
+
+      #contact-signin-section, #contact-signup-section {
+        transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
       }
 
       .btn-auth-submit {
@@ -398,6 +417,11 @@
         transform: translateY(-2px);
       }
 
+      .btn-auth-submit:active, .btn-google-login:active {
+        transform: scale(0.97) translateY(0);
+        transition: transform 0.1s ease;
+      }
+
       .btn-auth-submit:hover i.zmdi-arrow-right {
         transform: translateX(5px);
       }
@@ -434,6 +458,16 @@
       @keyframes authFadeIn {
         from { opacity: 0; transform: translateY(-10px); }
         to { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes bannerShake {
+        0%, 100% { transform: translateX(0); }
+        20%, 60% { transform: translateX(-4px); }
+        40%, 80% { transform: translateX(4px); }
+      }
+
+      .auth-alert-banner.shake {
+        animation: bannerShake 0.4s ease-in-out;
       }
     </style>
     <style>
@@ -1023,8 +1057,8 @@
       function switchContactTab(tab) {
         const loginTab = document.getElementById('btn-tab-signin');
         const signupTab = document.getElementById('btn-tab-signup');
-        const loginSec = $('#contact-signin-section');
-        const signupSec = $('#contact-signup-section');
+        const loginSec = document.getElementById('contact-signin-section');
+        const signupSec = document.getElementById('contact-signup-section');
         const banner = document.getElementById('contact-auth-banner');
         const slider = document.querySelector('.auth-tabs-slider');
 
@@ -1034,16 +1068,50 @@
           loginTab.classList.add('active');
           signupTab.classList.remove('active');
           if (slider) slider.style.transform = 'translateX(0%)';
-          signupSec.stop().fadeOut(150, function() {
-            loginSec.stop().fadeIn(200);
-          });
+
+          // Animate signup out (slide right)
+          signupSec.style.opacity = '0';
+          signupSec.style.transform = 'translateX(20px)';
+
+          setTimeout(() => {
+            signupSec.style.display = 'none';
+
+            // Prepare login (slide in from left)
+            loginSec.style.display = 'block';
+            loginSec.style.opacity = '0';
+            loginSec.style.transform = 'translateX(-20px)';
+
+            // Trigger reflow
+            loginSec.offsetHeight;
+
+            // Animate login in
+            loginSec.style.opacity = '1';
+            loginSec.style.transform = 'translateX(0)';
+          }, 150);
         } else {
           loginTab.classList.remove('active');
           signupTab.classList.add('active');
           if (slider) slider.style.transform = 'translateX(100%)';
-          loginSec.stop().fadeOut(150, function() {
-            signupSec.stop().fadeIn(200);
-          });
+
+          // Animate login out (slide left)
+          loginSec.style.opacity = '0';
+          loginSec.style.transform = 'translateX(-20px)';
+
+          setTimeout(() => {
+            loginSec.style.display = 'none';
+
+            // Prepare signup (slide in from right)
+            signupSec.style.display = 'block';
+            signupSec.style.opacity = '0';
+            signupSec.style.transform = 'translateX(20px)';
+
+            // Trigger reflow
+            signupSec.offsetHeight;
+
+            // Animate signup in
+            signupSec.style.opacity = '1';
+            signupSec.style.transform = 'translateX(0)';
+          }, 150);
         }
       }
 
@@ -1073,6 +1141,10 @@
           icon.className = 'zmdi zmdi-check-circle';
         } else {
           icon.className = 'zmdi zmdi-alert-circle-o';
+          // Trigger shake feedback
+          banner.classList.remove('shake');
+          banner.offsetHeight; // trigger reflow
+          banner.classList.add('shake');
         }
       }
 
