@@ -77,8 +77,8 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
     var headerDesktop = $('.container-menu-desktop');
     var wrapMenu = $('.wrap-menu-desktop');
 
-    if($('.top-bar').length > 0) {
-        var posWrapHeader = $('.top-bar').height();
+    if($('.announcement-bar').length > 0) {
+        var posWrapHeader = $('.announcement-bar').outerHeight();
     }
     else {
         var posWrapHeader = 0;
@@ -136,7 +136,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                     '  <li><a href="#" class="js-trigger-slide-cart">Slide-Out Cart</a></li>' +
                     '  <li><a href="product.html">Dynamic Quick View</a></li>' +
                     '  <li><a href="wishlist.html">My Wishlist</a></li>' +
-                    '  <li><a href="contact.html">Account Center</a></li>' +
+                    '  <li><a href="signin.html">Account Center</a></li>' +
                     '</ul>'
                 );
             }
@@ -174,7 +174,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                     '  <li><a href="#" class="js-trigger-slide-cart">Slide-Out Cart</a></li>' +
                     '  <li><a href="product.html">Dynamic Quick View</a></li>' +
                     '  <li><a href="wishlist.html">My Wishlist</a></li>' +
-                    '  <li><a href="contact.html">Account Center</a></li>' +
+                    '  <li><a href="signin.html">Account Center</a></li>' +
                     '</ul>' +
                     '<span class="arrow-main-menu-m">' +
                     '  <i class="fa fa-angle-right" aria-hidden="true"></i>' +
@@ -731,55 +731,8 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         return result ? decodeURIComponent(result.pop()) : "";
     }
 
-    // Dynamic session and authentication sync across all headers and top bars
     function syncAuthHeader() {
-        var userState = localStorage.getItem("user");
-        var customerName = getCookieValue("CustomerName");
-        
-        // 1. Identify active authentication menus and top bar elements
-        var $loginLinks = $('.main-menu a:contains("Sign In"), .main-menu a:contains("Login"), .main-menu a:contains("Sign IN"), .main-menu a:contains("Contact")');
-        var $mobileLoginLinks = $('.main-menu-m a:contains("Sign In"), .main-menu-m a:contains("Login"), .main-menu-m a:contains("Sign IN"), .main-menu-m a:contains("Contact")');
-        var $topBarLeft = $('.left-top-bar');
-
-        if (userState === "loggedin" && customerName) {
-            // 2. Personalize the desktop topbar
-            if ($topBarLeft.length) {
-                $topBarLeft.html('Welcome back, <strong style="color: #fff; font-family: Poppins-Medium;">' + customerName + '</strong>! | <a href="#" class="js-global-logout" style="color: #6c7ae0; text-decoration: underline; margin-left: 5px;">Logout</a>');
-            }
-
-            // 3. Rewrite header navigation links to go to account center
-            $loginLinks.each(function() {
-                $(this).text("My Account");
-                $(this).attr("href", "contact.html");
-                $(this).closest('li').addClass('active-menu');
-            });
-            
-            $mobileLoginLinks.each(function() {
-                $(this).text("My Account");
-                $(this).attr("href", "contact.html");
-            });
-
-            // 4. Bind dynamic Logout action in header
-            $(document).off('click', '.js-global-logout').on('click', '.js-global-logout', function(e) {
-                e.preventDefault();
-                localStorage.setItem("user", "loggedout");
-                // Clear cookies
-                document.cookie = "CustomerName=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-                document.cookie = "CustomerNumber=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-                
-                if (typeof swal === 'function') {
-                    swal("Logged Out", "You have been successfully logged out.", "success");
-                }
-                setTimeout(function() {
-                    window.location.reload();
-                }, 1000);
-            });
-        } else {
-            // Restore default topbar left text
-            if ($topBarLeft.length && !$topBarLeft.find('.js-global-logout').length) {
-                $topBarLeft.text('Free shipping for standard order over $100');
-            }
-        }
+        // Consolidated under unified authentication flow in js/auth.js
     }
 
     // Intelligent category query routing and automatic isotope filter execution
@@ -1435,7 +1388,6 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
     $(document).ready(function() {
         initWishlist();
         initCart();
-        syncAuthHeader();
         initCatalogFilters();
         initPDPReviews();
         initPremiumPDPSwatches();
@@ -1444,7 +1396,6 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         $(window).on('load', function() {
             initWishlist();
             initCart();
-            syncAuthHeader();
             initCategoryFilteringRouting();
             initSearchFilteringRouting();
             initCatalogFilters();
@@ -2349,7 +2300,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             });
     }
 
-    // Intercept submit form on contact.html
+    // Intercept submit form on signin.html
     $(document).on('click', '.CSubmit', function(e) {
         if (!window.supabaseClient) return; // fallback to static login
         

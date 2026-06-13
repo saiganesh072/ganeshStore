@@ -29,8 +29,8 @@
       return 'cart';
     } else if (path.indexOf('/about.html') !== -1 || title.indexOf('about') !== -1) {
       return 'about';
-    } else if (path.indexOf('/contact.html') !== -1 || title.indexOf('contact') !== -1 || title.indexOf('sign in') !== -1) {
-      return 'contact';
+    } else if (path.indexOf('/signin.html') !== -1 || title.indexOf('contact') !== -1 || title.indexOf('sign in') !== -1) {
+      return 'signin';
     } else if (path.indexOf('/blog') !== -1 || title.indexOf('blog') !== -1) {
       return 'blog';
     }

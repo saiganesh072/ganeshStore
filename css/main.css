@@ -5376,3 +5376,20 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   opacity: 1;
   transform: translateY(0);
 }
+
+/*==================================================================
+[ Announcement Bar ]*/
+.announcement-bar {
+  background-color: #1a1a1a;
+  color: #ffffff;
+  font-family: Poppins-Regular;
+  font-size: 12px;
+  text-align: center;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.5px;
+  width: 100%;
+}
+

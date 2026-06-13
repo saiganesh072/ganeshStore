@@ -164,7 +164,7 @@ try {
     );
 
     assert(
-        jsContent.includes('js-trigger-slide-cart') && jsContent.includes('wishlist.html') && jsContent.includes('contact.html'),
+        jsContent.includes('js-trigger-slide-cart') && jsContent.includes('wishlist.html') && jsContent.includes('signin.html'),
         'Desktop main menu Features submenu showcases Slide-Out Cart, Wishlist, and Account links.'
     );
 

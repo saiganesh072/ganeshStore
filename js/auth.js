@@ -199,7 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// Update the header UI element ("My Account" -> Custom dynamic dropdown)
+// Update the header UI element ("Sign In" -> Custom dynamic dropdown matching template markup)
 function updateHeaderUI(user) {
   const accountLinks = findMyAccountLinks();
   
@@ -213,39 +213,59 @@ function updateHeaderUI(user) {
   }
   
   accountLinks.forEach(link => {
+    const parentLi = link.closest("li");
+    if (!parentLi) return;
+
+    // Remove any existing sub-menu or arrow markers to prevent duplicate stacks
+    const existingSub = parentLi.querySelector(".sub-menu, .sub-menu-m");
+    if (existingSub) existingSub.remove();
+    const existingArrow = parentLi.querySelector(".arrow-main-menu-m");
+    if (existingArrow) existingArrow.remove();
+
     if (user) {
       const displayName = user.displayName || user.email.split('@')[0];
-      const initials = displayName.substring(0, 2).toUpperCase();
-      
-      const dropdownContainer = document.createElement("div");
-      dropdownContainer.className = "auth-dropdown flex-c-m trans-04 p-lr-25";
-      dropdownContainer.style.cursor = "pointer";
-      
-      dropdownContainer.innerHTML = `
-        <span style="display: flex; align-items: center; gap: 8px;">
-          <span style="background-color: #717fe0; color: white; border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; text-transform: uppercase;">
-            ${initials}
-          </span>
-          <span style="font-weight: 500;">${displayName} ▾</span>
-        </span>
-        <div class="auth-dropdown-menu">
-          <a href="wishlist.html"><i class="zmdi zmdi-favorite-outline" style="margin-right: 8px;"></i> My Wishlist</a>
-          <a href="shoping-cart.html"><i class="zmdi zmdi-shopping-cart" style="margin-right: 8px;"></i> My Cart</a>
-          <a href="#" onclick="logoutUser(event)"><i class="zmdi zmdi-power" style="margin-right: 8px;"></i> Log Out</a>
-        </div>
-      `;
-      
-      link.parentNode.replaceChild(dropdownContainer, link);
-    } else {
-      link.setAttribute("href", "contact.html");
-      link.innerHTML = "My Account";
-      if (link.parentNode && link.parentNode.classList.contains("auth-dropdown")) {
-        const newLink = document.createElement("a");
-        newLink.className = "flex-c-m trans-04 p-lr-25";
-        newLink.setAttribute("href", "contact.html");
-        newLink.innerHTML = "My Account";
-        link.parentNode.parentNode.replaceChild(newLink, link.parentNode);
+      const isMobile = !!link.closest(".main-menu-m");
+
+      link.href = "signin.html";
+
+      if (isMobile) {
+        link.textContent = displayName;
+        
+        const subMenu = document.createElement("ul");
+        subMenu.className = "sub-menu-m";
+        subMenu.innerHTML = `
+          <li><a href="wishlist.html">My Wishlist</a></li>
+          <li><a href="shoping-cart.html">My Cart</a></li>
+          <li><a href="#" class="js-logout-trigger">Log Out</a></li>
+        `;
+        parentLi.appendChild(subMenu);
+
+        const arrow = document.createElement("span");
+        arrow.className = "arrow-main-menu-m";
+        arrow.innerHTML = `<i class="fa fa-angle-right" aria-hidden="true"></i>`;
+        
+        // Bind mobile toggle click handler
+        $(arrow).on('click', function() {
+            $(this).parent().find('.sub-menu-m').slideToggle();
+            $(this).toggleClass('turn-arrow-main-menu-m');
+        });
+        
+        parentLi.appendChild(arrow);
+      } else {
+        link.textContent = displayName;
+        
+        const subMenu = document.createElement("ul");
+        subMenu.className = "sub-menu";
+        subMenu.innerHTML = `
+          <li><a href="wishlist.html">My Wishlist</a></li>
+          <li><a href="shoping-cart.html">My Cart</a></li>
+          <li><a href="#" class="js-logout-trigger">Log Out</a></li>
+        `;
+        parentLi.appendChild(subMenu);
       }
+    } else {
+      link.setAttribute("href", "signin.html");
+      link.textContent = "Sign In";
     }
   });
 
@@ -255,16 +275,40 @@ function updateHeaderUI(user) {
 }
 
 function findMyAccountLinks() {
-  const links = document.querySelectorAll("a");
+  const header = document.querySelector("header");
+  if (!header) return [];
+  
+  // First try finding by standardized class
+  const classMatches = header.querySelectorAll(".js-auth-link");
+  if (classMatches.length > 0) {
+    return Array.from(classMatches);
+  }
+  
+  // Fallback to text matching
+  const links = header.querySelectorAll("a");
   const matches = [];
   links.forEach(link => {
     const text = link.textContent.trim().toLowerCase();
-    if (text === "my account" || text === "my account ▾" || text.includes("my account")) {
+    if (
+      text === "sign in" ||
+      text === "my account" ||
+      text === "my account ▾" ||
+      text === "login" ||
+      link.classList.contains("js-auth-link")
+    ) {
       matches.push(link);
     }
   });
   return matches;
 }
+
+// Global click event delegator for logout triggers
+document.addEventListener("click", function(e) {
+  if (e.target && e.target.classList.contains("js-logout-trigger")) {
+    logoutUser(e);
+  }
+});
+
 
 // Global Logout action
 function logoutUser(e) {
