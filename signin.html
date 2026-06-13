@@ -149,6 +149,7 @@
         display: flex;
         border-bottom: 2px solid #f0f0f0;
         margin-bottom: 20px;
+        position: relative;
       }
 
       .auth-tab-btn {
@@ -164,6 +165,7 @@
         outline: none;
         transition: all 0.3s ease;
         position: relative;
+        z-index: 2;
       }
 
       .auth-tab-btn:hover {
@@ -174,14 +176,15 @@
         color: var(--accent-color);
       }
 
-      .auth-tab-btn.active::after {
-        content: '';
+      .auth-tabs-slider {
         position: absolute;
         bottom: -2px;
         left: 0;
-        width: 100%;
+        width: 50%;
         height: 2px;
         background-color: var(--accent-color);
+        transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+        z-index: 1;
       }
 
       .btn-google-login {
@@ -198,14 +201,38 @@
         font-size: 14px;
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         margin-bottom: 0px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn-google-login::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -150%;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(
+          to right,
+          rgba(0, 0, 0, 0) 0%,
+          rgba(0, 0, 0, 0.04) 50%,
+          rgba(0, 0, 0, 0) 100%
+        );
+        transform: skewX(-25deg);
+        transition: left 0.6s ease;
+      }
+
+      .btn-google-login:hover::after {
+        left: 150%;
       }
 
       .btn-google-login:hover {
-        background-color: #f9f9f9;
+        background-color: #fcfcfc;
         border-color: #cccccc;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+        transform: translateY(-2px);
       }
 
       .btn-google-login img,
@@ -266,13 +293,14 @@
         border-radius: 10px;
         font-size: 14px;
         color: var(--primary-color);
-        transition: all 0.3s ease;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         outline: none;
       }
 
       .auth-input-field:focus {
         border-color: var(--accent-color);
-        box-shadow: 0 0 0 3px rgba(113, 127, 224, 0.15);
+        box-shadow: 0 0 0 4px rgba(113, 127, 224, 0.18);
+        transform: translateY(-1px);
       }
 
       .auth-password-toggle {
@@ -281,11 +309,12 @@
         top: 38px;
         cursor: pointer;
         color: var(--text-muted);
-        transition: color 0.2s ease;
+        transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
       }
 
       .auth-password-toggle:hover {
-        color: var(--primary-color);
+        color: var(--accent-color);
+        transform: scale(1.2) rotate(15deg);
       }
 
       .auth-options {
@@ -327,12 +356,35 @@
         font-size: 15px;
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 10px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn-auth-submit::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -150%;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(
+          to right,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.25) 50%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        transform: skewX(-25deg);
+        transition: left 0.6s ease;
+      }
+
+      .btn-auth-submit:hover::after {
+        left: 150%;
       }
 
       .btn-auth-submit i {
@@ -342,7 +394,8 @@
 
       .btn-auth-submit:hover {
         background-color: #333333;
-        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
       }
 
       .btn-auth-submit:hover i.zmdi-arrow-right {
@@ -663,16 +716,8 @@
       </div>
     </div>
 
-    <!-- Title page -->
-    <section
-      class="bg-img1 txt-center p-lr-15 p-tb-92"
-      style="background-image: url('images/bg-01.jpg')"
-    >
-      <h2 class="ltext-105 cl0 txt-center">Login</h2>
-    </section>
-
     <!-- Content page -->
-    <section class="bg0 p-t-104 p-b-116">
+    <section class="bg0 p-t-50 p-b-80">
       <div class="container">
         <div class="size-210 bor10 p-lr-50 p-t-55 p-b-70 p-lr-15-lg w-full-md mx-auto" style="background-color: #ffffff; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.025); border: 1px solid #eaeaea;">
           <!-- Account Profile Panel (Shown when logged in) -->
@@ -698,6 +743,7 @@
             <div class="auth-tabs">
               <button type="button" class="auth-tab-btn active" id="btn-tab-signin" onclick="switchContactTab('signin')">Sign In</button>
               <button type="button" class="auth-tab-btn" id="btn-tab-signup" onclick="switchContactTab('signup')">Create Account</button>
+              <div class="auth-tabs-slider"></div>
             </div>
 
             <!-- Inline Alert Feedback Banner -->
@@ -977,22 +1023,27 @@
       function switchContactTab(tab) {
         const loginTab = document.getElementById('btn-tab-signin');
         const signupTab = document.getElementById('btn-tab-signup');
-        const loginSec = document.getElementById('contact-signin-section');
-        const signupSec = document.getElementById('contact-signup-section');
+        const loginSec = $('#contact-signin-section');
+        const signupSec = $('#contact-signup-section');
         const banner = document.getElementById('contact-auth-banner');
+        const slider = document.querySelector('.auth-tabs-slider');
 
         banner.style.display = 'none';
 
         if (tab === 'signin') {
           loginTab.classList.add('active');
           signupTab.classList.remove('active');
-          loginSec.style.display = 'block';
-          signupSec.style.display = 'none';
+          if (slider) slider.style.transform = 'translateX(0%)';
+          signupSec.stop().fadeOut(150, function() {
+            loginSec.stop().fadeIn(200);
+          });
         } else {
           loginTab.classList.remove('active');
           signupTab.classList.add('active');
-          loginSec.style.display = 'none';
-          signupSec.style.display = 'block';
+          if (slider) slider.style.transform = 'translateX(100%)';
+          loginSec.stop().fadeOut(150, function() {
+            signupSec.stop().fadeIn(200);
+          });
         }
       }
 
