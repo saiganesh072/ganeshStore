@@ -199,7 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// Update the header UI element ("Sign In" -> Custom dynamic dropdown matching template markup)
+// Update the header UI element (Account Icon -> personalized avatar badge + dropdown)
 function updateHeaderUI(user) {
   const accountLinks = findMyAccountLinks();
   
@@ -213,61 +213,63 @@ function updateHeaderUI(user) {
   }
   
   accountLinks.forEach(link => {
-    const parentLi = link.closest("li");
-    if (!parentLi) return;
-
-    // Remove any existing sub-menu or arrow markers to prevent duplicate stacks
-    const existingSub = parentLi.querySelector(".sub-menu, .sub-menu-m");
-    if (existingSub) existingSub.remove();
-    const existingArrow = parentLi.querySelector(".arrow-main-menu-m");
-    if (existingArrow) existingArrow.remove();
-
     if (user) {
       const displayName = user.displayName || user.email.split('@')[0];
-      const isMobile = !!link.closest(".main-menu-m");
+      const initials = displayName.substring(0, 2).toUpperCase();
 
       link.href = "signin.html";
+      link.classList.add("logged-in");
 
-      if (isMobile) {
-        link.textContent = displayName;
-        
-        const subMenu = document.createElement("ul");
-        subMenu.className = "sub-menu-m";
-        subMenu.innerHTML = `
-          <li><a href="wishlist.html">My Wishlist</a></li>
-          <li><a href="shoping-cart.html">My Cart</a></li>
-          <li><a href="#" class="js-logout-trigger">Log Out</a></li>
-        `;
-        parentLi.appendChild(subMenu);
-
-        const arrow = document.createElement("span");
-        arrow.className = "arrow-main-menu-m";
-        arrow.innerHTML = `<i class="fa fa-angle-right" aria-hidden="true"></i>`;
-        
-        // Bind mobile toggle click handler
-        $(arrow).on('click', function() {
-            $(this).parent().find('.sub-menu-m').slideToggle();
-            $(this).toggleClass('turn-arrow-main-menu-m');
-        });
-        
-        parentLi.appendChild(arrow);
-      } else {
-        link.textContent = displayName;
-        
-        const subMenu = document.createElement("ul");
-        subMenu.className = "sub-menu";
-        subMenu.innerHTML = `
-          <li><a href="wishlist.html">My Wishlist</a></li>
-          <li><a href="shoping-cart.html">My Cart</a></li>
-          <li><a href="#" class="js-logout-trigger">Log Out</a></li>
-        `;
-        parentLi.appendChild(subMenu);
-      }
+      // Replace inner content with dynamic initials avatar and dynamic dropdown
+      link.innerHTML = `
+        <span class="user-avatar-badge">${initials}</span>
+        <div class="header-account-dropdown">
+          <div class="header-account-dropdown-greeting">
+            <span class="user-welcome">Welcome back,</span>
+            <span class="user-name">${displayName}</span>
+          </div>
+          <div class="header-account-dropdown-links">
+            <a href="wishlist.html"><i class="zmdi zmdi-favorite-outline"></i> My Wishlist</a>
+            <a href="shoping-cart.html"><i class="zmdi zmdi-shopping-cart"></i> My Cart</a>
+            <a href="#" class="js-logout-trigger logout-btn-dropdown"><i class="zmdi zmdi-power"></i> Log Out</a>
+          </div>
+        </div>
+      `;
     } else {
-      link.setAttribute("href", "signin.html");
-      link.textContent = "Sign In";
+      link.href = "signin.html";
+      link.classList.remove("logged-in");
+      link.innerHTML = `<i class="zmdi zmdi-account js-auth-icon" style="font-size: 26px;"></i>`;
     }
   });
+
+  // Specifically sync the Account Center text fields on the signin.html page if we are on it
+  if (window.location.pathname.indexOf('/signin.html') !== -1) {
+    const accountNameEl = document.querySelector('.AccountName');
+    const accountNumberEl = document.querySelector('.AccountNumber');
+    const logoutAvatarEl = document.querySelector('.js-logout-avatar');
+    
+    const loginMain = document.getElementsByClassName("Loginmain")[0];
+    const logoutMain = document.getElementsByClassName("Logoutmain")[0];
+    
+    if (user) {
+      const displayName = user.displayName || user.email.split('@')[0];
+      const userUid = user.uid || "mock-uid-123";
+      
+      if (accountNameEl) accountNameEl.textContent = displayName;
+      if (accountNumberEl) accountNumberEl.textContent = userUid;
+      if (logoutAvatarEl) logoutAvatarEl.textContent = displayName.substring(0, 2).toUpperCase();
+      
+      if (loginMain) loginMain.style.display = "none";
+      if (logoutMain) logoutMain.style.display = "block";
+    } else {
+      if (accountNameEl) accountNameEl.textContent = "Guest";
+      if (accountNumberEl) accountNumberEl.textContent = "Not Logged In";
+      if (logoutAvatarEl) logoutAvatarEl.textContent = "U";
+      
+      if (loginMain) loginMain.style.display = "block";
+      if (logoutMain) logoutMain.style.display = "none";
+    }
+  }
 
   if (typeof loginfun === "function") {
     loginfun();
@@ -278,34 +280,50 @@ function findMyAccountLinks() {
   const header = document.querySelector("header");
   if (!header) return [];
   
-  // First try finding by standardized class
-  const classMatches = header.querySelectorAll(".js-auth-link");
-  if (classMatches.length > 0) {
-    return Array.from(classMatches);
+  // Find the new account icon container link globally
+  const matches = header.querySelectorAll(".js-auth-link-container");
+  if (matches.length > 0) {
+    return Array.from(matches);
   }
   
-  // Fallback to text matching
-  const links = header.querySelectorAll("a");
-  const matches = [];
-  links.forEach(link => {
+  // Fallback to older text or class matches
+  const fallbackLinks = header.querySelectorAll(".js-auth-link, a");
+  const result = [];
+  fallbackLinks.forEach(link => {
     const text = link.textContent.trim().toLowerCase();
     if (
       text === "sign in" ||
       text === "my account" ||
-      text === "my account ▾" ||
       text === "login" ||
-      link.classList.contains("js-auth-link")
+      link.classList.contains("js-auth-link") ||
+      link.classList.contains("js-auth-link-container")
     ) {
-      matches.push(link);
+      result.push(link);
     }
   });
-  return matches;
+  return result;
 }
 
 // Global click event delegator for logout triggers
 document.addEventListener("click", function(e) {
   if (e.target && e.target.classList.contains("js-logout-trigger")) {
     logoutUser(e);
+  }
+});
+
+// Mobile account dropdown toggle (stops navigation on logged-in click to show menu)
+$(document).on('click', '.js-auth-link-container', function(e) {
+  if ($(window).width() < 992 && $(this).hasClass('logged-in')) {
+    e.preventDefault();
+    e.stopPropagation();
+    $(this).find('.header-account-dropdown').toggleClass('show-mobile');
+  }
+});
+
+// Close mobile dropdown when clicking outside
+$(document).on('click', function(e) {
+  if (!$(e.target).closest('.js-auth-link-container').length) {
+    $('.header-account-dropdown').removeClass('show-mobile');
   }
 });
 

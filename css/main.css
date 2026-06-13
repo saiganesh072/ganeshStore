@@ -5393,3 +5393,140 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   width: 100%;
 }
 
+/*==================================================================
+[ Account Header Dropdown ]*/
+.js-auth-link-container {
+  position: relative;
+}
+
+/* Base style for the container to support circle avatar when logged in */
+.js-auth-link-container.logged-in {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+.js-auth-link-container .user-avatar-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #717fe0, #ec38bc);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  box-shadow: 0 4px 10px rgba(113, 127, 224, 0.35);
+  border: 1.5px solid #ffffff;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.js-auth-link-container:hover .user-avatar-badge {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 6px 15px rgba(236, 56, 188, 0.45);
+}
+
+/* Glassmorphic Dropdown Panel */
+.header-account-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  min-width: 220px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 15px 0;
+  z-index: 1200;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(15px);
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+/* Show dropdown on hover (desktop only) */
+@media (min-width: 992px) {
+  .js-auth-link-container:hover .header-account-dropdown {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(5px);
+  }
+}
+
+/* Mobile dropdown visibility */
+.header-account-dropdown.show-mobile {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(5px);
+}
+
+.header-account-dropdown-greeting {
+  padding: 5px 20px 10px 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  margin-bottom: 8px;
+  text-align: left;
+}
+
+.header-account-dropdown-greeting .user-name {
+  font-family: Poppins-SemiBold;
+  font-size: 14px;
+  color: #222222;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.header-account-dropdown-greeting .user-welcome {
+  font-family: Poppins-Regular;
+  font-size: 11px;
+  color: #888888;
+  display: block;
+}
+
+.header-account-dropdown-links a {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px !important;
+  font-family: Poppins-Regular;
+  font-size: 13px;
+  color: #444444 !important;
+  transition: all 0.25s ease !important;
+  background-color: transparent !important;
+  width: 100% !important;
+  height: auto !important;
+  border-radius: 0 !important;
+}
+
+.header-account-dropdown-links a i {
+  font-size: 16px;
+  color: #717fe0;
+  transition: transform 0.25s ease;
+  width: 20px;
+}
+
+.header-account-dropdown-links a:hover {
+  background-color: rgba(113, 127, 224, 0.06) !important;
+  color: #717fe0 !important;
+  text-decoration: none !important;
+}
+
+.header-account-dropdown-links a:hover i {
+  transform: scale(1.2);
+}
+
+.header-account-dropdown-links a.logout-btn-dropdown:hover {
+  background-color: rgba(255, 51, 102, 0.06) !important;
+  color: #ff3366 !important;
+}
+
+.header-account-dropdown-links a.logout-btn-dropdown i {
+  color: #ff3366;
+}
+
+
