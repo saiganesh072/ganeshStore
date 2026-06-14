@@ -65,18 +65,18 @@ try {
     );
     
     assert(
-        cssContent.includes('background: linear-gradient(135deg, #717fe0, #5b69c5)'),
-        'Notification badges feature a beautiful, premium HSL linear-gradient background.'
+        cssContent.includes('background-color: #111111'),
+        'Notification badges feature a beautiful, flat minimalist dark charcoal background.'
     );
 
     assert(
-        cssContent.includes('border: 2px solid #fff'),
+        cssContent.includes('border: 1.5px solid #fff'),
         'Notification badges have a solid white border for premium backdrop separation.'
     );
     
     assert(
-        cssContent.includes('box-shadow: 0 4px 8px rgba(113, 127, 224, 0.35)'),
-        'Notification badges feature a custom, vibrant purple drop-shadow.'
+        cssContent.includes('box-shadow: none'),
+        'Notification badges feature a clean, shadow-free flat aesthetic.'
     );
 
     assert(

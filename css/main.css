@@ -514,7 +514,7 @@ Input, textarea : 14px/1.6 '', Arial, sans-serif;
 .icon-header-noti::after {
   content: attr(data-notify);
   font-family: Poppins-Bold;
-  font-size: 10px;
+  font-size: 9px;
   color: #fff;
   text-align: center;
   display: flex;
@@ -522,21 +522,20 @@ Input, textarea : 14px/1.6 '', Arial, sans-serif;
   justify-content: center;
 
   position: absolute;
-  top: -6px;
-  right: -6px;
-  min-width: 18px;
-  height: 18px;
+  top: -5px;
+  right: -5px;
+  min-width: 15px;
+  height: 15px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #717fe0, #5b69c5);
-  border: 2px solid #fff;
-  box-shadow: 0 4px 8px rgba(113, 127, 224, 0.35);
-  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+  background-color: #111111;
+  border: 1.5px solid #fff;
+  box-shadow: none;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   z-index: 10;
 }
 
 .icon-header-noti:hover::after {
-  transform: scale(1.25);
-  box-shadow: 0 6px 12px rgba(113, 127, 224, 0.55);
+  transform: scale(1.15);
 }
 
 /*---------------------------------------------*/
