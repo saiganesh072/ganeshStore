@@ -265,7 +265,7 @@
               slidesToShow: 3,
               slidesToScroll: 1,
               infinite: true,
-              autoplay: true,
+              autoplay: false,
               autoplaySpeed: 4000,
               arrows: false,
               dots: true,
