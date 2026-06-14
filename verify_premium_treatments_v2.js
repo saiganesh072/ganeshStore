@@ -91,8 +91,8 @@ try {
     );
     
     assert(
-        cssContent.includes('.icon-header-item:hover i') && cssContent.includes('transform: scale(1.15) rotate(-5deg)'),
-        'Header icons rotate and scale slightly on hover for tactile physical feedback.'
+        cssContent.includes('.icon-header-item:hover i') && cssContent.includes('transform: scale(1.15)'),
+        'Header icons scale slightly on hover for tactile physical feedback.'
     );
 
     // Check inline search navigation transitions and styles

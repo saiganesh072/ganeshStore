@@ -507,7 +507,7 @@ Input, textarea : 14px/1.6 '', Arial, sans-serif;
 }
 
 .icon-header-item:hover i {
-  transform: scale(1.15) rotate(-5deg);
+  transform: scale(1.15);
 }
 
 /*---------------------------------------------*/
@@ -5424,7 +5424,7 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
 }
 
 .js-auth-link-container:hover .user-avatar-badge {
-  transform: scale(1.1) rotate(5deg);
+  transform: scale(1.1);
   box-shadow: 0 6px 15px rgba(236, 56, 188, 0.45);
 }
 
