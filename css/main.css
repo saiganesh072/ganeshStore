@@ -527,16 +527,16 @@ Input, textarea : 14px/1.6 '', Arial, sans-serif;
   min-width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #ec38bc, #717fe0);
+  background: linear-gradient(135deg, #717fe0, #5b69c5);
   border: 2px solid #fff;
-  box-shadow: 0 4px 8px rgba(236, 56, 188, 0.3);
+  box-shadow: 0 4px 8px rgba(113, 127, 224, 0.35);
   transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
   z-index: 10;
 }
 
 .icon-header-noti:hover::after {
   transform: scale(1.25);
-  box-shadow: 0 6px 12px rgba(236, 56, 188, 0.5);
+  box-shadow: 0 6px 12px rgba(113, 127, 224, 0.55);
 }
 
 /*---------------------------------------------*/

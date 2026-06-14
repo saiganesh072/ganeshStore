@@ -65,7 +65,7 @@ try {
     );
     
     assert(
-        cssContent.includes('background: linear-gradient(135deg, #ec38bc, #717fe0)'),
+        cssContent.includes('background: linear-gradient(135deg, #717fe0, #5b69c5)'),
         'Notification badges feature a beautiful, premium HSL linear-gradient background.'
     );
 
@@ -75,8 +75,8 @@ try {
     );
     
     assert(
-        cssContent.includes('box-shadow: 0 4px 8px rgba(236, 56, 188, 0.3)'),
-        'Notification badges feature a custom, vibrant pink drop-shadow.'
+        cssContent.includes('box-shadow: 0 4px 8px rgba(113, 127, 224, 0.35)'),
+        'Notification badges feature a custom, vibrant purple drop-shadow.'
     );
 
     assert(
