@@ -2657,7 +2657,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
 
     // 2. Interactive Cursor Pan-Zoom on Main Images
     function initPDPPanZoom() {
-        $('.wrap-pic-w').each(function() {
+        $('.wrap-pic-w:not(.block1)').each(function() {
             var $container = $(this);
             var $img = $container.find('img');
             if (!$img.length) return;
