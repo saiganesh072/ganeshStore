@@ -907,60 +907,96 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         window.executeCombinedFilters = function() {
             if (!$topeContainer.length) return;
             
-            $topeContainer.isotope({
-                filter: function() {
-                    var $item = $(this);
-                    
-                    // 1. Category Filter
-                    if (window.activeFilters.category !== '*') {
-                        if (!$item.hasClass(window.activeFilters.category.replace('.', ''))) {
-                            return false;
+            var runFilter = function() {
+                $topeContainer.isotope({
+                    filter: function() {
+                        var $item = $(this);
+                        
+                        // 1. Category Filter
+                        if (window.activeFilters.category !== '*') {
+                            if (!$item.hasClass(window.activeFilters.category.replace('.', ''))) {
+                                return false;
+                            }
                         }
-                    }
-                    
-                    // 2. Price Range Filter
-                    var priceText = $item.find('.stext-105').text().trim();
-                    var priceVal = parseFloat(priceText.replace(/[^0-9.]/g, '')) || 0;
-                    
-                    if (window.activeFilters.priceRange !== 'all') {
-                        if (window.activeFilters.priceRange === '0-50') {
-                            if (priceVal < 0 || priceVal > 50) return false;
-                        } else if (window.activeFilters.priceRange === '50-100') {
-                            if (priceVal < 50 || priceVal > 100) return false;
-                        } else if (window.activeFilters.priceRange === '100-150') {
-                            if (priceVal < 100 || priceVal > 150) return false;
-                        } else if (window.activeFilters.priceRange === '150-200') {
-                            if (priceVal < 150 || priceVal > 200) return false;
-                        } else if (window.activeFilters.priceRange === '200+') {
-                            if (priceVal < 200) return false;
+                        
+                        // 2. Price Range Filter
+                        var priceText = $item.find('.stext-105').text().trim();
+                        var priceVal = parseFloat(priceText.replace(/[^0-9.]/g, '')) || 0;
+                        
+                        if (window.activeFilters.priceRange !== 'all') {
+                            if (window.activeFilters.priceRange === '0-50') {
+                                if (priceVal < 0 || priceVal > 50) return false;
+                            } else if (window.activeFilters.priceRange === '50-100') {
+                                if (priceVal < 50 || priceVal > 100) return false;
+                            } else if (window.activeFilters.priceRange === '100-150') {
+                                if (priceVal < 100 || priceVal > 150) return false;
+                            } else if (window.activeFilters.priceRange === '150-200') {
+                                if (priceVal < 150 || priceVal > 200) return false;
+                            } else if (window.activeFilters.priceRange === '200+') {
+                                if (priceVal < 200) return false;
+                            }
                         }
-                    }
-                    
-                    // 3. Color Filter
-                    if (window.activeFilters.color !== 'all') {
-                        if (!$item.hasClass('color-' + window.activeFilters.color)) {
-                            return false;
+                        
+                        // 3. Color Filter
+                        if (window.activeFilters.color !== 'all') {
+                            if (!$item.hasClass('color-' + window.activeFilters.color)) {
+                                return false;
+                            }
                         }
-                    }
-                    
-                    // 4. Tag Filter
-                    if (window.activeFilters.tag !== 'all') {
-                        if (!$item.hasClass('tag-' + window.activeFilters.tag)) {
-                            return false;
+                        
+                        // 4. Tag Filter
+                        if (window.activeFilters.tag !== 'all') {
+                            if (!$item.hasClass('tag-' + window.activeFilters.tag)) {
+                                return false;
+                            }
                         }
-                    }
-                    
-                    // 5. Search Query Filter
-                    if (window.activeFilters.searchQuery !== '') {
-                        var name = $item.find('.js-name-b2').text().toLowerCase();
-                        if (name.indexOf(window.activeFilters.searchQuery) === -1) {
-                            return false;
+                        
+                        // 5. Search Query Filter
+                        if (window.activeFilters.searchQuery !== '') {
+                            var name = $item.find('.js-name-b2').text().toLowerCase();
+                            if (name.indexOf(window.activeFilters.searchQuery) === -1) {
+                                return false;
+                            }
                         }
+                        
+                        return true;
                     }
-                    
-                    return true;
+                });
+            };
+
+            // Trigger modern skeleton loading shimmer transition
+            var $grid = $('.isotope-grid');
+            if ($grid.length && !$('.skeleton-container').length) {
+                // Create skeleton container
+                var skeletonHtml = '<div class="row skeleton-container w-full" style="padding: 0 15px; transition: opacity 0.2s ease; width: 100%;">';
+                for (var i = 0; i < 8; i++) {
+                    skeletonHtml += 
+                        '<div class="col-sm-6 col-md-4 col-lg-3 p-b-35">' +
+                        '  <div class="skeleton-product">' +
+                        '    <div class="skeleton-placeholder skeleton-product-pic"></div>' +
+                        '    <div class="skeleton-placeholder skeleton-product-title"></div>' +
+                        '    <div class="skeleton-placeholder skeleton-product-price"></div>' +
+                        '  </div>' +
+                        '</div>';
                 }
-            });
+                skeletonHtml += '</div>';
+                
+                var $skeletons = $(skeletonHtml).insertBefore($grid);
+                
+                // Hide grid with smooth fade
+                $grid.css({ 'opacity': '0', 'pointer-events': 'none', 'transition': 'opacity 0.2s ease' });
+                
+                setTimeout(function() {
+                    $skeletons.css('opacity', '0');
+                    setTimeout(function() {
+                        $skeletons.remove();
+                        $grid.css({ 'opacity': '1', 'pointer-events': 'auto' });
+                        runFilter();
+                    }, 200);
+                }, 500);
+            } else {
+                runFilter();
+            }
         };
 
         // 3. Keyup Search listener (Synchronized across responsive inputs)
@@ -2148,6 +2184,10 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             if (val > 1) {
                 val--;
                 $input.val(val).trigger('change');
+                $input.addClass('pulse-highlight');
+                setTimeout(function() {
+                    $input.removeClass('pulse-highlight');
+                }, 300);
             }
         }
     });
@@ -2160,6 +2200,10 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             var val = parseInt($input.val()) || 1;
             val++;
             $input.val(val).trigger('change');
+            $input.addClass('pulse-highlight');
+            setTimeout(function() {
+                $input.removeClass('pulse-highlight');
+            }, 300);
         }
     });
 
