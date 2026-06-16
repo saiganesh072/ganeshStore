@@ -1429,16 +1429,13 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         initPremiumPDPSwatches();
         initPDPPanZoom();
         initPDPPricingBadges();
+        initCheckout();
         $(window).on('load', function() {
             initWishlist();
             initCart();
             initCategoryFilteringRouting();
             initSearchFilteringRouting();
-            initCatalogFilters();
-            initPDPReviews();
-            initPremiumPDPSwatches();
-            initPDPPanZoom();
-            initPDPPricingBadges();
+            initCheckout();
         });
     });
 
@@ -1695,7 +1692,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
     /*==================================================================
     [ Cart Functionality Integration ]*/
     
-    var activeDiscountPercentage = 0;
+    var activeDiscountPercentage = parseInt(sessionStorage.getItem('activeDiscountPercentage')) || 0;
 
     // Helper to get cart from localStorage
     function getCart() {
@@ -1733,6 +1730,13 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         // 1. Rewrite all header/mobile-header cart icons to point directly to shoping-cart.html but open drawer dynamically
         $('.js-show-cart').each(function() {
             $(this).attr('href', 'shoping-cart.html');
+        });
+
+        // Rewrite Check Out buttons inside the drawer dynamically
+        $('.header-cart-buttons a').each(function() {
+            if ($(this).text().trim() === 'Check Out') {
+                $(this).attr('href', 'checkout.html');
+            }
         });
 
         $('.js-show-cart').off('click').on('click', function(e) {
@@ -1775,13 +1779,19 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             setTimeout(function() {
                 $btn.removeClass('is-loading');
                 
-                if (couponCode === 'GEMINI20') {
+                if (couponCode === 'GEMINI20' || couponCode === 'GANESH20') {
                     activeDiscountPercentage = 20;
+                    sessionStorage.setItem('activeDiscountPercentage', '20');
+                    sessionStorage.setItem('activeCouponCode', couponCode);
                     updateCartPageTotals();
                     if (typeof swal === 'function') {
-                        swal("Coupon Applied!", "Coupon 'GEMINI20' successfully applied. You received a 20% discount on all items!", "success");
+                        swal("Coupon Applied!", "Coupon '" + couponCode + "' successfully applied. You received a 20% discount on all items!", "success");
                     }
                 } else {
+                    activeDiscountPercentage = 0;
+                    sessionStorage.removeItem('activeDiscountPercentage');
+                    sessionStorage.removeItem('activeCouponCode');
+                    updateCartPageTotals();
                     if (typeof swal === 'function') {
                         swal("Invalid Coupon", "The coupon code '" + couponCode + "' is invalid, expired, or does not exist.", "error");
                     }
@@ -1789,60 +1799,10 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             }, 1200);
         });
 
-        // 6. Handle Proceed to Checkout form submission
+        // 6. Handle Proceed to Checkout form submission (redirect to dedicated checkout page)
         $(document).on('submit', '#cart-form', function(e) {
             e.preventDefault();
-            
-            var $form = $(this);
-            var $checkoutBtn = $form.find('.size-116');
-            if ($checkoutBtn.hasClass('is-loading')) return;
-
-            // Extract Shipping Variables
-            var country = $form.find('select[name="time"]').val();
-            var state = $form.find('input[name="state"]').val().trim();
-            var postcode = $form.find('input[name="postcode"]').val().trim();
-
-            // Validate Checkout Fields
-            if (!country || country === 'Select a country...' || !state || !postcode) {
-                if (typeof swal === 'function') {
-                    swal("Delivery Details Required", "Please complete all Shipping fields (Country, State, and Postcode) to validate order delivery.", "warning");
-                }
-                return;
-            }
-
-            // Trigger CTA loading spinner
-            $checkoutBtn.addClass('is-loading');
-
-            setTimeout(function() {
-                $checkoutBtn.removeClass('is-loading');
-                
-                // Clear cart from local state
-                saveCart([]);
-                activeDiscountPercentage = 0;
-                
-                // Trigger beautiful SweetAlert purchase success popup
-                if (typeof swal === 'function') {
-                    swal({
-                        title: "Order Placed Successfully!",
-                        text: "Thank you for shopping with Ganesh Store. Your order has been registered, and will ship shortly!",
-                        icon: "success",
-                        buttons: {
-                            confirm: {
-                                text: "Return to Store",
-                                value: true,
-                                visible: true,
-                                className: "sweet-confirm-obsidian"
-                            }
-                        }
-                    }).then(function() {
-                        // Re-render empty cart page state on confirm
-                        renderCartPage();
-                    });
-                } else {
-                    alert("Order Placed Successfully!");
-                    renderCartPage();
-                }
-            }, 1800);
+            window.location.href = 'checkout.html';
         });
     }
 
@@ -1993,6 +1953,10 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         });
 
         updateCartPageTotals();
+        var storedCoupon = sessionStorage.getItem('activeCouponCode');
+        if (storedCoupon) {
+            $('input[name="coupon"]').val(storedCoupon);
+        }
     }
 
     // Function to calculate and update the total amount
@@ -2744,4 +2708,503 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         });
     }
 
+    // ====================================================================
+    // SECURE CHECKOUT PAGE ENGINE
+    // ====================================================================
+    function initCheckout() {
+        var isCheckoutPage = window.location.pathname.indexOf('checkout.html') > -1;
+        if (!isCheckoutPage) return;
+
+        // 1. Guard against empty cart
+        var cart = getCart();
+        if (cart.length === 0) {
+            showPremiumToast('Your shopping cart is empty. Redirecting to Shop...', 'info');
+            setTimeout(function() {
+                window.location.href = 'product.html';
+            }, 2000);
+            return;
+        }
+
+        // 2. Multi-tab Cart Syncing
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'cartItems') {
+                var updatedCart = getCart();
+                if (updatedCart.length === 0) {
+                    window.location.href = 'product.html';
+                } else {
+                    renderCheckoutSummary();
+                }
+            }
+        });
+
+        // 3. Render Checkout Summary Card & Mobile Summary
+        var activeCouponDiscount = parseInt(sessionStorage.getItem('activeDiscountPercentage')) || 0; // percentage
+        var shippingFee = 0; // standard is free
+
+        function renderCheckoutSummary() {
+            var currentCart = getCart();
+            var $summaryList = $('.checkout-items-summary-list');
+            var $mobileSummaryList = $('.mobile-summary-items-list');
+            
+            if (!$summaryList.length) return;
+            
+            $summaryList.empty();
+            $mobileSummaryList.empty();
+
+            var subtotal = 0;
+            currentCart.forEach(function(item) {
+                var priceNum = parseFloat(item.price.replace(/[^\d.]/g, '')) || 0;
+                var itemQty = parseInt(item.quantity) || 1;
+                var totalItemPrice = priceNum * itemQty;
+                subtotal += totalItemPrice;
+
+                var itemHtml = 
+                    '<div class="flex-w flex-t p-b-15 border-bottom-light m-b-15" style="align-items: center;">' +
+                    '  <div style="width: 50px; height: 50px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.06); overflow: hidden; margin-right: 15px; flex-shrink: 0;">' +
+                    '    <img src="' + item.image + '" alt="IMG" style="width: 100%; height: 100%; object-fit: cover;" />' +
+                    '  </div>' +
+                    '  <div style="flex-grow: 1;">' +
+                    '    <span class="stext-115 cl2" style="font-family: Poppins-Medium; display: block; font-size: 13.5px;">' + item.name + '</span>' +
+                    '    <span class="stext-115 cl6" style="font-size: 11px;">Size: ' + item.size + ' | Color: ' + item.color + '</span>' +
+                    '  </div>' +
+                    '  <span class="stext-115 cl2" style="font-family: Poppins-Medium; flex-shrink: 0; padding-left: 10px;">' + itemQty + ' x ' + item.price + '</span>' +
+                    '</div>';
+
+                $summaryList.append(itemHtml);
+                $mobileSummaryList.append(itemHtml);
+            });
+
+            // Calculate Shipping
+            var isExpress = $('input[name="shipping_method_option"]:checked').val() === 'express';
+            shippingFee = isExpress ? 15.00 : 0.00;
+
+            // Calculate Coupon Discount
+            var discountVal = subtotal * (activeCouponDiscount / 100);
+            var finalTotal = subtotal - discountVal + shippingFee;
+
+            // Sync Totals in summary card
+            $('.js-checkout-subtotal').text('$ ' + subtotal.toFixed(2));
+            $('.js-checkout-shipping').text(shippingFee > 0 ? '$ 15.00' : 'Free');
+            
+            if (activeCouponDiscount > 0) {
+                $('.js-checkout-discount-row').show();
+                $('#checkoutDiscountAmount').text('- $ ' + discountVal.toFixed(2));
+            } else {
+                $('.js-checkout-discount-row').hide();
+            }
+
+            $('.js-checkout-total').text('$ ' + finalTotal.toFixed(2));
+            $('.js-mobile-total-summary').text('$ ' + finalTotal.toFixed(2));
+            $('.js-upi-payment-total').text('$ ' + finalTotal.toFixed(2));
+        }
+
+        renderCheckoutSummary();
+
+        // Pre-populate stored coupon if any
+        var storedCoupon = sessionStorage.getItem('activeCouponCode');
+        if (storedCoupon) {
+            var $couponInput = $('input[name="checkout_coupon"]');
+            $couponInput.val(storedCoupon);
+            if (activeCouponDiscount > 0) {
+                $couponInput.addClass('field-valid');
+            }
+        }
+
+        // 4. Shipping Radio Selector click bindings
+        $('input[name="shipping_method_option"]').on('change', function() {
+            $('.shipping-method-option').removeClass('active-method');
+            $(this).closest('.shipping-method-option').addClass('active-method');
+            renderCheckoutSummary();
+        });
+
+        // 5. Autocomplete address list simulator
+        var addressSuggestions = [
+            "123 Main St, New York, NY 10001",
+            "456 Broadway, New York, NY 10012",
+            "789 Fashion Ave, New York, NY 10018",
+            "101 Park Ave, New York, NY 10178",
+            "202 Fifth Ave, New York, NY 10010"
+        ];
+
+        $('.autocomplete-address-input').on('focus keyup', function() {
+            var val = $(this).val().toLowerCase().trim();
+            var $dropdown = $('.address-autocomplete-list');
+            $dropdown.empty();
+
+            var filtered = addressSuggestions.filter(function(addr) {
+                return addr.toLowerCase().indexOf(val) > -1;
+            });
+
+            if (filtered.length && $(this).is(':focus')) {
+                filtered.forEach(function(addr) {
+                    $dropdown.append('<div class="address-autocomplete-item">' + addr + '</div>');
+                });
+                $dropdown.show();
+            } else {
+                $dropdown.hide();
+            }
+        });
+
+        $(document).on('click', '.address-autocomplete-item', function() {
+            var selected = $(this).text();
+            var parts = selected.split(', ');
+            
+            $('.autocomplete-address-input').val(parts[0]).trigger('input').trigger('change').removeClass('field-error').addClass('field-valid');
+            $('input[name="city"]').val(parts[1]).trigger('input').trigger('change').removeClass('field-error').addClass('field-valid');
+            
+            var stateZip = parts[2].split(' ');
+            $('input[name="state"]').val(stateZip[0]).trigger('input').trigger('change').removeClass('field-error').addClass('field-valid');
+            $('input[name="postcode"]').val(stateZip[1]).trigger('input').trigger('change').removeClass('field-error').addClass('field-valid');
+            
+            $('.address-autocomplete-list').hide();
+        });
+
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('.position-relative').length) {
+                $('.address-autocomplete-list').hide();
+            }
+        });
+
+        // 6. Interactive credit card updates & flips
+        var $creditCard = $('#creditCard');
+        
+        $('#inputCardName').on('input', function() {
+            var val = $(this).val().trim();
+            $('#cardNameLabel').text(val ? val.toUpperCase() : 'YOUR NAME');
+        });
+
+        $('#inputCardNumber').on('input', function() {
+            var val = $(this).val().replace(/\D/g, '');
+            var formatted = val.match(/.{1,4}/g);
+            var maskedVal = formatted ? formatted.join(' ') : '';
+            $(this).val(maskedVal);
+            $('#cardNoLabel').text(maskedVal ? maskedVal : '•••• •••• •••• ••••');
+        });
+
+        $('#inputCardExpiry').on('input', function() {
+            var val = $(this).val().replace(/\D/g, '');
+            if (val.length >= 2) {
+                val = val.substring(0,2) + '/' + val.substring(2,4);
+            }
+            $(this).val(val);
+            $('#cardExpiryLabel').text(val ? val : 'MM/YY');
+        });
+
+        $('#inputCardCvv').on('focus', function() {
+            $creditCard.addClass('flipped');
+        }).on('blur', function() {
+            $creditCard.removeClass('flipped');
+        }).on('input', function() {
+            var val = $(this).val().replace(/\D/g, '');
+            $(this).val(val);
+            $('#cardCvvLabel').text(val ? val : '•••');
+        });
+
+        // 7. Payment Tab Switching
+        $('.payment-tab-btn').on('click', function() {
+            var tab = $(this).attr('data-tab');
+            $('.payment-tab-btn').removeClass('active-tab');
+            $(this).addClass('active-tab');
+
+            $('.payment-panel').removeClass('active-panel');
+            $('#panel-' + tab).addClass('active-panel');
+        });
+
+        // 8. Live input validation handlers
+        $('#checkoutForm input').on('input change blur', function() {
+            var $input = $(this);
+            var val = $input.val().trim();
+            var isValid = true;
+
+            if ($input.attr('required') && !val) {
+                isValid = false;
+            } else if ($input.attr('type') === 'email' && val) {
+                var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                isValid = re.test(val);
+            } else if ($input.attr('name') === 'card_number' && $('.payment-tab-btn.active-tab').attr('data-tab') === 'card') {
+                isValid = val.replace(/\s/g, '').length === 16;
+            } else if ($input.attr('name') === 'card_expiry' && $('.payment-tab-btn.active-tab').attr('data-tab') === 'card') {
+                isValid = val.length === 5 && val.indexOf('/') === 2;
+            } else if ($input.attr('name') === 'card_cvv' && $('.payment-tab-btn.active-tab').attr('data-tab') === 'card') {
+                isValid = val.length === 3;
+            }
+
+            if (isValid && val) {
+                $input.removeClass('field-error').addClass('field-valid');
+            } else if (!isValid) {
+                $input.removeClass('field-valid').addClass('field-error');
+            } else {
+                $input.removeClass('field-valid field-error');
+            }
+        });
+
+        // 9. Coupon validation trigger
+        $('.js-checkout-apply-coupon').on('click', function() {
+            var $input = $('input[name="checkout_coupon"]');
+            var code = $input.val().trim().toUpperCase();
+
+            if (code === 'GANESH20' || code === 'GEMINI20') {
+                activeCouponDiscount = 20;
+                sessionStorage.setItem('activeDiscountPercentage', '20');
+                sessionStorage.setItem('activeCouponCode', code);
+                $input.removeClass('field-error').addClass('field-valid');
+                showPremiumToast('Coupon applied! Enjoy 20% discount.', 'success');
+                renderCheckoutSummary();
+            } else {
+                activeCouponDiscount = 0;
+                sessionStorage.removeItem('activeDiscountPercentage');
+                sessionStorage.removeItem('activeCouponCode');
+                $input.removeClass('field-valid').addClass('field-error');
+                showPremiumToast('Invalid coupon code.', 'error');
+                renderCheckoutSummary();
+            }
+        });
+
+        // 10. UPI Scan verification handler
+        $('.js-verify-upi-payment').on('click', function() {
+            var $btn = $(this);
+            $btn.addClass('is-loading').text('Verifying...');
+            
+            setTimeout(function() {
+                $btn.removeClass('is-loading').text('Verified ✓').css('background-color', '#0f766e');
+                showPremiumToast('UPI Transaction Verified Successfully!', 'success');
+                $btn.data('verified', true);
+            }, 1500);
+        });
+
+        // 11. PayPal Popup simulation
+        $('.js-paypal-checkout-btn').on('click', function() {
+            showPremiumToast('Redirecting to PayPal securely...', 'info');
+            setTimeout(function() {
+                if (confirm("Simulate PayPal Sandbox Authorization?")) {
+                    window.paypalAuthorized = true;
+                    showPremiumToast('PayPal authorization completed successfully.', 'success');
+                    $('.js-btn-place-order').trigger('click');
+                }
+            }, 1000);
+        });
+
+        // 12. Mobile summary toggler
+        $('.mobile-summary-toggle').on('click', function() {
+            $(this).toggleClass('expanded');
+            $('.mobile-summary-collapse').toggleClass('open');
+        });
+
+        // 13. Printable Invoice PDF handler
+        $(document).on('click', '#btnPrintInvoice', function(e) {
+            e.preventDefault();
+            window.print();
+        });
+
+        // Confetti explosion script helper
+        function triggerConfettiBurst() {
+            var colors = ['#717fe0', '#ff3366', '#ffd700', '#0f766e', '#3081ed'];
+            for (var i = 0; i < 70; i++) {
+                var $particle = $('<div class="confetti-particle"></div>');
+                var randomColor = colors[Math.floor(Math.random() * colors.length)];
+                var randomLeft = Math.random() * 100;
+                var randomDelay = Math.random() * 2;
+                var randomSize = Math.floor(Math.random() * 8) + 6;
+
+                $particle.css({
+                    'background-color': randomColor,
+                    'left': randomLeft + '%',
+                    'width': randomSize + 'px',
+                    'height': randomSize + 'px',
+                    'animation-delay': randomDelay + 's'
+                });
+                $('body').append($particle);
+
+                // Auto clean particle
+                (function($p) {
+                    setTimeout(function() {
+                        $p.remove();
+                    }, 4500);
+                })($particle);
+            }
+        }
+
+        // 14. Place Order Submission
+        $('.js-btn-place-order').on('click', function(e) {
+            e.preventDefault();
+
+            // Validate personal fields
+            var hasErrors = false;
+            $('#checkoutForm input[required]').each(function() {
+                var val = $(this).val().trim();
+                if (!val) {
+                    $(this).addClass('field-error');
+                    hasErrors = true;
+                }
+            });
+
+            if (hasErrors) {
+                showPremiumToast('Please complete all required fields.', 'error');
+                $('.checkout-form-section').addClass('field-error');
+                setTimeout(function() {
+                    $('.checkout-form-section').removeClass('field-error');
+                }, 400);
+                return;
+            }
+
+            // Verify specific payment tab method authorization
+            var activeTab = $('.payment-tab-btn.active-tab').attr('data-tab');
+            if (activeTab === 'card') {
+                var cc = $('#inputCardNumber').val().replace(/\s/g, '');
+                var exp = $('#inputCardExpiry').val();
+                var cvv = $('#inputCardCvv').val();
+                if (cc.length !== 16 || exp.length !== 5 || cvv.length !== 3) {
+                    showPremiumToast('Please enter valid credit card details.', 'error');
+                    return;
+                }
+            } else if (activeTab === 'upi') {
+                if (!$('.js-verify-upi-payment').data('verified')) {
+                    showPremiumToast('Please scan the QR code and verify your transaction.', 'error');
+                    return;
+                }
+            } else if (activeTab === 'paypal') {
+                if (!window.paypalAuthorized) {
+                    showPremiumToast('Please click "Pay with PayPal" to authorize the transaction.', 'error');
+                    return;
+                }
+            }
+
+            // Launch secure loader
+            var $overlay = $('#processingOverlay');
+            $overlay.show();
+
+            // Animate steps
+            setTimeout(function() {
+                $('#proc-step-1').removeClass('active-step').addClass('step-completed').find('i').removeClass('zmdi-circle-o').addClass('zmdi-check-circle');
+                $('#proc-step-2').addClass('active-step');
+
+                setTimeout(function() {
+                    $('#proc-step-2').removeClass('active-step').addClass('step-completed').find('i').removeClass('zmdi-circle-o').addClass('zmdi-check-circle');
+                    $('#proc-step-3').addClass('active-step');
+
+                    setTimeout(function() {
+                        $('#proc-step-3').removeClass('active-step').addClass('step-completed').find('i').removeClass('zmdi-circle-o').addClass('zmdi-check-circle');
+                        $('#proc-step-4').addClass('active-step');
+
+                        // Save details to database
+                        var currentCart = getCart();
+                        var orderId = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
+                        var subtotalStr = $('.js-checkout-subtotal').text().replace(/[^\d.]/g, '');
+                        var subtotalNum = parseFloat(subtotalStr) || 0;
+                        var discountNum = subtotalNum * (activeCouponDiscount / 100);
+                        var totalNum = subtotalNum - discountNum + shippingFee;
+
+                        var emailVal = $('input[name="checkout-email"]').val().trim();
+                        var fullNameVal = $('input[name="firstname"]').val().trim() + ' ' + $('input[name="lastname"]').val().trim();
+                        var addrVal = $('input[name="address"]').val().trim() + ', ' + $('input[name="city"]').val().trim() + ', ' + $('input[name="state"]').val().trim() + ' ' + $('input[name="postcode"]').val().trim();
+                        var shipMethodVal = $('input[name="shipping_method_option"]:checked').val() === 'express' ? 'Express Delivery' : 'Standard Delivery';
+                        
+                        var orderData = {
+                            order_id: orderId,
+                            customer_name: fullNameVal,
+                            email: emailVal,
+                            shipping_address: addrVal,
+                            shipping_method: shipMethodVal,
+                            payment_method: activeTab.toUpperCase(),
+                            items: currentCart,
+                            subtotal: subtotalNum,
+                            discount: discountNum,
+                            total: totalNum
+                        };
+
+                        function completeTransaction() {
+                            $overlay.hide();
+                            $('#checkoutMainRow').hide();
+                            $('.bread-crumb').hide();
+                            $('.mobile-summary-toggle').hide();
+                            $('.mobile-summary-collapse').removeClass('open').hide();
+
+                            // Populate invoice details
+                            $('#receiptOrderId').text(orderId);
+                            $('#receiptDate').text(new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }));
+                            $('#receiptEmail').text(emailVal);
+                            $('#receiptPayment').text(activeTab.toUpperCase());
+                            $('#receiptAddress').text(addrVal);
+
+                            // Populate items table
+                            var $receiptTable = $('#receiptTableBody');
+                            $receiptTable.empty();
+                            currentCart.forEach(function(item) {
+                                var row = 
+                                    '<tr>' +
+                                    '  <td>' + item.name + ' <span style="font-size:11px;color:#888;">(' + item.size + ' / ' + item.color + ')</span></td>' +
+                                    '  <td style="text-align:center;">' + item.quantity + '</td>' +
+                                    '  <td style="text-align:right;">' + item.price + '</td>' +
+                                    '</tr>';
+                                $receiptTable.append(row);
+                            });
+
+                            $('#receiptSubtotal').text('$ ' + subtotalNum.toFixed(2));
+                            if (discountNum > 0) {
+                                $('#receiptDiscountRow').show();
+                                $('#receiptDiscount').text('- $ ' + discountNum.toFixed(2));
+                            } else {
+                                $('#receiptDiscountRow').hide();
+                            }
+                            $('#receiptShipping').text(shippingFee > 0 ? '$ 15.00' : 'Free');
+                            $('#receiptTotal').text('$ ' + totalNum.toFixed(2));
+
+                            $('#receiptContainer').show();
+                            
+                            // Save to local order history
+                            var history = [];
+                            try {
+                                history = JSON.parse(localStorage.getItem('order_history')) || [];
+                            } catch (err) {
+                                history = [];
+                            }
+                            history.push(orderData);
+                            localStorage.setItem('order_history', JSON.stringify(history));
+
+                            // Clear cart and coupon
+                            saveCart([]);
+                            sessionStorage.removeItem('activeDiscountPercentage');
+                            sessionStorage.removeItem('activeCouponCode');
+                            updateCartBadges();
+                            renderSideDrawerCart();
+
+                            // Fireworks / confetti explosion
+                            triggerConfettiBurst();
+                            showPremiumToast('Invoice has been sent to ' + emailVal, 'success');
+                        }
+
+                        // Save to Supabase Cloud Database if configured
+                        if (window.supabaseClient) {
+                            window.supabaseClient
+                                .from('orders')
+                                .insert(orderData)
+                                .then(function(res) {
+                                    if (res.error) {
+                                        console.warn("Supabase Order saving failed, falling back to local storage:", res.error.message);
+                                    } else {
+                                        console.log("Order saved to Supabase cloud successfully.");
+                                    }
+                                    completeTransaction();
+                                })
+                                .catch(function(err) {
+                                    console.warn("Supabase Order saving caught exception, falling back to local:", err);
+                                    completeTransaction();
+                                });
+                        } else {
+                            completeTransaction();
+                        }
+
+                    }, 1000);
+                }, 1000);
+            }, 1000);
+
+        });
+    }
+
+    // Run initialization on DOM load
+    $(document).ready(function() {
+        initCheckout();
+    });
+
 })(jQuery);
+

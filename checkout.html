@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Checkout | GaneshStore — Premium Fashion & Accessories</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!--===============================================================================================-->
+  <link rel="icon" type="image/png" href="images/icons/favicon.png" />
+  <!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css" />
+  <!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="fonts/font-awesome-4.7.0/css/font-awesome.min.css" />
+  <!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="fonts/iconic/css/material-design-iconic-font.min.css" />
+  <!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="fonts/linearicons-v1.0.0/icon-font.min.css" />
+  <!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="vendor/animate/animate.css" />
+  <!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="vendor/css-hamburgers/hamburgers.min.css" />
+  <!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="vendor/animsition/css/animsition.min.css" />
+  <!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css" />
+  <!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="vendor/perfect-scrollbar/perfect-scrollbar.css" />
+  <!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="css/util.css" />
+  <link rel="stylesheet" type="text/css" href="css/main.css?v=1.3" />
+  <!--===============================================================================================-->
+  <script src="https://assets.adobedtm.com/6268dc4b6b26/a79c12535bfd/launch-6b416d57c554-development.min.js" async></script>
+  <script src="js/datalayer.js"></script>
+</head>
+<body class="animsition">
+  
+  <!-- Header -->
+  <header class="header-v4">
+    <!-- Announcement Bar -->
+    <div class="announcement-bar">
+      Free shipping for standard orders over $100
+    </div>
+
+    <!-- Header desktop -->
+    <div class="container-menu-desktop">
+      <div class="wrap-menu-desktop how-shadow1">
+        <nav class="limiter-menu-desktop container">
+          <!-- Logo desktop -->
+          <a href="index.html" class="logo">
+            <img src="images/icons/logo-01.png" alt="IMG-LOGO" />
+          </a>
+
+          <!-- Menu desktop -->
+          <div class="menu-desktop">
+            <ul class="main-menu">
+              <li>
+                <a href="index.html">Home</a>
+              </li>
+              <li>
+                <a href="product.html">Shop</a>
+              </li>
+              <li class="label1" data-label1="hot">
+                <a href="shoping-cart.html">Features</a>
+              </li>
+              <li>
+                <a href="blog.html">Blog</a>
+              </li>
+              <li>
+                <a href="about.html">About</a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Icon header -->
+          <div class="wrap-icon-header flex-w flex-r-m">
+            <div class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 js-show-modal-search">
+              <i class="zmdi zmdi-search"></i>
+            </div>
+            <div class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti js-show-cart" data-notify="0">
+              <i class="zmdi zmdi-shopping-cart"></i>
+            </div>
+            <a href="wishlist.html" class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti" data-notify="0">
+              <i class="zmdi zmdi-favorite-outline"></i>
+            </a>
+            <a href="signin.html" class="dis-block icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 js-auth-link-container">
+              <i class="zmdi zmdi-account js-auth-icon"></i>
+            </a>
+          </div>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Header Mobile -->
+    <div class="wrap-header-mobile">
+      <div class="logo-mobile">
+        <a href="index.html"><img src="images/icons/logo-01.png" alt="IMG-LOGO" /></a>
+      </div>
+      <div class="wrap-icon-header flex-w flex-r-m m-r-15">
+        <div class="icon-header-item cl2 hov-cl1 trans-04 p-r-11 js-show-modal-search">
+          <i class="zmdi zmdi-search"></i>
+        </div>
+        <div class="icon-header-item cl2 hov-cl1 trans-04 p-r-11 p-l-10 icon-header-noti js-show-cart" data-notify="0">
+          <i class="zmdi zmdi-shopping-cart"></i>
+        </div>
+        <a href="wishlist.html" class="icon-header-item cl2 hov-cl1 trans-04 p-r-11 p-l-10 icon-header-noti" data-notify="0">
+          <i class="zmdi zmdi-favorite-outline"></i>
+        </a>
+        <a href="signin.html" class="dis-block icon-header-item cl2 hov-cl1 trans-04 p-r-11 p-l-10 js-auth-link-container">
+          <i class="zmdi zmdi-account js-auth-icon"></i>
+        </a>
+      </div>
+      <div class="btn-show-menu-mobile hamburger hamburger--squeeze">
+        <span class="hamburger-box">
+          <span class="hamburger-inner"></span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Menu Mobile -->
+    <div class="menu-mobile">
+      <ul class="main-menu-m">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="product.html">Shop</a></li>
+        <li><a href="shoping-cart.html" class="label1 rs1" data-label1="hot">Features</a></li>
+        <li><a href="blog.html">Blog</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Cart Drawer -->
+  <div class="wrap-header-cart js-panel-cart">
+    <div class="s-full js-hide-cart"></div>
+    <div class="header-cart flex-col-l p-l-65 p-r-25">
+      <div class="header-cart-title flex-w flex-sb-m p-b-8">
+        <span class="mtext-103 cl2"> Your Cart </span>
+        <div class="fs-35 lh-10 cl2 p-lr-5 pointer hov-cl1 trans-04 js-hide-cart">
+          <i class="zmdi zmdi-close"></i>
+        </div>
+      </div>
+      <div class="header-cart-content flex-w js-pscroll">
+        <ul class="header-cart-wrapitem w-full"></ul>
+        <div class="w-full">
+          <div class="header-cart-total w-full p-tb-40">Total: $0.00</div>
+          <div class="header-cart-buttons flex-w w-full">
+            <a href="shoping-cart.html" class="flex-c-m stext-101 cl0 size-107 bg3 bor2 hov-btn3 p-lr-15 trans-04 m-r-8 m-b-10">View Cart</a>
+            <a href="checkout.html" class="flex-c-m stext-101 cl0 size-107 bg3 bor2 hov-btn3 p-lr-15 trans-04 m-b-10">Check Out</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- breadcrumb -->
+  <div class="container print-hide">
+    <div class="bread-crumb flex-w p-l-25 p-r-15 p-t-30 p-lr-0-lg">
+      <a href="index.html" class="stext-109 cl8 hov-cl1 trans-04">Home <i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i></a>
+      <a href="shoping-cart.html" class="stext-109 cl8 hov-cl1 trans-04">Shopping Cart <i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i></a>
+      <span class="stext-109 cl4"> Secure Checkout </span>
+    </div>
+  </div>
+
+  <!-- Checkout Container -->
+  <section class="bg0 p-t-45 p-b-85">
+    <div class="container">
+      
+      <!-- Collapsible Mobile Cart Summary Trigger (Only visible on Mobile viewports) -->
+      <div class="mobile-summary-toggle print-hide d-md-none flex-w flex-sb-m">
+        <span class="stext-101"><i class="zmdi zmdi-shopping-cart"></i> Show Order Summary <i class="zmdi zmdi-chevron-down toggle-arrow"></i></span>
+        <span class="mtext-110 js-mobile-total-summary">$0.00</span>
+      </div>
+      <div class="mobile-summary-collapse print-hide d-md-none">
+        <div class="mobile-summary-items-list p-all-15">
+          <!-- Dynamically filled on mobile -->
+        </div>
+      </div>
+
+      <!-- Main Checkout Layout -->
+      <div class="row" id="checkoutMainRow">
+        <!-- Left Side: Shipping Form, Shipping Rates, Payment Methods -->
+        <div class="col-lg-7 m-b-50 checkout-form-section">
+          <form id="checkoutForm" class="p-r-40 p-r-0-lg">
+            
+            <!-- Shipping Details -->
+            <div class="checkout-section-box">
+              <h4 class="mtext-109 cl2 p-b-20 border-bottom-light">1. Shipping Address</h4>
+              
+              <div class="row p-t-15">
+                <div class="col-sm-6 m-b-20">
+                  <label class="stext-110 cl2 p-b-5">First Name <span class="text-danger">*</span></label>
+                  <div class="input-validate-container">
+                    <input class="size-111 bor8 p-lr-15 stext-115 cl2" type="text" name="firstname" placeholder="John" required />
+                    <span class="validation-badge"><i class="zmdi zmdi-check-circle"></i></span>
+                  </div>
+                </div>
+                <div class="col-sm-6 m-b-20">
+                  <label class="stext-110 cl2 p-b-5">Last Name <span class="text-danger">*</span></label>
+                  <div class="input-validate-container">
+                    <input class="size-111 bor8 p-lr-15 stext-115 cl2" type="text" name="lastname" placeholder="Doe" required />
+                    <span class="validation-badge"><i class="zmdi zmdi-check-circle"></i></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-sm-6 m-b-20">
+                  <label class="stext-110 cl2 p-b-5">Email Address <span class="text-danger">*</span></label>
+                  <div class="input-validate-container">
+                    <input class="size-111 bor8 p-lr-15 stext-115 cl2" type="email" name="checkout-email" placeholder="john.doe@example.com" required />
+                    <span class="validation-badge"><i class="zmdi zmdi-check-circle"></i></span>
+                  </div>
+                </div>
+                <div class="col-sm-6 m-b-20">
+                  <label class="stext-110 cl2 p-b-5">Phone Number <span class="text-danger">*</span></label>
+                  <div class="input-validate-container">
+                    <input class="size-111 bor8 p-lr-15 stext-115 cl2" type="tel" name="phone" placeholder="9876543210" required />
+                    <span class="validation-badge"><i class="zmdi zmdi-check-circle"></i></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="m-b-20 position-relative">
+                <label class="stext-110 cl2 p-b-5">Street Address <span class="text-danger">*</span></label>
+                <div class="input-validate-container">
+                  <input class="size-111 bor8 p-lr-15 stext-115 cl2 autocomplete-address-input" type="text" name="address" placeholder="House number, Street name" autocomplete="off" required />
+                  <span class="validation-badge"><i class="zmdi zmdi-check-circle"></i></span>
+                </div>
+                <!-- Autocomplete Dropdown List -->
+                <div class="address-autocomplete-list" style="display: none;"></div>
+              </div>
+
+              <div class="row">
+                <div class="col-sm-4 m-b-20">
+                  <label class="stext-110 cl2 p-b-5">City <span class="text-danger">*</span></label>
+                  <div class="input-validate-container">
+                    <input class="size-111 bor8 p-lr-15 stext-115 cl2" type="text" name="city" placeholder="New York" required />
+                    <span class="validation-badge"><i class="zmdi zmdi-check-circle"></i></span>
+                  </div>
+                </div>
+                <div class="col-sm-4 m-b-20">
+                  <label class="stext-110 cl2 p-b-5">State/Country <span class="text-danger">*</span></label>
+                  <div class="input-validate-container">
+                    <input class="size-111 bor8 p-lr-15 stext-115 cl2" type="text" name="state" placeholder="NY" required />
+                    <span class="validation-badge"><i class="zmdi zmdi-check-circle"></i></span>
+                  </div>
+                </div>
+                <div class="col-sm-4 m-b-20">
+                  <label class="stext-110 cl2 p-b-5">Postcode / ZIP <span class="text-danger">*</span></label>
+                  <div class="input-validate-container">
+                    <input class="size-111 bor8 p-lr-15 stext-115 cl2" type="text" name="postcode" placeholder="10001" required />
+                    <span class="validation-badge"><i class="zmdi zmdi-check-circle"></i></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Shipping Methods -->
+            <div class="checkout-section-box m-t-40">
+              <h4 class="mtext-109 cl2 p-b-20 border-bottom-light">2. Shipping Method</h4>
+              <div class="shipping-method-options p-t-15">
+                
+                <label class="shipping-method-option active-method">
+                  <input type="radio" name="shipping_method_option" value="standard" checked style="margin-right: 12px;" />
+                  <div class="method-details">
+                    <span class="method-name stext-101">Standard Shipping</span>
+                    <span class="method-time stext-115">Delivers in 3 - 5 business days</span>
+                  </div>
+                  <span class="method-price mtext-110">Free</span>
+                </label>
+
+                <label class="shipping-method-option">
+                  <input type="radio" name="shipping_method_option" value="express" style="margin-right: 12px;" />
+                  <div class="method-details">
+                    <span class="method-name stext-101">Express Shipping</span>
+                    <span class="method-time stext-115">Delivers in 1 - 2 business days</span>
+                  </div>
+                  <span class="method-price mtext-110">+$15.00</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Payment Methods -->
+            <div class="checkout-section-box m-t-40">
+              <h4 class="mtext-109 cl2 p-b-20 border-bottom-light">3. Payment Method</h4>
+              
+              <!-- Payment Tabs Navigation -->
+              <div class="payment-tabs flex-w p-t-15 m-b-25">
+                <button type="button" class="payment-tab-btn active-tab" data-tab="card">
+                  <i class="zmdi zmdi-card"></i> Credit Card
+                </button>
+                <button type="button" class="payment-tab-btn" data-tab="upi">
+                  <i class="zmdi zmdi-smartphone-android"></i> UPI / QR Code
+                </button>
+                <button type="button" class="payment-tab-btn" data-tab="paypal">
+                  <i class="zmdi zmdi-paypal"></i> PayPal
+                </button>
+              </div>
+
+              <!-- Payment Content Panels -->
+              <div class="payment-panels">
+                
+                <!-- Credit Card Panel -->
+                <div class="payment-panel active-panel" id="panel-card">
+                  <div class="row">
+                    
+                    <!-- Dynamic Virtual Card Widget -->
+                    <div class="col-md-6 m-b-25 d-flex align-items-center justify-content-center">
+                      <div class="premium-credit-card-wrapper">
+                        <div class="premium-credit-card" id="creditCard">
+                          <!-- Front Face -->
+                          <div class="card-face card-front">
+                            <div class="card-chip"></div>
+                            <div class="card-logo-visa">VISA</div>
+                            <div class="card-number-label" id="cardNoLabel">•••• •••• •••• ••••</div>
+                            <div class="card-row">
+                              <div class="card-col">
+                                <div class="card-sub-header">CARDHOLDER</div>
+                                <div class="card-sub-text" id="cardNameLabel">YOUR NAME</div>
+                              </div>
+                              <div class="card-col text-right">
+                                <div class="card-sub-header">EXPIRES</div>
+                                <div class="card-sub-text" id="cardExpiryLabel">MM/YY</div>
+                              </div>
+                            </div>
+                          </div>
+                          <!-- Back Face -->
+                          <div class="card-face card-back">
+                            <div class="card-magnetic-strip"></div>
+                            <div class="card-signature-bar">
+                              <div class="card-cvv-text" id="cardCvvLabel">•••</div>
+                            </div>
+                            <div class="card-back-text">SECURE TRANSACTION</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Card details form fields -->
+                    <div class="col-md-6">
+                      <div class="m-b-15">
+                        <label class="stext-110 cl2 p-b-5">Cardholder Name <span class="text-danger">*</span></label>
+                        <div class="input-validate-container">
+                          <input class="size-111 bor8 p-lr-15 stext-115 cl2" type="text" name="card_name" id="inputCardName" placeholder="JOHN DOE" />
+                          <span class="validation-badge"><i class="zmdi zmdi-check-circle"></i></span>
+                        </div>
+                      </div>
+                      <div class="m-b-15">
+                        <label class="stext-110 cl2 p-b-5">Card Number <span class="text-danger">*</span></label>
+                        <div class="input-validate-container">
+                          <input class="size-111 bor8 p-lr-15 stext-115 cl2" type="text" name="card_number" id="inputCardNumber" placeholder="4111 1111 1111 1111" maxlength="19" />
+                          <span class="validation-badge"><i class="zmdi zmdi-check-circle"></i></span>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-6 m-b-15">
+                          <label class="stext-110 cl2 p-b-5">Expiry Date <span class="text-danger">*</span></label>
+                          <div class="input-validate-container">
+                            <input class="size-111 bor8 p-lr-15 stext-115 cl2" type="text" name="card_expiry" id="inputCardExpiry" placeholder="MM/YY" maxlength="5" />
+                            <span class="validation-badge"><i class="zmdi zmdi-check-circle"></i></span>
+                          </div>
+                        </div>
+                        <div class="col-6 m-b-15">
+                          <label class="stext-110 cl2 p-b-5">CVV <span class="text-danger">*</span></label>
+                          <div class="input-validate-container">
+                            <input class="size-111 bor8 p-lr-15 stext-115 cl2" type="password" name="card_cvv" id="inputCardCvv" placeholder="•••" maxlength="3" />
+                            <span class="validation-badge"><i class="zmdi zmdi-check-circle"></i></span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- UPI / QR Code Panel -->
+                <div class="payment-panel" id="panel-upi">
+                  <div class="flex-col-c-m p-tb-15 text-center">
+                    <div class="upi-qr-wrapper">
+                      <!-- Simulated interactive QR scan component -->
+                      <div class="upi-qr-code">
+                        <div class="upi-qr-scan-line"></div>
+                        <img src="images/icons/logo-01.png" alt="QR-BRAND" class="upi-qr-center-logo" style="width: 32px; height: 32px;" />
+                        <!-- High quality QR placeholder patterns -->
+                        <div class="upi-qr-mock-matrix"></div>
+                      </div>
+                    </div>
+                    <span class="stext-101 cl2 m-t-15">Scan to Pay via UPI App</span>
+                    <span class="stext-115 cl6 m-t-5 m-b-15">Amount: <strong class="js-upi-payment-total">$0.00</strong></span>
+                    <button type="button" class="flex-c-m stext-101 cl0 size-107 bg3 bor2 hov-btn3 p-lr-15 trans-04 js-verify-upi-payment">
+                      Verify Payment
+                    </button>
+                  </div>
+                </div>
+
+                <!-- PayPal Panel -->
+                <div class="payment-panel" id="panel-paypal">
+                  <div class="flex-col-c-m p-tb-30 text-center">
+                    <i class="zmdi zmdi-paypal cl1 m-b-15" style="font-size: 60px; color: #003087;"></i>
+                    <p class="stext-115 cl6 m-b-20" style="max-width: 350px;">
+                      Clicking checkout will redirect you to PayPal to authorize the purchase. Once verified, you will return here automatically.
+                    </p>
+                    <button type="button" class="flex-c-m stext-101 cl0 size-116 bg1 bor14 hov-btn1 p-lr-15 trans-04 js-paypal-checkout-btn" style="max-width: 250px; height: 50px; background-color: #ffc439 !important; color: #003087 !important; border-color: #ffc439 !important;">
+                      <i class="zmdi zmdi-paypal m-r-8" style="font-size: 18px;"></i> Pay with PayPal
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Right Side: Order Summary & Coupon Code -->
+        <div class="col-lg-5 m-b-50 print-hide">
+          <div class="bor10 p-lr-45 p-tb-35 m-l-20 m-l-0-lg p-lr-15-sm">
+            <h4 class="mtext-109 cl2 p-b-20 border-bottom-light">Order Summary</h4>
+            
+            <!-- Items Scroll List -->
+            <div class="checkout-items-summary-list p-tb-20" style="max-height: 280px; overflow-y: auto;">
+              <!-- Dynamic item lines -->
+            </div>
+
+            <!-- Totals Rows -->
+            <div class="p-t-20 border-top-light">
+              <div class="flex-sb-m p-b-10">
+                <span class="stext-110 cl6">Subtotal</span>
+                <span class="mtext-110 cl2 js-checkout-subtotal">$0.00</span>
+              </div>
+              <div class="flex-sb-m p-b-10 js-checkout-discount-row" style="display: none; color: #0f766e;">
+                <span class="stext-110" style="font-family: Poppins-Medium;">Discount (20%):</span>
+                <span class="stext-110" style="font-family: Poppins-Medium;" id="checkoutDiscountAmount">- $0.00</span>
+              </div>
+              <div class="flex-sb-m p-b-10">
+                <span class="stext-110 cl6">Shipping</span>
+                <span class="mtext-110 cl2 js-checkout-shipping">Free</span>
+              </div>
+              <div class="flex-sb-m p-tb-15 border-top-light border-bottom-light m-tb-10">
+                <span class="mtext-101 cl2">Total</span>
+                <span class="mtext-110 cl2 js-checkout-total" style="font-size: 22px; font-family: Poppins-Bold; color: #717fe0;">$0.00</span>
+              </div>
+            </div>
+
+            <!-- Coupon Code Form -->
+            <div class="flex-w flex-m p-t-15 p-b-30">
+              <div class="input-validate-container m-r-10 m-b-10" style="flex-grow: 1;">
+                <input class="stext-104 cl2 plh4 size-117 bor13 p-lr-20 w-full" type="text" name="checkout_coupon" placeholder="Coupon Code (e.g. GANESH20)" style="height: 45px;" />
+                <span class="validation-badge"><i class="zmdi zmdi-check-circle"></i></span>
+              </div>
+              <button type="button" class="flex-c-m stext-101 cl2 size-118 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-b-10 js-checkout-apply-coupon" style="height: 45px;">
+                Apply
+              </button>
+            </div>
+
+            <!-- Place Order CTA Button -->
+            <button type="button" class="flex-c-m stext-101 cl0 size-116 bg3 bor14 hov-btn3 p-lr-15 trans-04 pointer js-btn-place-order">
+              Place Order
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Celebratory Success Receipt Interface (Initially hidden) -->
+      <div id="receiptContainer" style="display: none; max-width: 700px; margin: 0 auto;">
+        <div class="receipt-card p-all-45 p-lr-15-sm background-glass shadow-premium border-premium radius-premium">
+          <div class="flex-col-c-m text-center p-b-30">
+            <div class="success-icon-wrapper m-b-20">
+              <div class="success-checkmark"></div>
+            </div>
+            <h2 class="mtext-109 cl2 p-b-10 font-bold-poppins" style="font-size: 32px;">Order Placed Successfully!</h2>
+            <p class="stext-115 cl6">
+              Thank you for shopping with GaneshStore. A confirmation email has been sent to <strong id="receiptEmail" style="color: #717fe0;"></strong>.
+            </p>
+          </div>
+
+          <div class="receipt-meta-box p-tb-20 border-top-light border-bottom-light m-b-30">
+            <div class="row">
+              <div class="col-sm-6 m-b-10">
+                <span class="stext-110 cl9">ORDER ID:</span>
+                <h5 class="mtext-101 cl2" id="receiptOrderId">ORD-89471</h5>
+              </div>
+              <div class="col-sm-6 m-b-10 text-right text-left-sm">
+                <span class="stext-110 cl9">TRANSACTION DATE:</span>
+                <h5 class="mtext-101 cl2" id="receiptDate">June 16, 2026</h5>
+              </div>
+            </div>
+            <div class="row m-t-15">
+              <div class="col-sm-6 m-b-10">
+                <span class="stext-110 cl9">PAYMENT METHOD:</span>
+                <h5 class="mtext-101 cl2" id="receiptPayment">Credit Card</h5>
+              </div>
+              <div class="col-sm-6 m-b-10 text-right text-left-sm">
+                <span class="stext-110 cl9">SHIPPING ADDRESS:</span>
+                <h5 class="mtext-101 cl2" id="receiptAddress" style="font-size: 13px; line-height: 1.4;"></h5>
+              </div>
+            </div>
+          </div>
+
+          <h5 class="mtext-101 cl2 p-b-15">Purchased Items</h5>
+          <div class="table-responsive">
+            <table class="table receipt-items-table">
+              <thead>
+                <tr>
+                  <th style="font-family: Poppins-Medium;">Product</th>
+                  <th style="font-family: Poppins-Medium; text-align: center;">Qty</th>
+                  <th style="font-family: Poppins-Medium; text-align: right;">Total</th>
+                </tr>
+              </thead>
+              <tbody id="receiptTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="flex-col-e-m text-right p-t-15 border-top-light">
+            <div style="width: 250px; display: flex; flex-direction: column; gap: 8px;">
+              <div class="flex-sb-m font-size-14">
+                <span class="stext-115 cl9">Subtotal:</span>
+                <span class="stext-115 cl2" id="receiptSubtotal">$0.00</span>
+              </div>
+              <div class="flex-sb-m font-size-14" id="receiptDiscountRow" style="display: none; color: #0f766e;">
+                <span class="stext-115">Discount:</span>
+                <span class="stext-115" id="receiptDiscount">- $0.00</span>
+              </div>
+              <div class="flex-sb-m font-size-14">
+                <span class="stext-115 cl9">Shipping Fee:</span>
+                <span class="stext-115 cl2" id="receiptShipping">$0.00</span>
+              </div>
+              <div class="flex-sb-m border-top-light p-t-8 m-t-5 font-size-16">
+                <strong class="mtext-101 cl2">Final Total:</strong>
+                <strong class="mtext-110 cl2" id="receiptTotal" style="color: #717fe0;">$0.00</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="receipt-cta-buttons print-hide flex-w flex-c-m p-t-40" style="gap: 20px;">
+            <button type="button" class="flex-c-m stext-101 cl0 size-115 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer" id="btnPrintInvoice" style="background-color: #222 !important; border-color: #222 !important;">
+              <i class="zmdi zmdi-print m-r-8"></i> Print Invoice
+            </button>
+            <a href="index.html" class="flex-c-m stext-101 cl0 size-115 bg1 bor14 hov-btn1 p-lr-15 trans-04 pointer" style="background-color: #717fe0 !important; border-color: #717fe0 !important;">
+              Continue Shopping
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Fullscreen Secured Processing Transition Overlay -->
+  <div class="processing-overlay print-hide" id="processingOverlay" style="display: none;">
+    <div class="processing-card p-all-45 text-center background-glass shadow-premium border-premium radius-premium">
+      <div class="spinner-premium m-b-30"></div>
+      <h4 class="mtext-109 cl2 p-b-10" style="font-family: Poppins-Bold;">Securing Secure Checkout</h4>
+      <p class="stext-115 cl6 m-b-30">Please do not refresh the page or click back.</p>
+      
+      <div class="processing-steps text-left">
+        <div class="processing-step active-step" id="proc-step-1">
+          <i class="zmdi zmdi-circle-o check-icon"></i> Verifying shipping and customer details...
+        </div>
+        <div class="processing-step" id="proc-step-2">
+          <i class="zmdi zmdi-circle-o check-icon"></i> Connecting to bank payment gateway...
+        </div>
+        <div class="processing-step" id="proc-step-3">
+          <i class="zmdi zmdi-circle-o check-icon"></i> Authorizing transaction funds...
+        </div>
+        <div class="processing-step" id="proc-step-4">
+          <i class="zmdi zmdi-circle-o check-icon"></i> finalising secure database transaction...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg3 p-t-75 p-b-32 print-hide">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-6 col-lg-3 p-b-50">
+          <h4 class="stext-301 cl0 p-b-30">Categories</h4>
+          <ul>
+            <li class="p-b-10"><a href="#" class="stext-107 cl7 hov-cl1 trans-04">Women</a></li>
+            <li class="p-b-10"><a href="#" class="stext-107 cl7 hov-cl1 trans-04">Men</a></li>
+            <li class="p-b-10"><a href="#" class="stext-107 cl7 hov-cl1 trans-04">Shoes</a></li>
+            <li class="p-b-10"><a href="#" class="stext-107 cl7 hov-cl1 trans-04">Watches</a></li>
+          </ul>
+        </div>
+        <div class="col-sm-6 col-lg-3 p-b-50">
+          <h4 class="stext-301 cl0 p-b-30">Help</h4>
+          <ul>
+            <li class="p-b-10"><a href="#" class="stext-107 cl7 hov-cl1 trans-04">Track Order</a></li>
+            <li class="p-b-10"><a href="#" class="stext-107 cl7 hov-cl1 trans-04">Returns</a></li>
+            <li class="p-b-10"><a href="#" class="stext-107 cl7 hov-cl1 trans-04">Shipping</a></li>
+            <li class="p-b-10"><a href="#" class="stext-107 cl7 hov-cl1 trans-04">FAQs</a></li>
+          </ul>
+        </div>
+        <div class="col-sm-6 col-lg-3 p-b-50">
+          <h4 class="stext-301 cl0 p-b-30">GET IN TOUCH</h4>
+          <p class="stext-107 cl7 size-201">
+            Any questions? Let us know in store at 8th floor, 379 Hudson St, New York, NY 10018 or call us on (+1) 96 716 6879
+          </p>
+          <div class="p-t-27">
+            <a href="#" class="fs-18 cl7 hov-cl1 trans-04 m-r-16"><i class="fa fa-facebook"></i></a>
+            <a href="#" class="fs-18 cl7 hov-cl1 trans-04 m-r-16"><i class="fa fa-instagram"></i></a>
+            <a href="#" class="fs-18 cl7 hov-cl1 trans-04 m-r-16"><i class="fa fa-pinterest-p"></i></a>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3 p-b-50">
+          <h4 class="stext-301 cl0 p-b-30">Newsletter</h4>
+          <form>
+            <div class="wrap-input1 w-full p-b-4">
+              <input class="input1 bg-none plh1 stext-107 cl7" type="text" name="email" placeholder="email@example.com" />
+              <div class="focus-input1 trans-04"></div>
+            </div>
+            <div class="p-t-18">
+              <button class="flex-c-m stext-101 cl0 size-103 bg1 bor1 hov-btn2 p-lr-15 trans-04">Subscribe</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="p-t-40">
+        <div class="flex-c-m flex-w p-b-18">
+          <a href="#" class="m-all-1"><img src="images/icons/icon-pay-01.png" alt="ICON-PAY" /></a>
+          <a href="#" class="m-all-1"><img src="images/icons/icon-pay-02.png" alt="ICON-PAY" /></a>
+          <a href="#" class="m-all-1"><img src="images/icons/icon-pay-03.png" alt="ICON-PAY" /></a>
+          <a href="#" class="m-all-1"><img src="images/icons/icon-pay-04.png" alt="ICON-PAY" /></a>
+          <a href="#" class="m-all-1"><img src="images/icons/icon-pay-05.png" alt="ICON-PAY" /></a>
+        </div>
+        <p class="stext-107 cl6 txt-center">
+          Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | Made with <i class="fa fa-heart-o" aria-hidden="true"></i> by Colorlib
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!--===============================================================================================-->
+  <script src="vendor/jquery/jquery-3.2.1.min.js"></script>
+  <!--===============================================================================================-->
+  <script src="vendor/animsition/js/animsition.min.js"></script>
+  <!--===============================================================================================-->
+  <script src="vendor/bootstrap/js/popper.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+  <!--===============================================================================================-->
+  <script src="vendor/select2/select2.min.js"></script>
+  <!--===============================================================================================-->
+  <script src="vendor/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+  <!--===============================================================================================-->
+  <script src="vendor/sweetalert/sweetalert.min.js"></script>
+  <!--===============================================================================================-->
+  <script src="js/main.js?v=1.2"></script>
+</body>
+</html>
