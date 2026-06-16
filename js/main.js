@@ -701,7 +701,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             var rowHtml = 
                 '<tr class="table_row" style="transition: all 0.5s ease;">' +
                 '  <td class="column-1">' +
-                '    <div class="how-itemcart1 js-remove-wishlist-item" data-name="' + item.name + '" title="Remove from Wishlist">' +
+                '    <div class="wishlist-item-img">' +
                 '      <img src="' + item.image + '" alt="IMG">' +
                 '    </div>' +
                 '  </td>' +
@@ -717,6 +717,11 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 '              data-image="' + item.image + '" ' +
                 '              data-link="' + item.link + '">' +
                 '        Add to Cart' +
+                '      </button>' +
+                '      <button class="btn-remove-wishlist js-remove-wishlist-item" ' +
+                '              data-name="' + item.name + '" ' +
+                '              title="Remove from Wishlist">' +
+                '        <i class="zmdi zmdi-delete"></i>' +
                 '      </button>' +
                 '    </div>' +
                 '  </td>' +
@@ -1687,6 +1692,51 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             
             showPremiumToast('<strong>' + name + '</strong> has been removed from your wishlist.', 'info');
         }
+    });
+
+    // Handle Add to Cart from Wishlist Click
+    $(document).off('click', '.js-add-cart-from-wishlist').on('click', '.js-add-cart-from-wishlist', function(e) {
+        e.preventDefault();
+        var $btn = $(this);
+        if ($btn.hasClass('is-loading')) return;
+
+        var name = $btn.attr('data-name');
+        var price = $btn.attr('data-price');
+        var img = $btn.attr('data-image');
+        var size = "Size M"; // default
+        var color = "Default Color"; // default
+        var qty = 1;
+
+        $btn.addClass('is-loading');
+
+        setTimeout(function() {
+            $btn.removeClass('is-loading');
+
+            var cart = getCart();
+            var existingItem = cart.find(function(item) {
+                return item.name === name && item.size === size && item.color === color;
+            });
+
+            if (existingItem) {
+                existingItem.quantity = (parseInt(existingItem.quantity) || 1) + qty;
+            } else {
+                cart.push({
+                    name: name,
+                    price: price,
+                    image: img,
+                    quantity: qty,
+                    size: size,
+                    color: color
+                });
+            }
+
+            saveCart(cart);
+            renderSideDrawerCart();
+
+            showPremiumToast('<strong>' + name + '</strong> (' + size + ' / ' + color + ') has been added to your cart.', 'cart-success', {
+                image: img
+            });
+        }, 1200);
     });
 
     /*==================================================================
