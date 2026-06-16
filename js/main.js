@@ -1739,6 +1739,21 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         }, 1200);
     });
 
+    // Handle Share Wishlist Click
+    $(document).off('click', '.js-share-wishlist').on('click', '.js-share-wishlist', function(e) {
+        e.preventDefault();
+        var dummyUrl = window.location.origin + window.location.pathname + '?shared=true';
+        
+        var tempInput = document.createElement("input");
+        tempInput.value = dummyUrl;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
+
+        showPremiumToast('Wishlist link successfully copied to clipboard! Share it with friends.', 'success');
+    });
+
     /*==================================================================
     [ Cart Functionality Integration ]*/
     
