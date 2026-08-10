@@ -3273,3 +3273,80 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
 
 })(jQuery);
 
+
+
+    /*==================================================================
+    [ Free-Scroll Sliders Logic for .slick2 and .slick4 ]*/
+    function initFreeScrollSliders() {
+        $('.wrap-slick2').each(function() {
+            var $wrap = $(this);
+            if (!$wrap.find('.prev-slick2').length) {
+                $wrap.append('<button class="arrow-slick2 prev-slick2"><i class="fa fa-angle-left" aria-hidden="true"></i></button>');
+            }
+            if (!$wrap.find('.next-slick2').length) {
+                $wrap.append('<button class="arrow-slick2 next-slick2"><i class="fa fa-angle-right" aria-hidden="true"></i></button>');
+            }
+        });
+
+        $('.slick2, .slick4').each(function() {
+            var el = this;
+            var isDown = false;
+            var startX;
+            var scrollLeft;
+            
+            el.addEventListener('mousedown', function(e) {
+                isDown = true;
+                el.style.scrollBehavior = 'auto';
+                startX = e.pageX - el.offsetLeft;
+                scrollLeft = el.scrollLeft;
+                el.style.cursor = 'grabbing';
+            });
+            
+            el.addEventListener('mouseleave', function() {
+                isDown = false;
+                el.style.cursor = 'grab';
+            });
+            
+            el.addEventListener('mouseup', function() {
+                isDown = false;
+                el.style.cursor = 'grab';
+            });
+            
+            el.addEventListener('mousemove', function(e) {
+                if (!isDown) return;
+                e.preventDefault();
+                var x = e.pageX - el.offsetLeft;
+                var walk = (x - startX) * 1.5;
+                el.scrollLeft = scrollLeft - walk;
+            });
+
+            el.addEventListener('dragstart', function(e) {
+                e.preventDefault();
+            });
+
+            el.style.cursor = 'grab';
+        });
+
+        $('.wrap-slick2').each(function() {
+            var $wrap = $(this);
+            var $slick = $wrap.find('.slick2');
+            
+            $wrap.find('.prev-slick2').off('click').on('click', function(e) {
+                e.preventDefault();
+                $slick[0].style.scrollBehavior = 'smooth';
+                var cardWidth = $slick.find('.item-slick2').first().outerWidth() || 300;
+                $slick.scrollLeft($slick.scrollLeft() - cardWidth);
+            });
+            
+            $wrap.find('.next-slick2').off('click').on('click', function(e) {
+                e.preventDefault();
+                $slick[0].style.scrollBehavior = 'smooth';
+                var cardWidth = $slick.find('.item-slick2').first().outerWidth() || 300;
+                $slick.scrollLeft($slick.scrollLeft() + cardWidth);
+            });
+        });
+    }
+
+    $(document).ready(function() {
+        initFreeScrollSliders();
+    });
