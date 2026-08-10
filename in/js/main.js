@@ -119,6 +119,8 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 '  <li><a href="product.html?category=bag">Bags</a></li>' +
                 '  <li><a href="product.html?category=shoes">Shoes</a></li>' +
                 '  <li><a href="product.html?category=watches">Watches</a></li>' +
+                '  <li><a href="product.html?category=accessories">Accessories</a></li>' +
+                '  <li><a href="product.html?category=activewear">Activewear</a></li>' +
                 '</ul>'
             );
         }
@@ -154,6 +156,8 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 '  <li><a href="product.html?category=bag">Bags</a></li>' +
                 '  <li><a href="product.html?category=shoes">Shoes</a></li>' +
                 '  <li><a href="product.html?category=watches">Watches</a></li>' +
+                '  <li><a href="product.html?category=accessories">Accessories</a></li>' +
+                '  <li><a href="product.html?category=activewear">Activewear</a></li>' +
                 '</ul>' +
                 '<span class="arrow-main-menu-m">' +
                 '  <i class="fa fa-angle-right" aria-hidden="true"></i>' +
@@ -484,14 +488,19 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         
         $slick3.empty();
 
-        // Add 3 thumbnails for the dynamic product using its primary scraped image
+        var angle1 = $block.attr('data-angle1') || img;
+        var angle2 = $block.attr('data-angle2') || img;
+        var angle3 = $block.attr('data-angle3') || img;
+        
+        var angles = [angle1, angle2, angle3];
         var slideHtml = '';
         for (var i = 0; i < 3; i++) {
+            var currentImg = angles[i];
             slideHtml += 
-                '<div class="item-slick3" data-thumb="' + img + '">' +
+                '<div class="item-slick3" data-thumb="' + currentImg + '">' +
                 '  <div class="wrap-pic-w pos-relative">' +
-                '    <img src="' + img + '" alt="IMG-PRODUCT" />' +
-                '    <a class="flex-c-m size-108 how-pos1 bor0 fs-16 cl10 bg0 hov-btn3 trans-04" href="' + img + '">' +
+                '    <img src="' + currentImg + '" alt="IMG-PRODUCT" />' +
+                '    <a class="flex-c-m size-108 how-pos1 bor0 fs-16 cl10 bg0 hov-btn3 trans-04" href="' + currentImg + '">' +
                 '      <i class="fa fa-expand"></i>' +
                 '    </a>' +
                 '  </div>' +
@@ -698,32 +707,32 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         $tableBody.empty();
 
         wishlist.forEach(function(item) {
-            var rowHtml = 
-                '<tr class="table_row" style="transition: all 0.5s ease;">' +
+            var rowHtml =
+                '<tr class="table_row">' +
                 '  <td class="column-1">' +
                 '    <div class="wishlist-item-img">' +
                 '      <img src="' + item.image + '" alt="IMG">' +
                 '    </div>' +
                 '  </td>' +
                 '  <td class="column-2">' +
-                '    <a href="' + item.link + '" class="hov-cl1 trans-04 stext-115" style="font-family: Poppins-Medium; font-size: 15px; color: #333;">' + item.name + '</a>' +
+                '    <a href="' + item.link + '" class="hov-cl1 trans-04 stext-115 wishlist-product-name">' + item.name + '</a>' +
                 '  </td>' +
-                '  <td class="column-3 stext-115">' + item.price + '</td>' +
-                '  <td class="column-4" style="text-align: center; padding-right: 20px;">' +
-                '    <div class="flex-c-m flex-w">' +
-                '      <button class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04 js-add-cart-from-wishlist" ' +
-                '              data-name="' + item.name + '" ' +
-                '              data-price="' + item.price + '" ' +
-                '              data-image="' + item.image + '" ' +
-                '              data-link="' + item.link + '">' +
-                '        Add to Cart' +
-                '      </button>' +
-                '      <button class="btn-remove-wishlist js-remove-wishlist-item" ' +
-                '              data-name="' + item.name + '" ' +
-                '              title="Remove from Wishlist">' +
-                '        <i class="zmdi zmdi-delete"></i>' +
-                '      </button>' +
-                '    </div>' +
+                '  <td class="column-3 stext-115 wishlist-price-col">' + item.price + '</td>' +
+                '  <td class="column-4 wishlist-actions-col">' +
+                '    <button class="btn-wishlist-add-cart js-add-cart-from-wishlist"' +
+                '            data-name="' + item.name + '"' +
+                '            data-price="' + item.price + '"' +
+                '            data-image="' + item.image + '"' +
+                '            data-link="' + item.link + '">' +
+                '      <span class="btn-atc-text">Add to Cart</span>' +
+                '      <span class="btn-atc-spinner" style="display:none;"><i class="zmdi zmdi-rotate-right zmdi-hc-spin"></i></span>' +
+                '    </button>' +
+                '    <button class="btn-remove-wishlist js-remove-wishlist-item"' +
+                '            data-name="' + item.name + '"' +
+                '            title="Remove from wishlist">' +
+                '      <i class="zmdi zmdi-delete"></i>' +
+                '      <span class="btn-remove-label">Remove</span>' +
+                '    </button>' +
                 '  </td>' +
                 '</tr>';
             $tableBody.append(rowHtml);
@@ -747,6 +756,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         if (category) {
             var catName = category.toLowerCase().trim();
             var filterVal = '.' + catName;
+            var isSaleFilter = false;
             if (catName === 'bags' || catName === 'bag') {
                 filterVal = '.bag';
             } else if (catName === 'watches' || catName === 'watch') {
@@ -757,6 +767,9 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 filterVal = '.men';
             } else if (catName === 'women' || catName === 'woman') {
                 filterVal = '.women';
+            } else if (catName === 'sale') {
+                isSaleFilter = true;
+                filterVal = '*';
             } else if (catName === 'all') {
                 filterVal = '*';
             }
@@ -764,21 +777,35 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             var $topeContainer = $('.isotope-grid');
             var $btn = $('.filter-tope-group button[data-filter="' + filterVal + '"]');
             
-            if ($btn.length && $topeContainer.length) {
+            if ($topeContainer.length) {
                 // Remove active class from all buttons
                 $('.filter-tope-group button').removeClass('how-active1');
-                // Select active category button
-                $btn.addClass('how-active1');
-                
-                // Sync with combined filter state
-                window.activeFilters.category = filterVal;
-                if (typeof window.executeCombinedFilters === 'function') {
-                    window.executeCombinedFilters();
-                } else {
-                    $topeContainer.isotope({ filter: filterVal });
+                if ($btn.length) {
+                    $btn.addClass('how-active1');
                 }
                 
-                // Soft scroll to the filtered storefront section so the user lands straight on the active visual catalogue!
+                if (isSaleFilter) {
+                    // Sale filter: show only products with old-price (i.e., items on sale)
+                    window.activeFilters.category = '*';
+                    $topeContainer.isotope({
+                        filter: function() {
+                            return $(this).find('.old-price').length > 0 || $(this).find('.sale-price').length > 0;
+                        }
+                    });
+                } else {
+                    // Sync with combined filter state
+                    window.activeFilters.category = filterVal;
+                    if (typeof window.executeCombinedFilters === 'function') {
+                        window.executeCombinedFilters();
+                    } else {
+                        $topeContainer.isotope({ filter: filterVal });
+                    }
+                }
+                
+                // Show "No results" messaging after filter
+                showNoResultsMessage($topeContainer);
+                
+                // Soft scroll to the filtered storefront section
                 var $productCatalog = $('.bg0.m-t-23.p-b-140');
                 if ($productCatalog.length) {
                     $('html, body').animate({
@@ -967,6 +994,9 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                         return true;
                     }
                 });
+
+                // Show "No results" messaging after Isotope finishes layout
+                showNoResultsMessage($topeContainer);
             };
 
             // Trigger modern skeleton loading shimmer transition
@@ -1425,6 +1455,164 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         }
     }
 
+    // "No Results Found" empty state messaging
+    function showNoResultsMessage($container) {
+        if (!$container || !$container.length) return;
+        // Small delay to let Isotope finish layout
+        setTimeout(function() {
+            var visibleItems = $container.find('.isotope-item:not(.isotope-hidden)').length;
+            // Fallback: check display style
+            if (visibleItems === 0) {
+                visibleItems = $container.children().filter(function() {
+                    return $(this).css('display') !== 'none' && !$(this).hasClass('isotope-hidden');
+                }).length;
+            }
+            var $emptyMsg = $container.siblings('.no-results-message');
+            if (visibleItems === 0) {
+                if (!$emptyMsg.length) {
+                    $emptyMsg = $(
+                        '<div class="no-results-message" style="text-align: center; padding: 60px 20px; width: 100%;">' +
+                        '  <i class="zmdi zmdi-search" style="font-size: 48px; color: #ccc; display: block; margin-bottom: 16px;"></i>' +
+                        '  <h4 style="font-family: Poppins-SemiBold; font-size: 20px; color: #333; margin-bottom: 8px;">No products found</h4>' +
+                        '  <p style="font-family: Poppins-Regular; font-size: 14px; color: #888; margin-bottom: 24px;">Try adjusting your filters or search terms.</p>' +
+                        '  <button class="js-clear-all-filters" style="font-family: Poppins-Medium; font-size: 13px; padding: 10px 28px; border: 2px solid #717fe0; color: #717fe0; background: transparent; border-radius: 25px; cursor: pointer; transition: all 0.3s cubic-bezier(0.25,1,0.5,1);" onmouseover="this.style.background=\'#717fe0\';this.style.color=\'#fff\';" onmouseout="this.style.background=\'transparent\';this.style.color=\'#717fe0\';">Clear All Filters</button>' +
+                        '</div>'
+                    );
+                    $container.after($emptyMsg);
+
+                    // Bind clear filters handler
+                    $emptyMsg.find('.js-clear-all-filters').on('click', function() {
+                        window.activeFilters = { category: '*', priceRange: 'all', color: 'all', tag: 'all', searchQuery: '' };
+                        $('.filter-tope-group button').removeClass('how-active1');
+                        $('.filter-tope-group button[data-filter="*"]').addClass('how-active1');
+                        if (typeof window.executeCombinedFilters === 'function') {
+                            window.executeCombinedFilters();
+                        }
+                        // Clear any search inputs
+                        $('.js-search-input-field').val('');
+                        // Clear URL params
+                        if (window.history.replaceState) {
+                            window.history.replaceState({}, document.title, window.location.pathname);
+                        }
+                    });
+                }
+                $emptyMsg.show();
+            } else {
+                $emptyMsg.hide();
+            }
+        }, 300);
+    }
+
+    // Social Share Button Wiring for PDP pages
+    function initPDPSocialShare() {
+        var isPDP = window.location.pathname.indexOf('/p-') > -1 || window.location.pathname.indexOf('product-detail') > -1;
+        if (!isPDP) return;
+
+        var pageUrl = encodeURIComponent(window.location.href);
+        var productName = encodeURIComponent($('.js-name-detail').text().trim() || document.title);
+
+        // Wire up social share icons
+        $('.flex-w.flex-m.p-l-100.p-t-40 a, .flex-w.flex-r-m a').each(function() {
+            var $link = $(this);
+            var $icon = $link.find('i, .fa');
+            if (!$icon.length) return;
+            var iconClass = $icon.attr('class') || '';
+
+            if (iconClass.indexOf('fa-facebook') > -1) {
+                $link.attr('href', 'https://www.facebook.com/sharer/sharer.php?u=' + pageUrl);
+                $link.attr('target', '_blank');
+                $link.attr('rel', 'noopener noreferrer');
+            } else if (iconClass.indexOf('fa-twitter') > -1) {
+                $link.attr('href', 'https://twitter.com/intent/tweet?url=' + pageUrl + '&text=Check%20out%20' + productName + '%20on%20GaneshStore!');
+                $link.attr('target', '_blank');
+                $link.attr('rel', 'noopener noreferrer');
+            } else if (iconClass.indexOf('fa-pinterest') > -1) {
+                var imgSrc = encodeURIComponent($('.wrap-pic-w img, .gallery-lb img').first().attr('src') || '');
+                $link.attr('href', 'https://pinterest.com/pin/create/button/?url=' + pageUrl + '&media=' + imgSrc + '&description=' + productName);
+                $link.attr('target', '_blank');
+                $link.attr('rel', 'noopener noreferrer');
+            } else if (iconClass.indexOf('fa-instagram') > -1) {
+                // Instagram doesn't have a direct share URL; link to profile
+                $link.attr('href', 'https://www.instagram.com/');
+                $link.attr('target', '_blank');
+                $link.attr('rel', 'noopener noreferrer');
+            }
+
+            // Prevent default # navigation
+            $link.on('click', function(e) {
+                var href = $(this).attr('href');
+                if (!href || href === '#') {
+                    e.preventDefault();
+                }
+            });
+        });
+    }
+
+    // Newsletter form initialization
+    function initNewsletter() {
+        var $newsletterForms = $('form').filter(function() {
+            return $(this).find('input[name="email"]').length > 0 && $(this).find('button:contains("Subscribe")').length > 0;
+        });
+        
+        $newsletterForms.on('submit', function(e) {
+            e.preventDefault();
+            var $form = $(this);
+            var $emailInput = $form.find('input[name="email"]');
+            var email = $emailInput.val().trim();
+            
+            if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                if (typeof swal !== 'undefined') {
+                    swal("Subscribed!", "You have successfully subscribed to our newsletter.", "success");
+                }
+                $emailInput.val('');
+            } else {
+                if (typeof swal !== 'undefined') {
+                    swal("Error", "Please enter a valid email address.", "error");
+                }
+            }
+        });
+    }
+
+    // Auto-populate checkout fields for logged-in users
+    function autoPopulateCheckout() {
+        var isCheckoutPage = window.location.pathname.indexOf('checkout.html') > -1;
+        if (!isCheckoutPage) return;
+
+        var profile = null;
+        try {
+            profile = JSON.parse(localStorage.getItem('userProfile'));
+        } catch (e) {}
+
+        if (profile) {
+            // Auto-fill name
+            if (profile.name) {
+                var nameParts = profile.name.split(' ');
+                var $firstName = $('input[name="firstname"]');
+                var $lastName = $('input[name="lastname"]');
+                if ($firstName.length && !$firstName.val()) {
+                    $firstName.val(nameParts[0]).trigger('change');
+                }
+                if ($lastName.length && !$lastName.val() && nameParts.length > 1) {
+                    $lastName.val(nameParts.slice(1).join(' ')).trigger('change');
+                }
+            }
+            // Auto-fill email
+            if (profile.email) {
+                var $email = $('input[name="checkout-email"]');
+                if ($email.length && !$email.val()) {
+                    $email.val(profile.email).trigger('change');
+                }
+            }
+            // Auto-fill phone
+            if (profile.phone) {
+                var $phone = $('input[name="phone"]');
+                if ($phone.length && !$phone.val()) {
+                    $phone.val(profile.phone).trigger('change');
+                }
+            }
+        }
+    }
+
     // Run initialization on DOM load
     $(document).ready(function() {
         initWishlist();
@@ -1434,13 +1622,16 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         initPremiumPDPSwatches();
         initPDPPanZoom();
         initPDPPricingBadges();
+        initPDPSocialShare();
+        initNewsletter();
         initCheckout();
+        autoPopulateCheckout();
         $(window).on('load', function() {
             initWishlist();
             initCart();
             initCategoryFilteringRouting();
             initSearchFilteringRouting();
-            initCheckout();
+            initFreeScrollSliders();
         });
     });
 
@@ -1676,11 +1867,8 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             wishlist.splice(index, 1);
             saveWishlist(wishlist);
             
-            // Premium fade out transition animation
-            $row.css({
-                'opacity': '0',
-                'transform': 'translateX(-30px)'
-            });
+            // Premium collapse animation using shared keyframe
+            $row.addClass('row-removing');
             
             setTimeout(function() {
                 $row.remove();
@@ -1703,19 +1891,29 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         var name = $btn.attr('data-name');
         var price = $btn.attr('data-price');
         var img = $btn.attr('data-image');
-        var size = "Size M"; // default
-        var color = "Default Color"; // default
+        var size = 'M';
+        var color = 'Default';
         var qty = 1;
 
+        // Show spinner, hide text
         $btn.addClass('is-loading');
+        $btn.find('.btn-atc-text').hide();
+        $btn.find('.btn-atc-spinner').show();
 
         setTimeout(function() {
+            // Restore button
             $btn.removeClass('is-loading');
+            $btn.find('.btn-atc-text').show();
+            $btn.find('.btn-atc-spinner').hide();
 
             var cart = getCart();
-            var existingItem = cart.find(function(item) {
-                return item.name === name && item.size === size && item.color === color;
-            });
+            var existingItem = null;
+            for (var i = 0; i < cart.length; i++) {
+                if (cart[i].name === name && cart[i].size === size && cart[i].color === color) {
+                    existingItem = cart[i];
+                    break;
+                }
+            }
 
             if (existingItem) {
                 existingItem.quantity = (parseInt(existingItem.quantity) || 1) + qty;
@@ -1730,13 +1928,26 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 });
             }
 
+            if (window.GaneshDataLayer && typeof window.GaneshDataLayer.trackAddToCart === 'function') {
+                window.GaneshDataLayer.trackAddToCart({
+                    name: name,
+                    price: price,
+                    quantity: qty
+                });
+            }
+
             saveCart(cart);
+            updateCartBadges();
             renderSideDrawerCart();
 
-            showPremiumToast('<strong>' + name + '</strong> (' + size + ' / ' + color + ') has been added to your cart.', 'cart-success', {
+            // Flash the button green briefly
+            $btn.addClass('atc-success');
+            setTimeout(function() { $btn.removeClass('atc-success'); }, 1500);
+
+            showPremiumToast('<strong>' + name + '</strong> has been added to your cart.', 'cart-success', {
                 image: img
             });
-        }, 1200);
+        }, 900);
     });
 
     // Handle Share Wishlist Click
@@ -1864,6 +2075,26 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             }, 1200);
         });
 
+        // 5.5 Handle Update Cart click dynamic simulation refresh
+        $(document).on('click', '.js-update-cart', function(e) {
+            e.preventDefault();
+            var $btn = $(this);
+            if ($btn.hasClass('is-loading')) return;
+
+            var $table = $('.table-shopping-cart');
+            $btn.addClass('is-loading');
+            $table.addClass('refreshing');
+
+            setTimeout(function() {
+                $btn.removeClass('is-loading');
+                $table.removeClass('refreshing');
+                
+                // Trigger page updates
+                renderCartPage();
+                showPremiumToast('Shopping cart updated successfully!', 'success');
+            }, 1000);
+        });
+
         // 6. Handle Proceed to Checkout form submission (redirect to dedicated checkout page)
         $(document).on('submit', '#cart-form', function(e) {
             e.preventDefault();
@@ -1933,8 +2164,13 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         });
 
         if (itemIndex > -1) {
+            var removedItem = cart[itemIndex];
             cart.splice(itemIndex, 1);
             saveCart(cart);
+            
+            if (window.GaneshDataLayer && typeof window.GaneshDataLayer.trackRemoveFromCart === 'function') {
+                window.GaneshDataLayer.trackRemoveFromCart(removedItem);
+            }
             
             // Sync dynamic components
             renderCartPage();
@@ -1984,20 +2220,19 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             var rowHtml = 
                 '<tr class="table_row" style="transition: all 0.5s ease;">' +
                 '  <td class="column-1">' +
-                '    <div class="how-itemcart1 js-remove-cart-item" title="Remove from Cart" ' +
-                '         data-name="' + item.name + '" ' +
-                '         data-size="' + item.size + '" ' +
-                '         data-color="' + item.color + '">' +
+                '    <div class="cart-item-image">' +
                 '      <img src="' + item.image + '" alt="IMG">' +
                 '    </div>' +
                 '  </td>' +
                 '  <td class="column-2">' +
-                '    <span class="js-cart-item-name" style="font-family: Poppins-Medium; font-size: 15px; color: #333;">' + item.name + '</span>' +
-                '    <br>' +
-                '    <span style="font-size: 12px; color: #888;">' +
-                '      Size: <span class="js-cart-item-size">' + item.size + '</span> | ' +
-                '      Color: <span class="js-cart-item-color">' + item.color + '</span>' +
-                '    </span>' +
+                '    <div style="padding-right: 25px;">' +
+                '      <span class="js-cart-item-name" style="font-family: Poppins-Medium; font-size: 15px; color: #333;">' + item.name + '</span>' +
+                '      <br>' +
+                '      <span style="font-size: 12px; color: #888;">' +
+                '        Size: <span class="js-cart-item-size">' + item.size + '</span> | ' +
+                '        Color: <span class="js-cart-item-color">' + item.color + '</span>' +
+                '      </span>' +
+                '    </div>' +
                 '  </td>' +
                 '  <td class="column-3 stext-115">' + item.price + '</td>' +
                 '  <td class="column-4">' +
@@ -2013,6 +2248,14 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 '    </div>' +
                 '  </td>' +
                 '  <td class="column-5 stext-115">' + totalStr + '</td>' +
+                '  <td class="column-6" style="text-align: center; vertical-align: middle;">' +
+                '    <button class="btn-remove-cart js-remove-cart-item" title="Remove from Cart" ' +
+                '            data-name="' + item.name + '" ' +
+                '            data-size="' + item.size + '" ' +
+                '            data-color="' + item.color + '">' +
+                '      <i class="zmdi zmdi-delete"></i>' +
+                '    </button>' +
+                '  </td>' +
                 '</tr>';
             $table.append(rowHtml);
         });
@@ -2286,12 +2529,8 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             cart.splice(itemIndex, 1);
             saveCart(cart);
             
-            // Premium fade out transition animation
-            $row.css({
-                'opacity': '0',
-                'transform': 'translateX(-30px)',
-                'transition': 'all 0.5s ease'
-            });
+            // Premium collapsing height and slide out transition animation
+            $row.addClass('row-removing');
             
             setTimeout(function() {
                 $row.remove();
@@ -3164,8 +3403,14 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                         var addrVal = $('input[name="address"]').val().trim() + ', ' + $('input[name="city"]').val().trim() + ', ' + $('input[name="state"]').val().trim() + ' ' + $('input[name="postcode"]').val().trim();
                         var shipMethodVal = $('input[name="shipping_method_option"]:checked').val() === 'express' ? 'Express Delivery' : 'Standard Delivery';
                         
+                        var activeProfile = null;
+                        try {
+                            activeProfile = JSON.parse(localStorage.getItem('userProfile'));
+                        } catch(e) {}
+
                         var orderData = {
                             order_id: orderId,
+                            user_id: activeProfile ? activeProfile.id : null,
                             customer_name: fullNameVal,
                             email: emailVal,
                             shipping_address: addrVal,
@@ -3266,18 +3511,10 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         });
     }
 
-    // Run initialization on DOM load
-    $(document).ready(function() {
-        initCheckout();
-    });
-
-})(jQuery);
-
-
-
     /*==================================================================
     [ Free-Scroll Sliders Logic for .slick2 and .slick4 ]*/
     function initFreeScrollSliders() {
+        // Inject arrows dynamically for .wrap-slick2 if they are not present
         $('.wrap-slick2').each(function() {
             var $wrap = $(this);
             if (!$wrap.find('.prev-slick2').length) {
@@ -3288,6 +3525,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             }
         });
 
+        // 1. Mouse Drag to Scroll (free scroll) for .slick2 and .slick4
         $('.slick2, .slick4').each(function() {
             var el = this;
             var isDown = false;
@@ -3296,7 +3534,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             
             el.addEventListener('mousedown', function(e) {
                 isDown = true;
-                el.style.scrollBehavior = 'auto';
+                el.style.scrollBehavior = 'auto'; // Disable smooth scroll while dragging
                 startX = e.pageX - el.offsetLeft;
                 scrollLeft = el.scrollLeft;
                 el.style.cursor = 'grabbing';
@@ -3316,17 +3554,20 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 if (!isDown) return;
                 e.preventDefault();
                 var x = e.pageX - el.offsetLeft;
-                var walk = (x - startX) * 1.5;
+                var walk = (x - startX) * 1.5; // multiplier
                 el.scrollLeft = scrollLeft - walk;
             });
 
+            // Prevent browser image/link ghosting on drag
             el.addEventListener('dragstart', function(e) {
                 e.preventDefault();
             });
 
+            // Set initial grab cursor
             el.style.cursor = 'grab';
         });
 
+        // 2. Click arrows to scroll .slick2
         $('.wrap-slick2').each(function() {
             var $wrap = $(this);
             var $slick = $wrap.find('.slick2');
@@ -3345,8 +3586,102 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 $slick.scrollLeft($slick.scrollLeft() + cardWidth);
             });
         });
+
+        // 3. Dynamic responsive dots for .slick4 (Category Banners)
+        $('.wrap-slick4').each(function() {
+            var $wrap = $(this);
+            var $slick = $wrap.find('.slick4');
+            var $slides = $slick.find('.item-slick4');
+            var numSlides = $slides.length;
+            
+            function renderDots() {
+                $wrap.find('.slick2-dots').remove();
+                
+                var width = $(window).width();
+                var slidesToShow = 3;
+                if (width <= 992 && width > 576) slidesToShow = 2;
+                else if (width <= 576) slidesToShow = 1;
+                
+                var numPages = numSlides - slidesToShow + 1;
+                if (numPages <= 1) return; // No dots needed if all slides fit
+                
+                var $dotsContainer = $('<ul class="slick2-dots" style="display: flex; justify-content: center; margin-top: 25px; list-style: none; padding: 0;"></ul>');
+                
+                for (var i = 0; i < numPages; i++) {
+                    $dotsContainer.append('<li style="margin: 0 5px;" data-index="' + i + '"><button type="button" style="width: 8px; height: 8px; border-radius: 50%; background: #ccc; border: none; padding: 0; outline: none; transition: all 0.3s; cursor: pointer;"></button></li>');
+                }
+                
+                $wrap.append($dotsContainer);
+                var $dots = $dotsContainer.find('li');
+                
+                // Set initial active dot
+                var scrollLeft = $slick.scrollLeft();
+                var maxScroll = $slick[0].scrollWidth - $slick.outerWidth();
+                var ratio = maxScroll > 0 ? (scrollLeft / maxScroll) : 0;
+                var activeIndex = Math.round(ratio * (numPages - 1));
+                
+                $dots.removeClass('slick-active').find('button').css({
+                    'width': '8px',
+                    'border-radius': '50%',
+                    'background': '#ccc'
+                });
+                $dots.eq(activeIndex).addClass('slick-active').find('button').css({
+                    'width': '24px',
+                    'border-radius': '4px',
+                    'background': 'linear-gradient(90deg, #717fe0 0%, #ec38bc 100%)'
+                });
+                
+                // Handle dots click
+                $dots.off('click').on('click', function() {
+                    var index = $(this).data('index');
+                    $slick[0].style.scrollBehavior = 'smooth';
+                    var scrollVal = (index / (numPages - 1)) * maxScroll;
+                    $slick.scrollLeft(scrollVal);
+                });
+            }
+            
+            renderDots();
+            
+            // Re-render dots on resize (debounced)
+            var resizeTimer;
+            $(window).on('resize', function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(renderDots, 100);
+            });
+            
+            // Update dots on scroll
+            $slick.on('scroll', function() {
+                var scrollLeft = $slick.scrollLeft();
+                var maxScroll = $slick[0].scrollWidth - $slick.outerWidth();
+                if (maxScroll <= 0) return;
+                
+                var width = $(window).width();
+                var slidesToShow = 3;
+                if (width <= 992 && width > 576) slidesToShow = 2;
+                else if (width <= 576) slidesToShow = 1;
+                
+                var numPages = numSlides - slidesToShow + 1;
+                var ratio = scrollLeft / maxScroll;
+                var activeIndex = Math.round(ratio * (numPages - 1));
+                
+                var $dots = $wrap.find('.slick2-dots li');
+                $dots.removeClass('slick-active').find('button').css({
+                    'width': '8px',
+                    'border-radius': '50%',
+                    'background': '#ccc'
+                });
+                
+                $dots.eq(activeIndex).addClass('slick-active').find('button').css({
+                    'width': '24px',
+                    'border-radius': '4px',
+                    'background': 'linear-gradient(90deg, #717fe0 0%, #ec38bc 100%)'
+                });
+            });
+        });
     }
 
-    $(document).ready(function() {
-        initFreeScrollSliders();
-    });
+    // NOTE: initCheckout() and initFreeScrollSliders() are now called
+    // from the primary $(document).ready block above to avoid duplication.
+
+})(jQuery);
+

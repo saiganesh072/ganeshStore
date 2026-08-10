@@ -397,20 +397,17 @@ Input, textarea : 14px/1.6 '', Arial, sans-serif;
   min-width: 178px;
   max-width: 225px;
   background-color: #fff;
-  transition: all 0.4s;
-  -webkit-transition: all 0.4s;
-  -o-transition: all 0.4s;
-  -moz-transition: all 0.4s;
   padding: 5px 0;
 
-  box-shadow: 0 1px 5px 0px rgba(0, 0, 0, 0.2);
-  -moz-box-shadow: 0 1px 5px 0px rgba(0, 0, 0, 0.2);
-  -webkit-box-shadow: 0 1px 5px 0px rgba(0, 0, 0, 0.2);
-  -o-box-shadow: 0 1px 5px 0px rgba(0, 0, 0, 0.2);
-  -ms-box-shadow: 0 1px 5px 0px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 
   visibility: hidden;
   opacity: 0;
+  transform: translateX(-12px) scale(0.96);
+  transform-origin: top left;
+  transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.4s;
 }
 
 .sub-menu li {
@@ -426,6 +423,8 @@ Input, textarea : 14px/1.6 '', Arial, sans-serif;
 .main-menu > li > .sub-menu {
   top: 100%;
   left: 0;
+  transform: translateY(-12px) scale(0.96);
+  transform-origin: top left;
 }
 
 .sub-menu a {
@@ -458,11 +457,13 @@ Input, textarea : 14px/1.6 '', Arial, sans-serif;
 .main-menu > li:hover > .sub-menu {
   visibility: visible;
   opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 .sub-menu li:hover > .sub-menu {
   visibility: visible;
   opacity: 1;
+  transform: translateX(0) scale(1);
 }
 
 .sub-menu li:hover {
@@ -1350,6 +1351,7 @@ Input, textarea : 14px/1.6 '', Arial, sans-serif;
   background-position: center center;
 }
 
+
 .rs1-slick1 .item-slick1 {
   height: calc(100vh - 84px);
 }
@@ -2222,7 +2224,7 @@ input.num-product::-webkit-inner-spin-button {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to top, rgba(38, 28, 72, 0.85) 0%, rgba(236, 56, 188, 0.25) 100%) !important;
+  background-color: rgba(15, 17, 32, 0.45) !important;
   opacity: 0;
   transition: opacity 0.5s ease !important;
   z-index: -1;
@@ -2231,6 +2233,27 @@ input.num-product::-webkit-inner-spin-button {
 
 .block1-txt:hover::before {
   opacity: 1 !important;
+}
+
+.block1-txt::after {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  right: 15px;
+  bottom: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 8px;
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1), transform 0.5s cubic-bezier(0.25, 1, 0.5, 1) !important;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.block1-txt:hover::after {
+  opacity: 1 !important;
+  transform: scale(1) !important;
 }
 
 /*---------------------------------------------*/
@@ -2325,6 +2348,19 @@ input.num-product::-webkit-inner-spin-button {
   position: relative;
   border-radius: 6px;
   overflow: hidden;
+  /* Force uniform image height across ALL product cards */
+  aspect-ratio: 3 / 4;
+  background-color: #f4f4f4;
+}
+
+/* All product card images fill the container uniformly */
+.block2-pic > a > img,
+.block2-pic > a:first-child img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
 }
 
 .block2-btn {
@@ -6475,13 +6511,16 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   }
 }
 
+
 /* ====================================================================
-   WISHLIST PAGE ENHANCEMENTS
+   WISHLIST PAGE — PREMIUM REDESIGN (v2)
    ==================================================================== */
+
+/* Product thumbnail */
 .wishlist-item-img {
-  width: 60px;
-  height: 80px;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  width: 62px;
+  height: 74px;
+  border: 1px solid rgba(0, 0, 0, 0.07);
   border-radius: 8px;
   overflow: hidden;
   display: inline-block;
@@ -6494,42 +6533,174 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   object-fit: cover;
 }
 
-.btn-remove-wishlist {
-  background: none;
-  border: none;
-  color: #888;
-  font-size: 18px;
-  cursor: pointer;
-  padding: 0;
-  margin-left: 15px;
-  transition: all 0.25s ease;
+/* Product name */
+.wishlist-product-name {
+  font-family: Poppins-Medium, sans-serif;
+  font-size: 14.5px;
+  color: #333;
+  display: block;
+}
+
+/* Price column */
+.wishlist-price-col {
+  font-family: Poppins-Medium, sans-serif;
+  font-size: 14px;
+  color: #555;
+}
+
+/* Actions column — flex layout */
+.wishlist-actions-col {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-start;
+  white-space: nowrap;
+}
+
+/* "Add to Cart" premium dark pill button */
+.btn-wishlist-add-cart {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  background-color: #f8f9fa;
-  border: 1px solid #e6e6e6;
+  gap: 6px;
+  padding: 9px 22px;
+  background: #333;
+  color: #fff;
+  border: 1.5px solid #333;
+  border-radius: 6px;
+  font-family: Poppins-Medium, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-wishlist-add-cart:hover {
+  background: #717fe0;
+  border-color: #717fe0;
+  box-shadow: 0 4px 14px rgba(113, 127, 224, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-wishlist-add-cart.is-loading {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+.btn-wishlist-add-cart.atc-success {
+  background: #0f766e;
+  border-color: #0f766e;
+}
+
+/* ====================================================================
+   PREMIUM DELETE BUTTON — SHARED KEYFRAMES (Cart + Wishlist)
+   ==================================================================== */
+
+/* Trash icon shake wiggle on hover */
+@keyframes trashShake {
+  0%   { transform: rotate(0deg); }
+  20%  { transform: rotate(-8deg); }
+  40%  { transform: rotate(8deg); }
+  60%  { transform: rotate(-5deg); }
+  80%  { transform: rotate(5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* Danger ripple emanating outward on click */
+@keyframes dangerRipple {
+  0%   { transform: translate(-50%, -50%) scale(0); opacity: 0.5; }
+  100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+}
+
+/* Smooth row collapse */
+@keyframes rowCollapse {
+  0%   { opacity: 1; transform: translateX(0); max-height: 120px; }
+  50%  { opacity: 0.3; transform: translateX(-30px); max-height: 120px; }
+  100% { opacity: 0; transform: translateX(-50px); max-height: 0; padding-top: 0; padding-bottom: 0; }
+}
+
+/* ====================================================================
+   WISHLIST — DELETE BUTTON (outlined with label)
+   ==================================================================== */
+
+.btn-remove-wishlist {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 9px 14px;
+  background: transparent;
+  border: 1.5px solid #e4e4e4;
+  border-radius: 8px;
+  color: #999;
+  font-family: Poppins-Regular, sans-serif;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: background 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+              border-color 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+              color 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+              transform 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+              box-shadow 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  white-space: nowrap;
   vertical-align: middle;
+  position: relative;
+  overflow: hidden;
+  outline: none;
+}
+
+.btn-remove-wishlist i {
+  font-size: 15px;
+  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.btn-remove-label {
+  font-size: 12px;
+  letter-spacing: 0.2px;
 }
 
 .btn-remove-wishlist:hover {
-  color: #ff3366;
-  background-color: #fff0f3;
-  border-color: #ffb3c1;
-  transform: scale(1.1);
-  box-shadow: 0 4px 10px rgba(255, 51, 102, 0.15);
+  color: #e53e3e;
+  border-color: #fed7d7;
+  background: #fff5f5;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(229, 62, 62, 0.12);
 }
 
 .btn-remove-wishlist:hover i {
-  animation: trashShake 0.4s ease-in-out;
+  animation: trashShake 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-@keyframes trashShake {
-  0%, 100% { transform: rotate(0); }
-  25% { transform: rotate(-15deg); }
-  75% { transform: rotate(15deg); }
+.btn-remove-wishlist:active {
+  transform: scale(0.95) translateY(0);
+  box-shadow: 0 1px 4px rgba(229, 62, 62, 0.1);
+}
+
+/* Danger ripple pseudo-element on click */
+.btn-remove-wishlist::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(229, 62, 62, 0.2);
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  pointer-events: none;
+}
+.btn-remove-wishlist:active::after {
+  animation: dangerRipple 0.45s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+/* Wishlist row removal collapse animation */
+#wishlist-table-body .table_row.row-removing {
+  animation: rowCollapse 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  overflow: hidden;
+}
+#wishlist-table-body .table_row.row-removing td {
+  border-bottom-color: transparent !important;
+  transition: border-color 0.3s ease;
 }
 
 /* Premium Empty State Glassmorphism */
@@ -6543,49 +6714,108 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   padding: 80px 20px;
 }
 
-/* Wishlist Table Row Hover transitions */
-.table-shopping-cart .table_row {
-  transition: background-color 0.25s ease, transform 0.25s ease;
+/* Wishlist Table Row — smooth hover lift */
+#wishlist-table-body .table_row {
+  transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, opacity 0.45s ease;
 }
 
-.table-shopping-cart .table_row:hover {
-  background-color: rgba(113, 127, 224, 0.02);
+#wishlist-table-body .table_row:hover {
+  background-color: rgba(113, 127, 224, 0.025);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
 }
 
-/* Stagger entrance delay row fade-in */
-@keyframes rowEntranceFade {
-  0% {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Smooth wishlist row removal animation */
+#wishlist-table-body .table_row.row-removing {
+  opacity: 0 !important;
+  transform: translateX(-30px) !important;
+  transition: opacity 0.4s ease, transform 0.4s ease !important;
+}
+
+/* Staggered row entrance fade-in */
+@keyframes wishlistRowEntrance {
+  0%   { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
 #wishlist-table-body .table_row {
-  animation: rowEntranceFade 0.4s ease-out forwards;
+  animation: wishlistRowEntrance 0.35s ease-out forwards;
   opacity: 0;
 }
 
-#wishlist-table-body .table_row:nth-child(1) { animation-delay: 0.08s; }
-#wishlist-table-body .table_row:nth-child(2) { animation-delay: 0.16s; }
-#wishlist-table-body .table_row:nth-child(3) { animation-delay: 0.24s; }
-#wishlist-table-body .table_row:nth-child(4) { animation-delay: 0.32s; }
-#wishlist-table-body .table_row:nth-child(5) { animation-delay: 0.4s; }
-
-
-
-
-
+#wishlist-table-body .table_row:nth-child(1) { animation-delay: 0.06s; }
+#wishlist-table-body .table_row:nth-child(2) { animation-delay: 0.12s; }
+#wishlist-table-body .table_row:nth-child(3) { animation-delay: 0.18s; }
+#wishlist-table-body .table_row:nth-child(4) { animation-delay: 0.25s; }
+#wishlist-table-body .table_row:nth-child(5) { animation-delay: 0.32s; }
+#wishlist-table-body .table_row:nth-child(n+6) { animation-delay: 0.38s; }
 
 /* ====================================================================
-   FREE-SCROLL SLIDERS & PREMIUM CART DELETE ANIMATIONS
+   SHOPPING CART PAGE — PREMIUM TABLE ENHANCEMENTS
+   ==================================================================== */
+
+/* Premium Glassmorphic Shopping Cart Summary Card */
+.cart-summary-card {
+  background: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  border-radius: 20px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Premium Shopping Cart Table Row Hover lift */
+.table-shopping-cart .table_row {
+  transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, opacity 0.45s ease !important;
+}
+.table-shopping-cart .table_row:hover {
+  background-color: rgba(113, 127, 224, 0.025) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+}
+
+/* Premium smooth row removal — uses shared rowCollapse keyframe */
+.table-shopping-cart .table_row.row-removing {
+  animation: rowCollapse 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+  overflow: hidden !important;
+}
+.table-shopping-cart .table_row.row-removing td {
+  border-bottom-color: transparent !important;
+  transition: border-color 0.3s ease !important;
+}
+
+/* Quantity input pulsing highlight micro-animation */
+.num-product {
+  transition: all 0.3s ease !important;
+}
+.num-product.pulse-highlight {
+  transform: scale(1.15);
+  color: #717fe0 !important;
+  font-weight: bold;
+}
+
+/* Cart table refresh transition blur */
+.table-shopping-cart {
+  transition: all 0.4s ease !important;
+}
+.table-shopping-cart.refreshing {
+  opacity: 0.4;
+  filter: blur(2px);
+  -webkit-filter: blur(2px);
+}
+
+/* ====================================================================
+   CART — PREMIUM TRASH BIN DELETE BUTTON
    ==================================================================== */
 
 .btn-remove-cart {
-  display: flex;
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
@@ -6596,8 +6826,6 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   outline: none;
   position: relative;
   overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  cursor: pointer;
 }
 .btn-remove-cart:hover {
   color: #e53e3e;
@@ -6606,11 +6834,56 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   transform: scale(1.12) translateY(-2px);
   box-shadow: 0 5px 16px rgba(229, 62, 62, 0.18);
 }
+.btn-remove-cart:hover i {
+  animation: trashShake 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
 .btn-remove-cart:active {
   transform: scale(0.92);
   box-shadow: 0 1px 4px rgba(229, 62, 62, 0.1);
 }
 
+/* Danger ripple on click */
+.btn-remove-cart::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(229, 62, 62, 0.25);
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  pointer-events: none;
+}
+.btn-remove-cart:active::after {
+  animation: dangerRipple 0.45s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+/* Pure CSS Tooltip on hover */
+.btn-remove-cart[title]:hover::before {
+  content: 'Remove';
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 10px;
+  background: #1a1a2e;
+  color: #fff;
+  font-size: 11px;
+  font-family: Poppins-Regular, sans-serif;
+  border-radius: 5px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0.92;
+  letter-spacing: 0.3px;
+}
+
+/* ====================================================================
+   CATALOG PAGE — PREMIUM FILTER & CARD ANIMATIONS
+   ==================================================================== */
+
+/* Premium Glassmorphic Catalog Filter Panel */
 .filter-panel-glass {
   background: rgba(248, 249, 250, 0.8) !important;
   backdrop-filter: blur(12px);
@@ -6620,6 +6893,7 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.03) !important;
 }
 
+/* Premium Filter Link Underline slide micro-animations */
 .filter-link {
   position: relative;
   transition: color 0.3s ease !important;
@@ -6648,6 +6922,7 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   width: 100%;
 }
 
+/* Stagger entrance delay for catalog product cards */
 .isotope-item .block2 {
   animation: cardEntranceFade 0.6s cubic-bezier(0.25, 0.8, 0.25, 1) both;
 }
@@ -6673,7 +6948,10 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
 .isotope-item:nth-child(8) .block2  { animation-delay: 0.40s; }
 .isotope-item:nth-child(9) .block2  { animation-delay: 0.45s; }
 .isotope-item:nth-child(10) .block2 { animation-delay: 0.50s; }
+.isotope-item:nth-child(11) .block2 { animation-delay: 0.55s; }
+.isotope-item:nth-child(12) .block2 { animation-delay: 0.60s; }
 
+/* Premium Cart Item Image Wrapper */
 .cart-item-image {
   width: 60px;
   position: relative;
@@ -6692,6 +6970,62 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   display: block;
 }
 
+/* Premium New & Sale Badges on Product Cards */
+.block2-pic.label-sale,
+.block2-pic.label-new {
+  position: relative;
+}
+
+.block2-pic.label-sale::after {
+  content: attr(data-label);
+  font-family: Montserrat-Medium, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #fff;
+  line-height: 1.2;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  min-width: 54px;
+  height: 22px;
+  border-radius: 4px;
+  padding: 0 8px;
+  background-color: #ff3366; /* Elegant red/coral */
+  top: 15px;
+  left: 15px;
+  z-index: 10;
+  box-shadow: 0 4px 10px rgba(255, 51, 102, 0.3);
+}
+
+.block2-pic.label-new::after {
+  content: attr(data-label);
+  font-family: Montserrat-Medium, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #fff;
+  line-height: 1.2;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  min-width: 54px;
+  height: 22px;
+  border-radius: 4px;
+  padding: 0 8px;
+  background-color: #38bdf8; /* Flat modern sky blue */
+  top: 15px;
+  left: 15px;
+  z-index: 10;
+  box-shadow: 0 4px 10px rgba(56, 189, 248, 0.3);
+}
+
+/* Product card image — smooth hover zoom (no image swap) */
+
 .block2-pic img {
   width: 100%;
   height: 100%;
@@ -6706,6 +7040,7 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   transform: scale(1.04);
 }
 
+/* Strikethrough price for items on sale */
 .stext-105 .old-price {
   text-decoration: line-through;
   color: #999;
@@ -6718,6 +7053,7 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   font-weight: 600;
 }
 
+/* Custom smooth free scroll horizontal slider styling */
 .slick2, .slick4 {
   display: flex !important;
   flex-direction: row !important;
@@ -6735,6 +7071,7 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   display: none !important;
 }
 
+/* Base item flex configurations */
 .slick2 > .item-slick2 {
   flex: 0 0 25% !important;
   max-width: 25% !important;
@@ -6745,6 +7082,14 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   flex: 0 0 33.333% !important;
   max-width: 33.333% !important;
   box-sizing: border-box !important;
+}
+
+/* Responsive grid column mappings */
+@media (max-width: 1200px) {
+  .slick2 > .item-slick2 {
+    flex: 0 0 25% !important;
+    max-width: 25% !important;
+  }
 }
 
 @media (max-width: 992px) {
@@ -6775,3 +7120,4 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
     max-width: 100% !important;
   }
 }
+
