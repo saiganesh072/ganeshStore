@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Sign In — GaneshStore</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!--===============================================================================================-->
+    <link rel="icon" type="image/png" href="images/icons/favicon.png" />
+    <!--===============================================================================================-->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="vendor/bootstrap/css/bootstrap.min.css"
+    />
+    <!--===============================================================================================-->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="fonts/font-awesome-4.7.0/css/font-awesome.min.css"
+    />
+    <!--===============================================================================================-->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="fonts/iconic/css/material-design-iconic-font.min.css"
+    />
+    <!--===============================================================================================-->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="fonts/linearicons-v1.0.0/icon-font.min.css"
+    />
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="vendor/animate/animate.css" />
+    <!--===============================================================================================-->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="vendor/css-hamburgers/hamburgers.min.css"
+    />
+    <!--===============================================================================================-->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="vendor/animsition/css/animsition.min.css"
+    />
+    <!--===============================================================================================-->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="vendor/select2/select2.min.css"
+    />
+    <!--===============================================================================================-->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="vendor/perfect-scrollbar/perfect-scrollbar.css"
+    />
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="css/util.css" />
+    <link rel="stylesheet" type="text/css" href="css/main.css" />
+    <!--===============================================================================================-->
+    <script
+      src="https://assets.adobedtm.com/6268dc4b6b26/a79c12535bfd/launch-6b416d57c554-development.min.js"
+      async
+    ></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --primary-color: #222222;
+        --accent-color: #717fe0;
+        --accent-hover: #5b69c5;
+        --glass-bg: rgba(255, 255, 255, 0.9);
+        --glass-border: rgba(0, 0, 0, 0.05);
+        --text-muted: #888888;
+      }
+
+      .Loginmain, .Logoutmain {
+        font-family: 'Inter', sans-serif;
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 10px 5px;
+        transition: all 0.3s ease;
+      }
+
+      .Logouthead {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--primary-color);
+        text-align: center;
+        padding-bottom: 25px;
+        letter-spacing: -0.5px;
+      }
+
+      .LogoutName, .LogoutNumber {
+        font-size: 16px;
+        font-weight: 500;
+        color: #555555;
+        padding-bottom: 18px;
+        border-bottom: 1px solid #f2f2f2;
+        margin-bottom: 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .AccountName, .AccountNumber {
+        color: var(--primary-color);
+        font-weight: 600;
+        font-family: 'Inter', sans-serif;
+      }
+
+      button.CLogout {
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 15px;
+        text-transform: uppercase;
+        width: 100%;
+        height: 48px;
+        background-color: var(--primary-color);
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      button.CLogout i {
+        transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        display: inline-block;
+      }
+
+      button.CLogout:hover {
+        background-color: #333333;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+      }
+
+      button.CLogout:hover i {
+        transform: scale(1.15);
+      }
+
+      /* Premium Login Redesign styling */
+      .auth-tabs {
+        display: flex;
+        border-bottom: 2px solid #f0f0f0;
+        margin-bottom: 20px;
+        position: relative;
+      }
+
+      .auth-tab-btn {
+        flex: 1;
+        text-align: center;
+        padding: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text-muted);
+        cursor: pointer;
+        border: none;
+        background: none;
+        outline: none;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 2;
+      }
+
+      .auth-tab-btn:hover {
+        color: var(--primary-color);
+      }
+
+      .auth-tab-btn.active {
+        color: var(--accent-color);
+      }
+
+      .auth-tabs-slider {
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 50%;
+        height: 2px;
+        background-color: var(--accent-color);
+        transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+        z-index: 1;
+      }
+
+      .btn-google-login {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        background-color: #ffffff;
+        color: #333333;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        margin-bottom: 0px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn-google-login::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -150%;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(
+          to right,
+          rgba(0, 0, 0, 0) 0%,
+          rgba(0, 0, 0, 0.04) 50%,
+          rgba(0, 0, 0, 0) 100%
+        );
+        transform: skewX(-25deg);
+        transition: left 0.6s ease;
+      }
+
+      .btn-google-login:hover::after {
+        left: 150%;
+      }
+
+      .btn-google-login:hover {
+        background-color: #fcfcfc;
+        border-color: #cccccc;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+        transform: translateY(-2px);
+      }
+
+      .btn-google-login img,
+      .btn-google-login svg {
+        width: 20px;
+        height: 20px;
+        transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      }
+
+      .btn-google-login:hover svg {
+        transform: scale(1.15);
+      }
+
+      .auth-divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 12px;
+        margin-top: 25px;
+        margin-bottom: 20px;
+      }
+
+      .auth-divider::before,
+      .auth-divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid #eeeeee;
+      }
+
+      .auth-divider:not(:empty)::before {
+        margin-right: .5em;
+      }
+
+      .auth-divider:not(:empty)::after {
+        margin-left: .5em;
+      }
+
+      .auth-input-group {
+        position: relative;
+        margin-bottom: 20px;
+      }
+
+      .auth-input-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 6px;
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .auth-input-field {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1.5px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 14px;
+        color: var(--primary-color);
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        outline: none;
+      }
+
+      .auth-input-field:focus {
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 4px rgba(113, 127, 224, 0.18);
+        transform: translateY(-1px);
+      }
+
+      .auth-password-toggle {
+        position: absolute;
+        right: 16px;
+        top: 38px;
+        cursor: pointer;
+        color: var(--text-muted);
+        transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+      }
+
+      .auth-password-toggle:hover {
+        color: var(--accent-color);
+        transform: scale(1.2);
+      }
+
+      .auth-options {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+        margin-bottom: 25px;
+      }
+
+      .auth-remember {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+      }
+
+      .auth-remember input[type="checkbox"] {
+        width: 15px;
+        height: 15px;
+        accent-color: var(--accent-color);
+        cursor: pointer;
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        margin: 0;
+      }
+
+      .auth-remember:hover input[type="checkbox"] {
+        transform: scale(1.2);
+      }
+
+      .auth-remember input[type="checkbox"]:active {
+        transform: scale(0.9);
+      }
+
+      .auth-forgot-link {
+        color: var(--accent-color);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s ease;
+      }
+
+      .auth-forgot-link:hover {
+        text-decoration: underline;
+        color: var(--accent-hover);
+      }
+
+      #contact-signin-section, #contact-signup-section {
+        transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      }
+
+      .btn-auth-submit {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 10px;
+        background-color: var(--primary-color);
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn-auth-submit::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -150%;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(
+          to right,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.25) 50%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        transform: skewX(-25deg);
+        transition: left 0.6s ease;
+      }
+
+      .btn-auth-submit:hover::after {
+        left: 150%;
+      }
+
+      .btn-auth-submit i {
+        transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        display: inline-block;
+      }
+
+      .btn-auth-submit:hover {
+        background-color: #333333;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+      }
+
+      .btn-auth-submit:active, .btn-google-login:active {
+        transform: scale(0.97) translateY(0);
+        transition: transform 0.1s ease;
+      }
+
+      .btn-auth-submit:hover i.zmdi-arrow-right {
+        transform: translateX(5px);
+      }
+
+      .btn-auth-submit:hover i.zmdi-assignment-account {
+        transform: scale(1.2);
+      }
+
+      .auth-alert-banner {
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        margin-bottom: 12px;
+        display: none;
+        align-items: center;
+        gap: 10px;
+        animation: authFadeIn 0.3s ease;
+      }
+
+      .auth-alert-banner.success {
+        background-color: #e6f6ee;
+        color: #178a53;
+        border: 1px solid #b8ebcd;
+        display: flex;
+      }
+
+      .auth-alert-banner.error {
+        background-color: #fdeded;
+        color: #c92c2c;
+        border: 1px solid #f9c7c7;
+        display: flex;
+      }
+
+      @keyframes authFadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes bannerShake {
+        0%, 100% { transform: translateX(0); }
+        20%, 60% { transform: translateX(-4px); }
+        40%, 80% { transform: translateX(4px); }
+      }
+
+      .auth-alert-banner.shake {
+        animation: bannerShake 0.4s ease-in-out;
+      }
+    </style>
+    <style>
+      input::-webkit-outer-spin-button,
+      input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      input[type="number"] {
+        -moz-appearance: textfield;
+      }
+    </style>
+    <script src="js/datalayer.js"></script>
+</head>
+  <body class="animsition">
+    <!-- Header -->
+    <header class="header-v4">
+    <!-- Announcement Bar -->
+    <div class="announcement-bar">
+      Free shipping for standard orders over $100
+    </div>
+
+      <!-- Header desktop -->
+      <div class="container-menu-desktop">
+        
+
+        <div class="wrap-menu-desktop how-shadow1">
+          <nav class="limiter-menu-desktop container">
+            <!-- Logo desktop -->
+            <a href="index.html" class="logo">
+              <img src="images/icons/logo-01.png" alt="IMG-LOGO" />
+            </a>
+
+            <!-- Menu desktop -->
+            <div class="menu-desktop">
+              <ul class="main-menu">
+                <li>
+                  <a href="index.html">Home</a>
+                </li>
+
+                <li>
+                  <a href="product.html">Shop</a>
+                </li>
+
+                <li class="label1" data-label1="hot">
+                  <a href="shoping-cart.html">Features</a>
+                </li>
+
+                <li>
+                  <a href="blog.html">Blog</a>
+                </li>
+
+                <li>
+                  <a href="about.html">About</a>
+                </li>
+
+                <li class="active-menu">
+                  <a href="signin.html">Login</a>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Icon header -->
+            <div class="wrap-icon-header flex-w flex-r-m">
+              <div
+                class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 js-show-modal-search"
+              >
+                <i class="zmdi zmdi-search"></i>
+              </div>
+
+              <div
+                class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti js-show-cart"
+                data-notify="2"
+              >
+                <i class="zmdi zmdi-shopping-cart"></i>
+              </div>
+
+              <a
+                href="#"
+                class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti"
+                data-notify="0"
+              >
+                <i class="zmdi zmdi-favorite-outline"></i>
+              </a>
+            </div>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Header Mobile -->
+      <div class="wrap-header-mobile">
+        <!-- Logo moblie -->
+        <div class="logo-mobile">
+          <a href="index.html"
+            ><img src="images/icons/logo-01.png" alt="IMG-LOGO"
+          /></a>
+        </div>
+
+        <!-- Icon header -->
+        <div class="wrap-icon-header flex-w flex-r-m m-r-15">
+          <div
+            class="icon-header-item cl2 hov-cl1 trans-04 p-r-11 js-show-modal-search"
+          >
+            <i class="zmdi zmdi-search"></i>
+          </div>
+
+          <div
+            class="icon-header-item cl2 hov-cl1 trans-04 p-r-11 p-l-10 icon-header-noti js-show-cart"
+            data-notify="2"
+          >
+            <i class="zmdi zmdi-shopping-cart"></i>
+          </div>
+
+          <a
+            href="#"
+            class="dis-block icon-header-item cl2 hov-cl1 trans-04 p-r-11 p-l-10 icon-header-noti"
+            data-notify="0"
+          >
+            <i class="zmdi zmdi-favorite-outline"></i>
+          </a>
+
+        <a href="signin.html" class="dis-block icon-header-item cl2 hov-cl1 trans-04 p-r-11 p-l-10 js-auth-link-container">
+          <i class="zmdi zmdi-account js-auth-icon"></i>
+        </a>
+        </div>
+
+        <!-- Button show menu -->
+        <div class="btn-show-menu-mobile hamburger hamburger--squeeze">
+          <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Menu Mobile -->
+      <div class="menu-mobile">
+        
+
+        <ul class="main-menu-m">
+          <li>
+            <a href="index.html">Home</a>
+          </li>
+
+          <li>
+            <a href="product.html">Shop</a>
+          </li>
+
+          <li>
+            <a href="shoping-cart.html" class="label1 rs1" data-label1="hot"
+              >Features</a
+            >
+          </li>
+
+          <li>
+            <a href="blog.html">Blog</a>
+          </li>
+
+          <li>
+            <a href="about.html">About</a>
+          </li>
+
+          
+        </ul>
+      </div>
+
+      <!-- Modal Search -->
+      <div class="modal-search-header flex-c-m trans-04 js-hide-modal-search">
+        <div class="container-search-header">
+          <button
+            class="flex-c-m btn-hide-modal-search trans-04 js-hide-modal-search"
+          >
+            <img src="images/icons/icon-close2.png" alt="CLOSE" />
+          </button>
+
+          <form class="wrap-search-header flex-w p-l-15">
+            <button class="flex-c-m trans-04">
+              <i class="zmdi zmdi-search"></i>
+            </button>
+            <input
+              class="plh3"
+              type="text"
+              name="search"
+              placeholder="Search..."
+            />
+          </form>
+        </div>
+      </div>
+    </header>
+
+    <!-- Cart -->
+    <div class="wrap-header-cart js-panel-cart">
+      <div class="s-full js-hide-cart"></div>
+
+      <div class="header-cart flex-col-l p-l-65 p-r-25">
+        <div class="header-cart-title flex-w flex-sb-m p-b-8">
+          <span class="mtext-103 cl2"> Your Cart </span>
+
+          <div
+            class="fs-35 lh-10 cl2 p-lr-5 pointer hov-cl1 trans-04 js-hide-cart"
+          >
+            <i class="zmdi zmdi-close"></i>
+          </div>
+        </div>
+
+        <div class="header-cart-content flex-w js-pscroll">
+          <ul class="header-cart-wrapitem w-full">
+            <li class="header-cart-item flex-w flex-t m-b-12">
+              <div class="header-cart-item-img">
+                <img src="images/item-cart-01.jpg" alt="IMG" />
+              </div>
+
+              <div class="header-cart-item-txt p-t-8">
+                <a
+                  href="#"
+                  class="header-cart-item-name m-b-18 hov-cl1 trans-04"
+                >
+                  White Shirt Pleat
+                </a>
+
+                <span class="header-cart-item-info"> 1 x $19.00 </span>
+              </div>
+            </li>
+
+            <li class="header-cart-item flex-w flex-t m-b-12">
+              <div class="header-cart-item-img">
+                <img src="images/item-cart-02.jpg" alt="IMG" />
+              </div>
+
+              <div class="header-cart-item-txt p-t-8">
+                <a
+                  href="#"
+                  class="header-cart-item-name m-b-18 hov-cl1 trans-04"
+                >
+                  Converse All Star
+                </a>
+
+                <span class="header-cart-item-info"> 1 x $39.00 </span>
+              </div>
+            </li>
+
+            <li class="header-cart-item flex-w flex-t m-b-12">
+              <div class="header-cart-item-img">
+                <img src="images/item-cart-03.jpg" alt="IMG" />
+              </div>
+
+              <div class="header-cart-item-txt p-t-8">
+                <a
+                  href="#"
+                  class="header-cart-item-name m-b-18 hov-cl1 trans-04"
+                >
+                  Nixon Porter Leather
+                </a>
+
+                <span class="header-cart-item-info"> 1 x $17.00 </span>
+              </div>
+            </li>
+          </ul>
+
+          <div class="w-full">
+            <div class="header-cart-total w-full p-tb-40">Total: $75.00</div>
+
+            <div class="header-cart-buttons flex-w w-full">
+              <a
+                href="shoping-cart.html"
+                class="flex-c-m stext-101 cl0 size-107 bg3 bor2 hov-btn3 p-lr-15 trans-04 m-r-8 m-b-10"
+              >
+                View Cart
+              </a>
+
+              <a
+                href="shoping-cart.html"
+                class="flex-c-m stext-101 cl0 size-107 bg3 bor2 hov-btn3 p-lr-15 trans-04 m-b-10"
+              >
+                Check Out
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content page -->
+    <section class="p-t-30 p-b-80" style="background: linear-gradient(180deg, #fdfcf9 0%, #f6f0e4 100%);">
+      <div class="container">
+        <div class="size-210 bor10 p-lr-50 p-t-55 p-b-70 p-lr-15-lg w-full-md mx-auto" style="background-color: #ffffff; border-radius: 16px; box-shadow: 0 12px 35px rgba(0,0,0,0.045); border: 1px solid #eaeaea;">
+          <!-- Account Profile Panel (Shown when logged in) -->
+          <div class="Logoutmain">
+            <div style="width: 70px; height: 70px; border-radius: 50%; background: #717fe0; color: white; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; margin: 0 auto 20px auto; text-transform: uppercase; box-shadow: 0 4px 10px rgba(113, 127, 224, 0.3);" class="js-logout-avatar">
+              U
+            </div>
+            <div class="Logouthead">Account Center</div>
+            
+            <div class="LogoutName">
+              <span>Name</span>
+              <span class="AccountName">Sai Ganesh</span>
+            </div>
+            <div class="LogoutNumber">
+              <span>Details / ID</span>
+              <span class="AccountNumber">Not Logged In</span>
+            </div>
+            <button class="CLogout flex-c-m" onclick="logoutUser(event)"><i class="zmdi zmdi-power" style="margin-right: 8px; font-size: 18px;"></i> Logout</button>
+          </div>
+
+          <!-- Auth Forms Panel (Shown when logged out) -->
+          <div class="Loginmain">
+            <div class="auth-tabs">
+              <button type="button" class="auth-tab-btn active" id="btn-tab-signin" onclick="switchContactTab('signin')">Sign In</button>
+              <button type="button" class="auth-tab-btn" id="btn-tab-signup" onclick="switchContactTab('signup')">Create Account</button>
+              <div class="auth-tabs-slider"></div>
+            </div>
+
+            <!-- Inline Alert Feedback Banner -->
+            <div class="auth-alert-banner" id="contact-auth-banner">
+              <i class="zmdi zmdi-info-outline" id="c-banner-icon"></i>
+              <span id="c-banner-text">Welcome back!</span>
+            </div>
+
+            <!-- ================= Sign In Mode ================= -->
+            <div id="contact-signin-section">
+              <form id="contact-login-form" onsubmit="handleEmailLogin(event)">
+                <div class="auth-input-group">
+                  <label class="auth-input-label" for="c-login-email">Email Address</label>
+                  <input class="auth-input-field auth-email-input" type="email" id="c-login-email" required placeholder="name@example.com" />
+                </div>
+
+                <div class="auth-input-group">
+                  <label class="auth-input-label" for="c-login-password">Password</label>
+                  <input class="auth-input-field auth-password-input" type="password" id="c-login-password" required placeholder="••••••••" />
+                  <i class="zmdi zmdi-eye auth-password-toggle" onclick="toggleContactPassword('c-login-password', this)"></i>
+                </div>
+
+                <div class="auth-options">
+                  <label class="auth-remember">
+                    <input type="checkbox" id="c-login-remember" checked />
+                    <span>Remember me</span>
+                  </label>
+                  <a href="#" class="auth-forgot-link" onclick="handleForgotPassword(event)">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="btn-auth-submit btn-auth-submit-action">
+                  <span>Sign In</span>
+                  <i class="zmdi zmdi-arrow-right"></i>
+                </button>
+              </form>
+            </div>
+
+            <!-- ================= Sign Up Mode ================= -->
+            <div id="contact-signup-section" style="display: none;">
+              <form id="contact-register-form" onsubmit="handleEmailSignUp(event)">
+                <div class="auth-input-group">
+                  <label class="auth-input-label" for="c-signup-name">Full Name</label>
+                  <input class="auth-input-field" type="text" id="c-signup-name" required placeholder="Sai Ganesh" />
+                </div>
+
+                <div class="auth-input-group">
+                  <label class="auth-input-label" for="c-signup-email">Email Address</label>
+                  <input class="auth-input-field" type="email" id="c-signup-email" required placeholder="name@example.com" />
+                </div>
+
+                <div class="auth-input-group">
+                  <label class="auth-input-label" for="c-signup-password">Password</label>
+                  <input class="auth-input-field" type="password" id="c-signup-password" required placeholder="Min 6 characters" minlength="6" />
+                  <i class="zmdi zmdi-eye auth-password-toggle" onclick="toggleContactPassword('c-signup-password', this)"></i>
+                </div>
+
+                <div class="auth-options">
+                  <label class="auth-remember" style="font-size: 12px; line-height: 1.4;">
+                    <input type="checkbox" id="c-signup-agree" required />
+                    <span>I agree to the Terms of Service & Privacy Policy</span>
+                  </label>
+                </div>
+
+                <button type="submit" class="btn-auth-submit">
+                  <span>Create Account</span>
+                  <i class="zmdi zmdi-assignment-account"></i>
+                </button>
+              </form>
+            </div>
+
+            <div class="auth-divider">or continue with</div>
+
+            <!-- Google Authentication Trigger -->
+            <button type="button" class="btn-google-login" onclick="handleGoogleSignIn()">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20px" height="20px">
+                <path fill="#EA4335" d="M24 9.5c3.3 0 6.3 1.2 8.7 3.2l6.5-6.5C34.5 2.5 29.8 0 24 0 14.7 0 6.8 5.6 3.1 13.8l7.5 5.8C12.5 12.8 17.7 9.5 24 9.5z"/>
+                <path fill="#4285F4" d="M46.9 24.5c0-1.6-.1-3.2-.4-4.7H24v9.4h12.9c-.6 3.1-2.3 5.7-4.9 7.4l7.7 6c4.5-4.2 7.2-10.4 7.2-18.1z"/>
+                <path fill="#FBBC05" d="M10.6 28.5c-1-3-1-6.3 0-9.4l-7.5-5.8c-2.7 5.4-2.7 11.8 0 17.2l7.5-5.8z"/>
+                <path fill="#34A853" d="M24 48c6.5 0 11.9-2.2 15.9-5.9l-7.7-6c-2.2 1.5-5 2.3-8.2 2.3-6.3 0-11.5-4.2-13.4-10.1l-7.5 5.8C6.8 42.4 14.7 48 24 48z"/>
+              </svg>
+              <span>Continue with Google</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg3 p-t-75 p-b-32">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-6 col-lg-3 p-b-50">
+            <h4 class="stext-301 cl0 p-b-30">Categories</h4>
+
+            <ul>
+              <li class="p-b-10">
+                <a href="#" class="stext-107 cl7 hov-cl1 trans-04"> Women </a>
+              </li>
+
+              <li class="p-b-10">
+                <a href="#" class="stext-107 cl7 hov-cl1 trans-04"> Men </a>
+              </li>
+
+              <li class="p-b-10">
+                <a href="#" class="stext-107 cl7 hov-cl1 trans-04"> Shoes </a>
+              </li>
+
+              <li class="p-b-10">
+                <a href="#" class="stext-107 cl7 hov-cl1 trans-04"> Watches </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="col-sm-6 col-lg-3 p-b-50">
+            <h4 class="stext-301 cl0 p-b-30">Help</h4>
+
+            <ul>
+              <li class="p-b-10">
+                <a href="#" class="stext-107 cl7 hov-cl1 trans-04">
+                  Track Order
+                </a>
+              </li>
+
+              <li class="p-b-10">
+                <a href="#" class="stext-107 cl7 hov-cl1 trans-04"> Returns </a>
+              </li>
+
+              <li class="p-b-10">
+                <a href="#" class="stext-107 cl7 hov-cl1 trans-04">
+                  Shipping
+                </a>
+              </li>
+
+              <li class="p-b-10">
+                <a href="#" class="stext-107 cl7 hov-cl1 trans-04"> FAQs </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="col-sm-6 col-lg-3 p-b-50">
+            <h4 class="stext-301 cl0 p-b-30">GET IN TOUCH</h4>
+
+            <p class="stext-107 cl7 size-201">
+              Any questions? Let us know in store at 8th floor, 379 Hudson St,
+              New York, NY 10018 or call us on (+1) 96 716 6879
+            </p>
+
+            <div class="p-t-27">
+              <a href="#" class="fs-18 cl7 hov-cl1 trans-04 m-r-16">
+                <i class="fa fa-facebook"></i>
+              </a>
+
+              <a href="#" class="fs-18 cl7 hov-cl1 trans-04 m-r-16">
+                <i class="fa fa-instagram"></i>
+              </a>
+
+              <a href="#" class="fs-18 cl7 hov-cl1 trans-04 m-r-16">
+                <i class="fa fa-pinterest-p"></i>
+              </a>
+            </div>
+          </div>
+
+          <div class="col-sm-6 col-lg-3 p-b-50">
+            <h4 class="stext-301 cl0 p-b-30">Newsletter</h4>
+
+            <form>
+              <div class="wrap-input1 w-full p-b-4">
+                <input
+                  class="input1 bg-none plh1 stext-107 cl7"
+                  type="text"
+                  name="email"
+                  placeholder="email@example.com"
+                />
+                <div class="focus-input1 trans-04"></div>
+              </div>
+
+              <div class="p-t-18">
+                <button
+                  class="flex-c-m stext-101 cl0 size-103 bg1 bor1 hov-btn2 p-lr-15 trans-04"
+                >
+                  Subscribe
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="p-t-40">
+          <div class="flex-c-m flex-w p-b-18">
+            <a href="#" class="m-all-1">
+              <img src="images/icons/icon-pay-01.png" alt="ICON-PAY" />
+            </a>
+
+            <a href="#" class="m-all-1">
+              <img src="images/icons/icon-pay-02.png" alt="ICON-PAY" />
+            </a>
+
+            <a href="#" class="m-all-1">
+              <img src="images/icons/icon-pay-03.png" alt="ICON-PAY" />
+            </a>
+
+            <a href="#" class="m-all-1">
+              <img src="images/icons/icon-pay-04.png" alt="ICON-PAY" />
+            </a>
+
+            <a href="#" class="m-all-1">
+              <img src="images/icons/icon-pay-05.png" alt="ICON-PAY" />
+            </a>
+          </div>
+
+          <p class="stext-107 cl6 txt-center">
+            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+            Copyright &copy;
+            <script>
+              document.write(new Date().getFullYear());
+            </script>
+            All rights reserved | This template is made with
+            <i class="fa fa-heart-o" aria-hidden="true"></i> by
+            <a href="https://colorlib.com" target="_blank">Colorlib</a>
+            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Back to top -->
+    <div class="btn-back-to-top" id="myBtn">
+      <span class="symbol-btn-back-to-top">
+        <i class="zmdi zmdi-chevron-up"></i>
+      </span>
+    </div>
+
+    <!--===============================================================================================-->
+    <script src="js/homeDatalayer.js"></script>
+    <!--===============================================================================================-->
+    <script src="vendor/jquery/jquery-3.2.1.min.js"></script>
+    <!--===============================================================================================-->
+    <script src="vendor/animsition/js/animsition.min.js"></script>
+    <!--===============================================================================================-->
+    <script src="vendor/bootstrap/js/popper.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+    <!--===============================================================================================-->
+    <script src="vendor/select2/select2.min.js"></script>
+    <script>
+      $(".js-select2").each(function () {
+        $(this).select2({
+          minimumResultsForSearch: 20,
+          dropdownParent: $(this).next(".dropDownSelect2"),
+        });
+      });
+    </script>
+    <!--===============================================================================================-->
+    <script src="vendor/MagnificPopup/jquery.magnific-popup.min.js"></script>
+    <!--===============================================================================================-->
+    <script src="vendor/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script>
+      $(".js-pscroll").each(function () {
+        $(this).css("position", "relative");
+        $(this).css("overflow", "hidden");
+        var ps = new PerfectScrollbar(this, {
+          wheelSpeed: 1,
+          scrollingThreshold: 1000,
+          wheelPropagation: false,
+        });
+
+        $(window).on("resize", function () {
+          ps.update();
+        });
+      });
+    </script>
+    <!--===============================================================================================-->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAKFWBqlKAGCeS1rMVoaNlwyayu0e0YRes"></script>
+    <script src="js/map-custom.js"></script>
+    <!--===============================================================================================-->
+    <script src="js/main.js"></script>
+    <script>
+      function switchContactTab(tab) {
+        const loginTab = document.getElementById('btn-tab-signin');
+        const signupTab = document.getElementById('btn-tab-signup');
+        const loginSec = document.getElementById('contact-signin-section');
+        const signupSec = document.getElementById('contact-signup-section');
+        const banner = document.getElementById('contact-auth-banner');
+        const slider = document.querySelector('.auth-tabs-slider');
+
+        banner.style.display = 'none';
+
+        if (tab === 'signin') {
+          loginTab.classList.add('active');
+          signupTab.classList.remove('active');
+          if (slider) slider.style.transform = 'translateX(0%)';
+
+          // Animate signup out (slide right)
+          signupSec.style.opacity = '0';
+          signupSec.style.transform = 'translateX(20px)';
+
+          setTimeout(() => {
+            signupSec.style.display = 'none';
+
+            // Prepare login (slide in from left)
+            loginSec.style.display = 'block';
+            loginSec.style.opacity = '0';
+            loginSec.style.transform = 'translateX(-20px)';
+
+            // Trigger reflow
+            loginSec.offsetHeight;
+
+            // Animate login in
+            loginSec.style.opacity = '1';
+            loginSec.style.transform = 'translateX(0)';
+          }, 150);
+        } else {
+          loginTab.classList.remove('active');
+          signupTab.classList.add('active');
+          if (slider) slider.style.transform = 'translateX(100%)';
+
+          // Animate login out (slide left)
+          loginSec.style.opacity = '0';
+          loginSec.style.transform = 'translateX(-20px)';
+
+          setTimeout(() => {
+            loginSec.style.display = 'none';
+
+            // Prepare signup (slide in from right)
+            signupSec.style.display = 'block';
+            signupSec.style.opacity = '0';
+            signupSec.style.transform = 'translateX(20px)';
+
+            // Trigger reflow
+            signupSec.offsetHeight;
+
+            // Animate signup in
+            signupSec.style.opacity = '1';
+            signupSec.style.transform = 'translateX(0)';
+          }, 150);
+        }
+      }
+
+      function toggleContactPassword(id, icon) {
+        const input = document.getElementById(id);
+        if (input.type === 'password') {
+          input.type = 'text';
+          icon.classList.remove('zmdi-eye');
+          icon.classList.add('zmdi-eye-off');
+        } else {
+          input.type = 'password';
+          icon.classList.remove('zmdi-eye-off');
+          icon.classList.add('zmdi-eye');
+        }
+      }
+
+      function showContactMessage(type, message) {
+        const banner = document.getElementById('contact-auth-banner');
+        const textSpan = document.getElementById('c-banner-text');
+        const icon = document.getElementById('c-banner-icon');
+
+        banner.className = 'auth-alert-banner ' + type;
+        textSpan.textContent = message;
+        banner.style.display = 'flex';
+
+        if (type === 'success') {
+          icon.className = 'zmdi zmdi-check-circle';
+        } else {
+          icon.className = 'zmdi zmdi-alert-circle-o';
+          // Trigger shake feedback
+          banner.classList.remove('shake');
+          banner.offsetHeight; // trigger reflow
+          banner.classList.add('shake');
+        }
+      }
+
+      function getCookieValue(name) {
+        let result = document.cookie.match(
+          "(^|[^;]+)\\s*" + name + "\\s*=\\s*([^;]+)"
+        );
+        return result ? decodeURIComponent(result.pop()) : "";
+      }
+
+      // Check current login state and show appropriate UI panel
+      function loginfun() {
+        const userState = localStorage.getItem("user");
+        const customerName = getCookieValue("CustomerName");
+        
+        if (userState === "loggedin" && customerName) {
+          document.getElementsByClassName("Loginmain")[0].style.display = "none";
+          document.getElementsByClassName("Logoutmain")[0].style.display = "block";
+          
+          document.getElementsByClassName("AccountName")[0].innerText = customerName;
+          
+          const customerNum = getCookieValue("CustomerNumber");
+          document.getElementsByClassName("AccountNumber")[0].innerText = customerNum || "Member";
+          
+          // Generate user avatar initials dynamically
+          const initials = customerName.substring(0, 2).toUpperCase();
+          const avatarElement = document.querySelector(".js-logout-avatar");
+          if (avatarElement) {
+            avatarElement.innerText = initials;
+          }
+        } else {
+          document.getElementsByClassName("Loginmain")[0].style.display = "block";
+          document.getElementsByClassName("Logoutmain")[0].style.display = "none";
+        }
+      }
+      
+      // Hook login sync directly
+      loginfun();
+    </script>
+  
+  <!-- Firebase & GaneshStore Auth Engine -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="js/auth.js"></script>
+
+</body>
+</html>
