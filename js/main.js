@@ -3994,11 +3994,11 @@ function initStickyPDPBar() {
         }
     });
 
-    $(document).on('click', '.js-sticky-add-cart', function() {
+    $(document).off('click', '.js-sticky-add-cart').on('click', '.js-sticky-add-cart', function() {
         $('.js-addcart-detail').first().trigger('click');
     });
 
-    $(document).on('click', '.js-sticky-buy-now', function() {
+    $(document).off('click', '.js-sticky-buy-now').on('click', '.js-sticky-buy-now', function() {
         $('.js-addcart-detail').first().trigger('click');
         setTimeout(function() {
             window.location.href = 'checkout.html';
@@ -4047,7 +4047,7 @@ window.flyProductImageToCart = function($imgElement) {
 
 // Feature 3: One-Click Buy Now Button Integration
 function initBuyNowButton() {
-    $(document).on('click', '.js-buy-now', function(e) {
+    $(document).off('click', '.js-buy-now').on('click', '.js-buy-now', function(e) {
         e.preventDefault();
         var $btn = $(this);
         var $parentPDP = $btn.closest('.p-r-50, .p-r-0-lg, .modal-content');
@@ -4088,10 +4088,13 @@ function initSizeGuideModal() {
         '</table>' +
         '</div>';
 
-    // Insert trigger button next to size label
-    $('.p-b-10:contains("Size"), .p-b-10:contains("SIZE")').append('<span class="size-guide-trigger" id="open-size-guide">📏 Size Guide</span>');
+    // Insert trigger button next to size label if not already present
+    var $sizeContainer = $('.p-b-10:contains("Size"), .p-b-10:contains("SIZE")');
+    if (!$sizeContainer.find('.js-open-size-guide').length) {
+        $sizeContainer.append('<span class="size-guide-trigger js-open-size-guide">📏 Size Guide</span>');
+    }
 
-    $(document).on('click', '#open-size-guide', function() {
+    $(document).off('click', '.js-open-size-guide').on('click', '.js-open-size-guide', function() {
         if (typeof swal === 'function') {
             swal({
                 title: "📏 Size Guide & Fit Chart",
@@ -4227,7 +4230,7 @@ function initScrollProgressRing() {
 }
 
 // Hook into Add to Cart for Flying Animation
-$(document).on('click', '.js-addcart-detail, .js-addwish-b2', function() {
+$(document).off('click', '.js-addcart-detail, .js-addwish-b2').on('click', '.js-addcart-detail, .js-addwish-b2', function() {
     var $img = $(this).closest('.block2, .wrap-pic-w, .modal-content').find('img').first();
     if ($img.length && typeof window.flyProductImageToCart === 'function') {
         window.flyProductImageToCart($img);
