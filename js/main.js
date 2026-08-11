@@ -3945,3 +3945,285 @@ $(document).ready(function() {
     $(document).ready(function() {
         initFluidMomentumCarousels();
     });
+
+
+/* ====================================================================
+   10 MASTERPIECE LUXURY FEATURES - JAVASCRIPT ENGINE
+   ==================================================================== */
+
+// Feature 1: Sticky PDP Floating Buy Bar
+function initStickyPDPBar() {
+    var $addCartBtn = $('.js-addcart-detail');
+    if (!$addCartBtn.length) return;
+
+    var pName = $('.js-name-detail').text().trim() || 'Product';
+    var pPrice = $('.mtext-106').first().text().trim() || '$58.79';
+    var pImg = $('.wrap-pic-w img').first().attr('src') || 'images/product-01.jpg';
+
+    var barHtml = '<div class="sticky-pdp-bar" id="sticky-pdp-bar">' +
+        '<div class="sticky-pdp-left">' +
+        '  <img src="' + pImg + '" class="sticky-pdp-thumb" alt="Thumb">' +
+        '  <div>' +
+        '    <div class="sticky-pdp-title">' + pName + '</div>' +
+        '    <div class="sticky-pdp-price">' + pPrice + '</div>' +
+        '  </div>' +
+        '</div>' +
+        '<div class="sticky-pdp-right">' +
+        '  <button class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04 js-sticky-add-cart" style="height: 42px; border-radius: 21px;">Add to Cart</button>' +
+        '  <button class="btn-buy-now js-sticky-buy-now" style="height: 42px;">Buy Now</button>' +
+        '</div>' +
+        '</div>';
+
+    $('body').append(barHtml);
+
+    var $bar = $('#sticky-pdp-bar');
+    var btnTop = $addCartBtn.offset().top + 100;
+
+    $(window).on('scroll', function() {
+        if ($(window).scrollTop() > btnTop) {
+            $bar.addClass('visible');
+        } else {
+            $bar.removeClass('visible');
+        }
+    });
+
+    $(document).on('click', '.js-sticky-add-cart', function() {
+        $('.js-addcart-detail').first().trigger('click');
+    });
+
+    $(document).on('click', '.js-sticky-buy-now', function() {
+        $('.js-addcart-detail').first().trigger('click');
+        setTimeout(function() {
+            window.location.href = 'checkout.html';
+        }, 400);
+    });
+}
+
+// Feature 2: Flying Thumbnail Animation
+window.flyProductImageToCart = function($imgElement) {
+    if (!$imgElement || !$imgElement.length) return;
+
+    var $cartIcon = $('.js-show-cart').first();
+    if (!$cartIcon.length) return;
+
+    var imgPos = $imgElement.offset();
+    var cartPos = $cartIcon.offset();
+
+    var $clone = $imgElement.clone()
+        .addClass('flying-product-thumb')
+        .css({
+            top: imgPos.top,
+            left: imgPos.left,
+            width: $imgElement.width(),
+            height: $imgElement.height(),
+            opacity: 0.9
+        })
+        .appendTo('body');
+
+    setTimeout(function() {
+        $clone.css({
+            top: cartPos.top + 5,
+            left: cartPos.left + 5,
+            width: 25,
+            height: 25,
+            opacity: 0.2,
+            transform: 'scale(0.2) rotate(360deg)'
+        });
+    }, 20);
+
+    setTimeout(function() {
+        $clone.remove();
+        $cartIcon.addClass('pulse-highlight');
+        setTimeout(function() { $cartIcon.removeClass('pulse-highlight'); }, 400);
+    }, 850);
+};
+
+// Feature 3: One-Click Buy Now Button Integration
+function initBuyNowButton() {
+    $(document).on('click', '.js-buy-now', function(e) {
+        e.preventDefault();
+        var $btn = $(this);
+        var $parentPDP = $btn.closest('.p-r-50, .p-r-0-lg, .modal-content');
+
+        if ($parentPDP.length) {
+            var $addCartBtn = $parentPDP.find('.js-addcart-detail');
+            if ($addCartBtn.length) {
+                $addCartBtn.trigger('click');
+                setTimeout(function() {
+                    window.location.href = 'checkout.html';
+                }, 400);
+                return;
+            }
+        }
+        window.location.href = 'checkout.html';
+    });
+}
+
+// Feature 4: Size Guide Modal & Converter
+function initSizeGuideModal() {
+    if (!$('.wrap-num-product').length) return;
+
+    var sizeGuideHtml = '<div class="size-guide-modal-box modal-dialog-centered" id="size-guide-modal-content">' +
+        '<h2>Size Guide & Measurement Chart</h2>' +
+        '<p style="color:#666; font-size:13px; margin-bottom:15px;">Use our measurement guide to find your perfect fit.</p>' +
+        '<div class="size-unit-toggle">' +
+        '  <button class="size-unit-btn active" data-unit="in">Inches (IN)</button>' +
+        '  <button class="size-unit-btn" data-unit="cm">Centimeters (CM)</button>' +
+        '</div>' +
+        '<table class="size-table" id="size-guide-table">' +
+        '  <thead><tr><th>Size</th><th>Chest</th><th>Waist</th><th>Hip</th></tr></thead>' +
+        '  <tbody>' +
+        '    <tr><td>S</td><td class="s-chest">34-36"</td><td class="s-waist">28-30"</td><td class="s-hip">35-37"</td></tr>' +
+        '    <tr><td>M</td><td class="m-chest">38-40"</td><td class="m-waist">32-34"</td><td class="m-hip">39-41"</td></tr>' +
+        '    <tr><td>L</td><td class="l-chest">42-44"</td><td class="l-waist">36-38"</td><td class="l-hip">43-45"</td></tr>' +
+        '    <tr><td>XL</td><td class="xl-chest">46-48"</td><td class="xl-waist">40-42"</td><td class="xl-hip">47-49"</td></tr>' +
+        '  </tbody>' +
+        '</table>' +
+        '</div>';
+
+    // Insert trigger button next to size label
+    $('.p-b-10:contains("Size"), .p-b-10:contains("SIZE")').append('<span class="size-guide-trigger" id="open-size-guide">📏 Size Guide</span>');
+
+    $(document).on('click', '#open-size-guide', function() {
+        if (typeof swal === 'function') {
+            swal({
+                title: "📏 Size Guide & Fit Chart",
+                text: "Small (34-36") | Medium (38-40") | Large (42-44") | XL (46-48")
+
+Fits true to size. For an oversized fit, order 1 size up.",
+                icon: "info"
+            });
+        }
+    });
+}
+
+// Feature 5: Recently Viewed Products Drawer
+function initRecentlyViewedTracker() {
+    var pName = $('.js-name-detail').text().trim();
+    if (!pName) return;
+
+    var pPrice = $('.mtext-106').first().text().trim() || '$58.79';
+    var pImg = $('.wrap-pic-w img').first().attr('src') || 'images/product-01.jpg';
+    var pUrl = window.location.href;
+
+    var recentList = JSON.parse(localStorage.getItem('ganeshRecentlyViewed')) || [];
+
+    // Filter out duplicates
+    recentList = recentList.filter(function(item) { return item.name !== pName; });
+
+    // Prepend current product
+    recentList.unshift({ name: pName, price: pPrice, img: pImg, url: pUrl });
+
+    // Keep top 6 items
+    if (recentList.length > 6) recentList = recentList.slice(0, 6);
+
+    localStorage.setItem('ganeshRecentlyViewed', JSON.stringify(recentList));
+}
+
+function renderRecentlyViewedRibbon() {
+    var recentList = JSON.parse(localStorage.getItem('ganeshRecentlyViewed')) || [];
+    if (recentList.length < 2) return;
+
+    var $container = $('#recently-viewed-ribbon');
+    if (!$container.length) return;
+
+    var itemsHtml = '';
+    recentList.forEach(function(item) {
+        itemsHtml += '<div style="flex: 0 0 160px; text-align: center;">' +
+            '<a href="' + item.url + '">' +
+            '  <img src="' + item.img + '" style="width: 140px; height: 160px; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06);">' +
+            '  <div style="font-size: 13px; font-family: Poppins-Medium; color: #222; margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' + item.name + '</div>' +
+            '  <div style="font-size: 12px; color: #717fe0; font-weight: 600;">' + item.price + '</div>' +
+            '</a>' +
+            '</div>';
+    });
+
+    var ribbonHtml = '<div class="recently-viewed-container">' +
+        '<div class="container">' +
+        '  <div class="recently-viewed-title">Recently Viewed Products</div>' +
+        '  <div class="free-scroll-carousel" style="display: flex; gap: 20px; overflow-x: auto; padding-bottom: 10px;">' + itemsHtml + '</div>' +
+        '</div>' +
+        '</div>';
+
+    $container.html(ribbonHtml);
+}
+
+// Feature 6 & 7: Stock Scarcity Badges & Delivery Calculator
+function initPDPExtras() {
+    var $priceContainer = $('.mtext-106').first();
+    if (!$priceContainer.length) return;
+
+    if (!$('.stock-scarcity-badge').length) {
+        var scarcityHtml = '<div>' +
+            '<span class="stock-scarcity-badge">⚡ Only 3 left in stock - order soon</span>' +
+            '<span class="popularity-badge">🔥 14 viewed in last hour</span>' +
+            '</div>';
+        $priceContainer.after(scarcityHtml);
+    }
+
+    if (!$('.delivery-estimate-box').length) {
+        var today = new Date();
+        today.setDate(today.getDate() + 3);
+        var dateOptions = { weekday: 'short', month: 'short', day: 'numeric' };
+        var dateStr = today.toLocaleDateString('en-US', dateOptions);
+
+        var deliveryHtml = '<div class="delivery-estimate-box">' +
+            '<i class="zmdi zmdi-truck"></i> <strong>Express Delivery:</strong> Get it by <strong>' + dateStr + '</strong> with Free Shipping.' +
+            '</div>';
+        $('.p-b-26').first().after(deliveryHtml);
+    }
+}
+
+// Feature 8: Scroll Progress Ring & Back-to-Top Button
+function initScrollProgressRing() {
+    var progressBtnHtml = '<div class="scroll-progress-btn" id="scroll-progress-btn">' +
+        '<svg class="scroll-progress-svg" viewBox="0 0 50 50">' +
+        '  <circle class="scroll-progress-circle" cx="25" cy="25" r="23"></circle>' +
+        '</svg>' +
+        '<i class="zmdi zmdi-chevron-up"></i>' +
+        '</div>';
+
+    $('body').append(progressBtnHtml);
+
+    var $btn = $('#scroll-progress-btn');
+    var $circle = $('.scroll-progress-circle');
+    var maxDash = 145;
+
+    $(window).on('scroll', function() {
+        var scrollTop = $(window).scrollTop();
+        var docHeight = $(document).height() - $(window).height();
+        var progress = scrollTop / docHeight;
+        var dashoffset = maxDash - (progress * maxDash);
+
+        $circle.css('stroke-dashoffset', dashoffset);
+
+        if (scrollTop > 300) {
+            $btn.addClass('visible');
+        } else {
+            $bar.removeClass('visible');
+            $btn.removeClass('visible');
+        }
+    });
+
+    $btn.on('click', function() {
+        $('html, body').animate({ scrollTop: 0 }, 500);
+    });
+}
+
+// Hook into Add to Cart for Flying Animation
+$(document).on('click', '.js-addcart-detail, .js-addwish-b2', function() {
+    var $img = $(this).closest('.block2, .wrap-pic-w, .modal-content').find('img').first();
+    if ($img.length && typeof window.flyProductImageToCart === 'function') {
+        window.flyProductImageToCart($img);
+    }
+});
+
+$(document).ready(function() {
+    initStickyPDPBar();
+    initBuyNowButton();
+    initSizeGuideModal();
+    initRecentlyViewedTracker();
+    renderRecentlyViewedRibbon();
+    initPDPExtras();
+    initScrollProgressRing();
+});
