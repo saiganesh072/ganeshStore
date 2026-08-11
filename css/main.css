@@ -7121,3 +7121,83 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   }
 }
 
+
+
+/* ====================================================================
+   SMOOTH QUANTITY CONTROL & CRISP HOVER BUTTON STYLING
+   ==================================================================== */
+.wrap-num-product {
+  border: 1px solid #e6e6e6 !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+  background-color: #ffffff !important;
+}
+
+.wrap-num-product:hover,
+.wrap-num-product:focus-within {
+  border-color: #717fe0 !important;
+  box-shadow: 0 4px 14px rgba(113, 127, 224, 0.14) !important;
+}
+
+.btn-num-product-up,
+.btn-num-product-down {
+  width: 45px !important;
+  height: 100% !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-color: #f9f9fb !important;
+  color: #333333 !important;
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  user-select: none !important;
+  border: none !important;
+}
+
+.btn-num-product-up i,
+.btn-num-product-down i {
+  font-size: 16px !important;
+  color: #333333 !important;
+  transition: transform 0.2s ease, color 0.2s ease !important;
+  display: inline-block !important;
+}
+
+/* Premium Hover State - Icon stays crisp, 100% visible & vibrant */
+.btn-num-product-up:hover,
+.btn-num-product-down:hover {
+  background-color: #717fe0 !important;
+  color: #ffffff !important;
+}
+
+.btn-num-product-up:hover i,
+.btn-num-product-down:hover i {
+  color: #ffffff !important;
+  transform: scale(1.25) !important;
+}
+
+.btn-num-product-up:active,
+.btn-num-product-down:active {
+  background-color: #5b69c7 !important;
+  transform: scale(0.94) !important;
+}
+
+/* Middle input container - Smooth, static, 0% flickering */
+.num-product {
+  width: calc(100% - 90px) !important;
+  height: 100% !important;
+  border-left: 1px solid #e6e6e6 !important;
+  border-right: 1px solid #e6e6e6 !important;
+  background-color: #ffffff !important;
+  color: #222222 !important;
+  font-family: Poppins-Medium, sans-serif !important;
+  font-size: 16px !important;
+  text-align: center !important;
+  transition: none !important;
+  transform: none !important;
+  animation: none !important;
+}
+
+.num-product.pulse-highlight {
+  animation: none !important;
+}

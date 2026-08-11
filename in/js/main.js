@@ -401,17 +401,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         $('.js-sidebar').removeClass('show-sidebar');
     });
 
-    /*==================================================================
-    [ +/- num product ]*/
-    $('.btn-num-product-down').on('click', function(){
-        var numProduct = Number($(this).next().val());
-        if(numProduct > 0) $(this).next().val(numProduct - 1);
-    });
-
-    $('.btn-num-product-up').on('click', function(){
-        var numProduct = Number($(this).prev().val());
-        $(this).prev().val(numProduct + 1);
-    });
+    /* Legacy +/- handlers removed to prevent double-increment */
 
     /*==================================================================
     [ Rating ]*/
@@ -2447,35 +2437,32 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         }, 1200);
     });
 
-    // Handle delegated quantity decrease button click
+    
+    // Handle delegated quantity decrease button click (single clean execution)
     $(document).on('click', '.btn-num-product-down', function(e) {
         e.preventDefault();
-        var $input = $(this).next('.num-product');
+        e.stopPropagation();
+        var $input = $(this).siblings('.num-product');
+        if (!$input.length) $input = $(this).next('.num-product');
         if ($input.length) {
-            var val = parseInt($input.val()) || 1;
+            var val = parseInt($input.val(), 10) || 1;
             if (val > 1) {
                 val--;
                 $input.val(val).trigger('change');
-                $input.addClass('pulse-highlight');
-                setTimeout(function() {
-                    $input.removeClass('pulse-highlight');
-                }, 300);
             }
         }
     });
 
-    // Handle delegated quantity increase button click
+    // Handle delegated quantity increase button click (single clean execution)
     $(document).on('click', '.btn-num-product-up', function(e) {
         e.preventDefault();
-        var $input = $(this).prev('.num-product');
+        e.stopPropagation();
+        var $input = $(this).siblings('.num-product');
+        if (!$input.length) $input = $(this).prev('.num-product');
         if ($input.length) {
-            var val = parseInt($input.val()) || 1;
+            var val = parseInt($input.val(), 10) || 1;
             val++;
             $input.val(val).trigger('change');
-            $input.addClass('pulse-highlight');
-            setTimeout(function() {
-                $input.removeClass('pulse-highlight');
-            }, 300);
         }
     });
 
