@@ -7373,3 +7373,72 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   color: #6b7280;
   margin-bottom: 25px;
 }
+
+
+/* ====================================================================
+   FLUID MOMENTUM NON-SNAPPING CAROUSELS (TRACKPAD & MOUSE DRAG)
+   ==================================================================== */
+
+.slick2, .slick4, .free-scroll-carousel {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  scroll-snap-type: none !important; /* Zero rigid snapping - stops exactly where trackpad/finger lifts */
+  -webkit-overflow-scrolling: touch !important;
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+  cursor: grab;
+}
+
+.slick2::-webkit-scrollbar, 
+.slick4::-webkit-scrollbar, 
+.free-scroll-carousel::-webkit-scrollbar {
+  display: none !important;
+}
+
+.slick2:active, .slick4:active, .free-scroll-carousel:active {
+  cursor: grabbing !important;
+}
+
+.slick2 > .item-slick2 {
+  flex: 0 0 25% !important;
+  max-width: 25% !important;
+  box-sizing: border-box !important;
+}
+
+.slick4 > .item-slick4 {
+  flex: 0 0 33.333% !important;
+  max-width: 33.333% !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 992px) {
+  .slick2 > .item-slick2 {
+    flex: 0 0 33.333% !important;
+    max-width: 33.333% !important;
+  }
+  .slick4 > .item-slick4 {
+    flex: 0 0 50% !important;
+    max-width: 50% !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .slick2 > .item-slick2 {
+    flex: 0 0 50% !important;
+    max-width: 50% !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .slick2 > .item-slick2 {
+    flex: 0 0 85% !important; /* Leaves partial preview of next card */
+    max-width: 85% !important;
+  }
+  .slick4 > .item-slick4 {
+    flex: 0 0 85% !important;
+    max-width: 85% !important;
+  }
+}

@@ -3859,3 +3859,89 @@ $(document).ready(function() {
         $('#applied-coupon-tag-container').html(tagHtml);
     }
 });
+
+    /*==================================================================
+    [ FLUID MOMENTUM TRACKPAD & DRAG SCROLL FOR CAROUSELS ]*/
+    function initFluidMomentumCarousels() {
+        $('.wrap-slick2').each(function() {
+            var $wrap = $(this);
+            if (!$wrap.find('.prev-slick2').length) {
+                $wrap.append('<button class="arrow-slick2 prev-slick2"><i class="fa fa-angle-left" aria-hidden="true"></i></button>');
+            }
+            if (!$wrap.find('.next-slick2').length) {
+                $wrap.append('<button class="arrow-slick2 next-slick2"><i class="fa fa-angle-right" aria-hidden="true"></i></button>');
+            }
+        });
+
+        $('.slick2, .slick4, .free-scroll-carousel').each(function() {
+            var el = this;
+            var isMouseDown = false;
+            var startX, scrollLeft;
+
+            // Trackpad 2-finger horizontal scroll (1:1 smooth tracking without snapping)
+            el.addEventListener('wheel', function(e) {
+                if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+                    e.preventDefault();
+                    el.style.scrollBehavior = 'auto'; // Instantaneous 1:1 tracking
+                    el.scrollLeft += e.deltaX;
+                }
+            }, { passive: false });
+
+            // Mouse Drag with Grab Cursor
+            el.addEventListener('mousedown', function(e) {
+                isMouseDown = true;
+                el.style.scrollBehavior = 'auto';
+                startX = e.pageX - el.offsetLeft;
+                scrollLeft = el.scrollLeft;
+                el.style.cursor = 'grabbing';
+            });
+
+            el.addEventListener('mouseleave', function() {
+                isMouseDown = false;
+                el.style.cursor = 'grab';
+            });
+
+            el.addEventListener('mouseup', function() {
+                isMouseDown = false;
+                el.style.cursor = 'grab';
+            });
+
+            el.addEventListener('mousemove', function(e) {
+                if (!isMouseDown) return;
+                e.preventDefault();
+                var x = e.pageX - el.offsetLeft;
+                var walk = (x - startX) * 1.4;
+                el.scrollLeft = scrollLeft - walk;
+            });
+
+            el.addEventListener('dragstart', function(e) {
+                e.preventDefault();
+            });
+
+            el.style.cursor = 'grab';
+        });
+
+        // Arrow button smooth navigation
+        $('.wrap-slick2').each(function() {
+            var $wrap = $(this);
+            var $slick = $wrap.find('.slick2');
+            
+            $wrap.find('.prev-slick2').off('click').on('click', function(e) {
+                e.preventDefault();
+                $slick[0].style.scrollBehavior = 'smooth';
+                var cardWidth = $slick.find('.item-slick2').first().outerWidth() || 300;
+                $slick[0].scrollLeft -= cardWidth;
+            });
+            
+            $wrap.find('.next-slick2').off('click').on('click', function(e) {
+                e.preventDefault();
+                $slick[0].style.scrollBehavior = 'smooth';
+                var cardWidth = $slick.find('.item-slick2').first().outerWidth() || 300;
+                $slick[0].scrollLeft += cardWidth;
+            });
+        });
+    }
+
+    $(document).ready(function() {
+        initFluidMomentumCarousels();
+    });

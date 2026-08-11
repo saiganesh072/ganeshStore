@@ -63,24 +63,7 @@
                     // Debounce logic for swipeEnd
                     if (resetTimer) clearTimeout(resetTimer);
                     
-                    resetTimer = setTimeout(function() {
-                        if (isTouchpadSwiping) {
-                            isTouchpadSwiping = false;
-
-                            // Premium, user-friendly responsive swipe threshold: 15% capped at 120px for a smooth, natural feel
-                            slickInstance.touchObject.minSwipe = Math.min(slickInstance.listWidth * 0.15, 120);
-
-                            var mockEndEvent = {
-                                originalEvent: {
-                                    touches: undefined
-                                }
-                            };
-
-                            // Let Slick finalize or snap back
-                            slickInstance.swipeEnd(mockEndEvent);
-                            accumulatedDeltaX = 0;
-                        }
-                    }, 150); // 150ms timeout to detect fingers lifted
+                    // Forced swipeEnd snap timer disabled for fluid momentum scroll // 150ms timeout to detect fingers lifted
                 }
             }, { passive: false });
         });
