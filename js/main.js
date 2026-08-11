@@ -4147,23 +4147,57 @@ function renderRecentlyViewedRibbon() {
 
     var itemsHtml = '';
     recentList.forEach(function(item) {
-        itemsHtml += '<div style="flex: 0 0 160px; text-align: center;">' +
-            '<a href="' + item.url + '">' +
-            '  <img src="' + item.img + '" style="width: 140px; height: 160px; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06);">' +
-            '  <div style="font-size: 13px; font-family: Poppins-Medium; color: #222; margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' + item.name + '</div>' +
-            '  <div style="font-size: 12px; color: #717fe0; font-weight: 600;">' + item.price + '</div>' +
-            '</a>' +
+        itemsHtml += '<div class="item-slick2 p-l-15 p-r-15 p-t-15 p-b-15">' +
+            '<div class="block2">' +
+            '  <div class="block2-pic hov-img0">' +
+            '    <a href="' + item.url + '"><img src="' + item.img + '" alt="IMG-PRODUCT"></a>' +
+            '    <a href="#" class="block2-btn flex-c-m stext-103 cl2 size-102 bg0 bor2 hov-btn1 p-lr-15 trans-04 js-show-modal1">Quick View</a>' +
+            '  </div>' +
+            '  <div class="block2-txt flex-w flex-t p-t-14">' +
+            '    <div class="block2-txt-child1 flex-col-l">' +
+            '      <a href="' + item.url + '" class="stext-104 cl4 hov-cl1 trans-04 js-name-b2 p-b-6">' + item.name + '</a>' +
+            '      <span class="stext-105 cl3">' + item.price + '</span>' +
+            '    </div>' +
+            '    <div class="block2-txt-child2 flex-r p-t-3">' +
+            '      <a href="#" class="btn-addwish-b2 dis-block pos-relative js-addwish-b2">' +
+            '        <img class="icon-heart1 dis-block trans-04" src="images/icons/icon-heart-01.png" alt="ICON">' +
+            '        <img class="icon-heart2 dis-block trans-04 ab-t-l" src="images/icons/icon-heart-02.png" alt="ICON">' +
+            '      </a>' +
+            '    </div>' +
+            '  </div>' +
+            '</div>' +
             '</div>';
     });
 
     var ribbonHtml = '<div class="recently-viewed-container">' +
         '<div class="container">' +
-        '  <div class="recently-viewed-title">Recently Viewed Products</div>' +
-        '  <div class="free-scroll-carousel" style="display: flex; gap: 20px; overflow-x: auto; padding-bottom: 10px;">' + itemsHtml + '</div>' +
+        '  <div class="recently-viewed-title p-b-45"><h3 class="ltext-106 cl5 txt-center">Recently Viewed</h3></div>' +
+        '  <div class="wrap-slick2"><div class="slick2" id="recently-slick-instance">' + itemsHtml + '</div></div>' +
         '</div>' +
         '</div>';
 
     $container.html(ribbonHtml);
+    
+    // Initialize Slick
+    if ($.fn.slick) {
+        var $slickInstance = $('#recently-slick-instance');
+        $slickInstance.slick({
+            slidesToShow: 5,
+            slidesToScroll: 1,
+            infinite: false,
+            autoplay: false,
+            arrows: true,
+            appendArrows: $container.find('.wrap-slick2'),
+            prevArrow:'<button class="arrow-slick2 prev-slick2"><i class="fa fa-angle-left" aria-hidden="true"></i></button>',
+            nextArrow:'<button class="arrow-slick2 next-slick2"><i class="fa fa-angle-right" aria-hidden="true"></i></button>',  
+            responsive: [
+                { breakpoint: 1400, settings: { slidesToShow: 4 } },
+                { breakpoint: 992, settings: { slidesToShow: 3 } },
+                { breakpoint: 768, settings: { slidesToShow: 2 } },
+                { breakpoint: 576, settings: { slidesToShow: 1 } }
+            ]
+        });
+    }
 }
 
 // Feature 6 & 7: Stock Scarcity Badges & Delivery Calculator
@@ -4233,25 +4267,58 @@ function initDynamicRelatedProducts() {
         return item.name.toLowerCase() !== currentName.toLowerCase();
     });
     
-    // Ensure we only show 5-6 products
+    // Ensure we have at least 6 products
     related = related.slice(0, 6);
     
     var itemsHtml = '';
     related.forEach(function(item) {
-        itemsHtml += '<div style="flex: 0 0 220px; text-align: center;">' +
-            '<a href="' + item.url + '">' +
-            '  <img src="' + item.img + '" style="width: 220px; height: 260px; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06);">' +
-            '  <div style="font-size: 15px; font-family: Poppins-Medium; color: #222; margin-top: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' + item.name + '</div>' +
-            '  <div style="font-size: 14px; color: #717fe0; font-weight: 600; margin-top: 4px;">' + item.price + '</div>' +
-            '</a>' +
+        itemsHtml += '<div class="item-slick2 p-l-15 p-r-15 p-t-15 p-b-15">' +
+            '<div class="block2">' +
+            '  <div class="block2-pic hov-img0">' +
+            '    <a href="' + item.url + '"><img src="' + item.img + '" alt="IMG-PRODUCT"></a>' +
+            '    <a href="#" class="block2-btn flex-c-m stext-103 cl2 size-102 bg0 bor2 hov-btn1 p-lr-15 trans-04 js-show-modal1">Quick View</a>' +
+            '  </div>' +
+            '  <div class="block2-txt flex-w flex-t p-t-14">' +
+            '    <div class="block2-txt-child1 flex-col-l">' +
+            '      <a href="' + item.url + '" class="stext-104 cl4 hov-cl1 trans-04 js-name-b2 p-b-6">' + item.name + '</a>' +
+            '      <span class="stext-105 cl3">' + item.price + '</span>' +
+            '    </div>' +
+            '    <div class="block2-txt-child2 flex-r p-t-3">' +
+            '      <a href="#" class="btn-addwish-b2 dis-block pos-relative js-addwish-b2">' +
+            '        <img class="icon-heart1 dis-block trans-04" src="images/icons/icon-heart-01.png" alt="ICON">' +
+            '        <img class="icon-heart2 dis-block trans-04 ab-t-l" src="images/icons/icon-heart-02.png" alt="ICON">' +
+            '      </a>' +
+            '    </div>' +
+            '  </div>' +
+            '</div>' +
             '</div>';
     });
 
-    // Replace the old bulky slick2 crosshairs with the premium fluid carousel layout
     var premiumHtml = '<div class="p-b-45"><h3 class="ltext-106 cl5 txt-center">Related Products</h3></div>' +
-        '<div class="free-scroll-carousel" style="display: flex; gap: 30px; overflow-x: auto; padding-bottom: 20px;">' + itemsHtml + '</div>';
+        '<div class="wrap-slick2"><div class="slick2" id="related-slick-instance">' + itemsHtml + '</div></div>';
         
     $relateSection.html(premiumHtml);
+
+    // Initialize Slick on the dynamically injected HTML
+    if ($.fn.slick) {
+        var $slickInstance = $('#related-slick-instance');
+        $slickInstance.slick({
+            slidesToShow: 5,
+            slidesToScroll: 1,
+            infinite: true,
+            autoplay: false,
+            arrows: true,
+            appendArrows: $relateSection.find('.wrap-slick2'),
+            prevArrow:'<button class="arrow-slick2 prev-slick2"><i class="fa fa-angle-left" aria-hidden="true"></i></button>',
+            nextArrow:'<button class="arrow-slick2 next-slick2"><i class="fa fa-angle-right" aria-hidden="true"></i></button>',  
+            responsive: [
+                { breakpoint: 1400, settings: { slidesToShow: 4 } },
+                { breakpoint: 992, settings: { slidesToShow: 3 } },
+                { breakpoint: 768, settings: { slidesToShow: 2 } },
+                { breakpoint: 576, settings: { slidesToShow: 1 } }
+            ]
+        });
+    }
 }
 // Feature 8: Scroll Progress Ring & Back-to-Top Button
 function initScrollProgressRing() {
