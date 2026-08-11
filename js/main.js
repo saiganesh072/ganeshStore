@@ -3672,3 +3672,190 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
 
 })(jQuery);
 
+
+
+/* ====================================================================
+   PREMIUM MAIN SHOPPING CART ENGINE & TELEMETRY
+   ==================================================================== */
+
+window.quickApplyCoupon = function(code) {
+    var $input = $('input[name="coupon"]');
+    if ($input.length) {
+        $input.val(code);
+        applyCartCouponCode(code);
+    }
+};
+
+window.removeAppliedCoupon = function() {
+    sessionStorage.removeItem('activeCouponCode');
+    sessionStorage.removeItem('activeCouponDiscount');
+    $('input[name="coupon"]').val('');
+    $('#applied-coupon-tag-container').empty();
+    if (typeof showToast === 'function') {
+        showToast('Coupon code removed', 'info');
+    }
+    updateCartPageTotals();
+};
+
+function applyCartCouponCode(code) {
+    var cleanCode = (code || '').trim().toUpperCase();
+    if (!cleanCode) return;
+
+    var discountPercent = 0;
+    var discountFixed = 0;
+
+    if (cleanCode === 'SAVE10') {
+        discountPercent = 10;
+    } else if (cleanCode === 'GANESH20') {
+        discountFixed = 20;
+    } else if (cleanCode === 'FREESHIP') {
+        discountFixed = 0; // Handled in shipping calc
+    } else if (cleanCode === 'WELCOME10') {
+        discountPercent = 10;
+    } else {
+        if (typeof showToast === 'function') {
+            showToast('Invalid coupon code', 'warning');
+        } else {
+            alert('Invalid coupon code');
+        }
+        return;
+    }
+
+    sessionStorage.setItem('activeCouponCode', cleanCode);
+    sessionStorage.setItem('activeCouponDiscountPercent', discountPercent);
+    sessionStorage.setItem('activeCouponDiscountFixed', discountFixed);
+
+    var tagHtml = '<div class="applied-coupon-tag">' +
+        '<span>🏷️ ' + cleanCode + ' Applied</span>' +
+        '<span class="remove-coupon-btn" onclick="removeAppliedCoupon()">&times;</span>' +
+        '</div>';
+    $('#applied-coupon-tag-container').html(tagHtml);
+
+    if (typeof showToast === 'function') {
+        showToast('Coupon ' + cleanCode + ' applied successfully! 🎉', 'success');
+    }
+
+    updateCartPageTotals();
+}
+
+function updateFreeShippingTracker(subtotal) {
+    var threshold = 100.00;
+    var $box = $('#free-shipping-box');
+    var $msg = $('#shipping-status-msg');
+    var $percent = $('#shipping-percent-txt');
+    var $bar = $('#shipping-bar-fill');
+
+    if (!$box.length) return;
+
+    if (subtotal >= threshold) {
+        $msg.html('🎉 Congratulations! You unlocked <strong>FREE Standard Shipping</strong>!');
+        $percent.text('100%');
+        $bar.css('width', '100%').addClass('unlocked');
+    } else {
+        var needed = (threshold - subtotal).toFixed(2);
+        var percent = Math.min(100, Math.round((subtotal / threshold) * 100));
+        $msg.html('Add <strong>$' + needed + '</strong> more to unlock <strong>FREE Shipping</strong>!');
+        $percent.text(percent + '%');
+        $bar.css('width', percent + '%').removeClass('unlocked');
+    }
+}
+
+// Enhance updateCartPageTotals to handle Free Shipping, Coupons, and Empty Cart
+const originalUpdateCartPageTotals = window.updateCartPageTotals;
+window.updateCartPageTotals = function() {
+    var cartItems = JSON.parse(localStorage.getItem('ganeshCartItems')) || [];
+    var $cartForm = $('#cart-form');
+    
+    if (cartItems.length === 0 && $cartForm.length) {
+        // Render Empty Cart Glassmorphic State
+        var emptyHtml = '<div class="container p-t-75 p-b-85">' +
+            '<div class="empty-cart-wrapper">' +
+            '  <div class="empty-cart-icon"><i class="zmdi zmdi-shopping-cart-plus"></i></div>' +
+            '  <h3 class="empty-cart-title">Your Shopping Cart is Empty</h3>' +
+            '  <p class="empty-cart-desc">Looks like you haven't added any stylish items to your cart yet.</p>' +
+            '  <a href="product.html" class="flex-c-m stext-101 cl0 size-116 bg1 bor14 hov-btn1 p-lr-15 trans-04 pointer" style="max-width: 240px; margin: 0 auto; border-radius: 30px;">' +
+            '    Explore Catalog' +
+            '  </a>' +
+            '</div>' +
+            '</div>';
+        $cartForm.html(emptyHtml);
+        return;
+    }
+
+    var subtotal = 0;
+    cartItems.forEach(function(item) {
+        var price = parseFloat((item.price || '0').replace(/[^0-9.]/g, '')) || 0;
+        var qty = parseInt(item.quantity || 1, 10);
+        subtotal += price * qty;
+    });
+
+    // Update Free Shipping Tracker
+    updateFreeShippingTracker(subtotal);
+
+    // Calculate Coupon Discount
+    var couponCode = sessionStorage.getItem('activeCouponCode');
+    var discountPercent = parseFloat(sessionStorage.getItem('activeCouponDiscountPercent')) || 0;
+    var discountFixed = parseFloat(sessionStorage.getItem('activeCouponDiscountFixed')) || 0;
+    
+    var discountAmount = 0;
+    if (discountPercent > 0) {
+        discountAmount = (subtotal * discountPercent) / 100;
+    } else if (discountFixed > 0) {
+        discountAmount = discountFixed;
+    }
+
+    var shippingCost = (subtotal >= 100 || couponCode === 'FREESHIP') ? 0 : 10.00;
+    var finalTotal = Math.max(0, subtotal - discountAmount + shippingCost);
+
+    // Update DOM elements on shoping-cart.html
+    $('.cart-summary-card .bor12:first-child .mtext-110').text('$' + subtotal.toFixed(2));
+    
+    // Add/Update Shipping Cost text
+    var shippingTxt = shippingCost === 0 ? '<span style="color:#10b981; font-weight:600;">FREE</span>' : '$' + shippingCost.toFixed(2);
+    $('.cart-summary-card .stext-111.cl6').html('Standard Shipping: ' + shippingTxt + '<br><small style="color:#888;">Free shipping on orders over $100</small>');
+
+    // Add/Update Discount Row if coupon active
+    $('.cart-summary-card .discount-row-summary').remove();
+    if (discountAmount > 0) {
+        var discountRowHtml = '<div class="flex-w flex-t bor12 p-tb-12 discount-row-summary" style="color: #10b981;">' +
+            '<div class="size-208"><span class="stext-110">Discount (' + couponCode + '):</span></div>' +
+            '<div class="size-209"><span class="mtext-110" style="color: #10b981;">-$' + discountAmount.toFixed(2) + '</span></div>' +
+            '</div>';
+        $('.cart-summary-card .bor12:first-child').after(discountRowHtml);
+    }
+
+    // Final Total
+    $('.cart-summary-card .p-t-27 .mtext-110').text('$' + finalTotal.toFixed(2));
+
+    // ACDL Event Telemetry
+    if (window.adobeDataLayer && typeof window.adobeDataLayer.push === 'function') {
+        window.adobeDataLayer.push({
+            event: 'cartUpdated',
+            cart: {
+                totalAmount: '$' + finalTotal.toFixed(2),
+                subtotalAmount: '$' + subtotal.toFixed(2),
+                itemCount: cartItems.length,
+                coupon: couponCode || ''
+            }
+        });
+    }
+};
+
+$(document).ready(function() {
+    // Handle Apply Coupon button click
+    $(document).on('click', '.wrap-table-shopping-cart + div .hov-btn3, .js-apply-coupon', function(e) {
+        e.preventDefault();
+        var code = $('input[name="coupon"]').val();
+        applyCartCouponCode(code);
+    });
+
+    // Check for stored coupon tag on load
+    var storedCoupon = sessionStorage.getItem('activeCouponCode');
+    if (storedCoupon) {
+        var tagHtml = '<div class="applied-coupon-tag">' +
+            '<span>🏷️ ' + storedCoupon + ' Applied</span>' +
+            '<span class="remove-coupon-btn" onclick="removeAppliedCoupon()">&times;</span>' +
+            '</div>';
+        $('#applied-coupon-tag-container').html(tagHtml);
+    }
+});

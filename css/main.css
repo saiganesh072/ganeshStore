@@ -7201,3 +7201,175 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
 .num-product.pulse-highlight {
   animation: none !important;
 }
+
+
+/* ====================================================================
+   PREMIUM MAIN SHOPPING CART OVERHAUL & MICRO-ANIMATIONS
+   ==================================================================== */
+
+/* Free Shipping Progress Bar */
+.free-shipping-container {
+  background: linear-gradient(135deg, rgba(113, 127, 224, 0.08) 0%, rgba(236, 56, 188, 0.08) 100%);
+  border: 1px solid rgba(113, 127, 224, 0.2);
+  border-radius: 14px;
+  padding: 18px 24px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s ease;
+}
+
+.free-shipping-text {
+  font-family: Poppins-Medium, sans-serif;
+  font-size: 14px;
+  color: #222;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.free-shipping-text i {
+  font-size: 18px;
+  color: #717fe0;
+  margin-right: 8px;
+}
+
+.free-shipping-bar-bg {
+  width: 100%;
+  height: 8px;
+  background-color: rgba(0, 0, 0, 0.06);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.free-shipping-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #717fe0 0%, #ec38bc 100%);
+  border-radius: 10px;
+  transition: width 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow: 0 0 10px rgba(113, 127, 224, 0.5);
+}
+
+.free-shipping-bar-fill.unlocked {
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
+}
+
+/* Coupon Quick Pills */
+.coupon-pills-wrap {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.coupon-pill {
+  font-size: 12px;
+  font-family: Poppins-Regular, sans-serif;
+  background: rgba(113, 127, 224, 0.1);
+  color: #717fe0;
+  border: 1px dashed #717fe0;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.coupon-pill:hover {
+  background: #717fe0;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.applied-coupon-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 13px;
+  font-family: Poppins-Medium, sans-serif;
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-top: 8px;
+}
+
+.applied-coupon-tag .remove-coupon-btn {
+  cursor: pointer;
+  color: #0284c7;
+  font-weight: bold;
+}
+.applied-coupon-tag .remove-coupon-btn:hover {
+  color: #ef4444;
+}
+
+/* Glassmorphic Cart Summary Box */
+.cart-summary-card {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.3s ease;
+}
+
+.cart-summary-card:hover {
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Trust & Security Badges */
+.trust-badges-container {
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+}
+
+.trust-badge-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 11px;
+  color: #666;
+  font-family: Poppins-Regular, sans-serif;
+}
+
+.trust-badge-item i {
+  font-size: 20px;
+  color: #717fe0;
+  margin-bottom: 5px;
+}
+
+/* Empty Cart State */
+.empty-cart-wrapper {
+  text-align: center;
+  padding: 60px 20px;
+  background: rgba(249, 250, 251, 0.8);
+  border-radius: 16px;
+  border: 1px dashed #e5e7eb;
+}
+
+.empty-cart-icon {
+  font-size: 54px;
+  color: #9ca3af;
+  margin-bottom: 15px;
+}
+
+.empty-cart-title {
+  font-family: Poppins-Bold, sans-serif;
+  font-size: 22px;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.empty-cart-desc {
+  font-family: Poppins-Regular, sans-serif;
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 25px;
+}
