@@ -4111,7 +4111,12 @@ function initRecentlyViewedTracker() {
     var pImg = $('.wrap-pic-w img').first().attr('src') || 'images/product-01.jpg';
     var pUrl = window.location.href;
 
-    var recentList = JSON.parse(localStorage.getItem('ganeshRecentlyViewed')) || [];
+    var recentList = [];
+    try {
+        recentList = JSON.parse(localStorage.getItem('ganeshRecentlyViewed')) || [];
+    } catch(e) {
+        recentList = [];
+    }
 
     // Filter out duplicates
     recentList = recentList.filter(function(item) { return item.name !== pName; });
@@ -4126,7 +4131,12 @@ function initRecentlyViewedTracker() {
 }
 
 function renderRecentlyViewedRibbon() {
-    var recentList = JSON.parse(localStorage.getItem('ganeshRecentlyViewed')) || [];
+    var recentList = [];
+    try {
+        recentList = JSON.parse(localStorage.getItem('ganeshRecentlyViewed')) || [];
+    } catch(e) {
+        recentList = [];
+    }
     if (recentList.length < 2) return;
 
     var $container = $('#recently-viewed-ribbon');
@@ -4194,6 +4204,8 @@ function initScrollProgressRing() {
     var $circle = $('.scroll-progress-circle');
     var maxDash = 145;
 
+    $('.btn-back-to-top').remove(); // Remove old template back-to-top button
+
     $(window).on('scroll', function() {
         var scrollTop = $(window).scrollTop();
         var docHeight = $(document).height() - $(window).height();
@@ -4205,7 +4217,6 @@ function initScrollProgressRing() {
         if (scrollTop > 300) {
             $btn.addClass('visible');
         } else {
-            $bar.removeClass('visible');
             $btn.removeClass('visible');
         }
     });
