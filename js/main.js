@@ -3779,7 +3779,7 @@ window.updateCartPageTotals = function() {
             '<div class="empty-cart-wrapper">' +
             '  <div class="empty-cart-icon"><i class="zmdi zmdi-shopping-cart-plus"></i></div>' +
             '  <h3 class="empty-cart-title">Your Shopping Cart is Empty</h3>' +
-            '  <p class="empty-cart-desc">Looks like you haven't added any stylish items to your cart yet.</p>' +
+            "  <p class=\"empty-cart-desc\">Looks like you haven't added any stylish items to your cart yet.</p>" +
             '  <a href="product.html" class="flex-c-m stext-101 cl0 size-116 bg1 bor14 hov-btn1 p-lr-15 trans-04 pointer" style="max-width: 240px; margin: 0 auto; border-radius: 30px;">' +
             '    Explore Catalog' +
             '  </a>' +
@@ -4095,9 +4095,7 @@ function initSizeGuideModal() {
         if (typeof swal === 'function') {
             swal({
                 title: "📏 Size Guide & Fit Chart",
-                text: "Small (34-36") | Medium (38-40") | Large (42-44") | XL (46-48")
-
-Fits true to size. For an oversized fit, order 1 size up.",
+                text: 'Small (34-36") | Medium (38-40") | Large (42-44") | XL (46-48")\\n\\nFits true to size. For an oversized fit, order 1 size up.',
                 icon: "info"
             });
         }
