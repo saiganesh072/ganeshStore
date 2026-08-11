@@ -38,14 +38,14 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
     $(".animsition").animsition({
         inClass: 'fade-in',
         outClass: 'fade-out',
-        inDuration: 1500,
+        inDuration: 500,
         outDuration: 800,
         linkElement: '.animsition-link',
         loading: true,
         loadingParentElement: 'html',
         loadingClass: 'animsition-loading-1',
         loadingInner: '<div class="loader05"></div>',
-        timeout: false,
+        timeout: true,
         timeoutCountdown: 5000,
         onLoadEvent: true,
         browser: [ 'animation-duration', '-webkit-animation-duration'],
@@ -54,6 +54,13 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         overlayParentElement : 'html',
         transition: function(url){ window.location.href = url; }
     });
+
+    // Safety fallback to guarantee page is 100% visible immediately without blank white screen
+    setTimeout(function() {
+        $('.animsition').css({'opacity': 1, 'visibility': 'visible'});
+        $('.animsition-loading-1').fadeOut(200);
+    }, 400);
+
     
     /*[ Back to top ]
     ===========================================================*/
