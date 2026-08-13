@@ -2013,20 +2013,69 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         });
 
         $('.js-show-cart').off('click').on('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            $('.js-panel-cart').addClass('show-header-cart');
-            renderSideDrawerCart();
+            window.location.href = 'shoping-cart.html';
         });
 
         // 2. Update badges and render panels immediately
         updateCartBadges();
         renderSideDrawerCart();
 
-        // 3. Clear existing inline click handlers that would double-fire
-        setTimeout(function() {
-            $('.js-addcart-detail').off('click');
-        }, 150);
+        // 3. Bind Add to Cart click handler for PDP and Modal buttons
+        $(document).off('click', '.js-addcart-detail').on('click', '.js-addcart-detail', function(e) {
+            e.preventDefault();
+            var $btn = $(this);
+            var originalText = $btn.text().trim();
+
+            // 1. Get product details from PDP container or modal
+            var $pdpContainer = $btn.closest('.sec-product-detail, .js-modal1, .row');
+            var nameProduct = $pdpContainer.find('.js-name-detail').first().text().trim() || 'Esprit Ruffle Shirt';
+            var priceText = $pdpContainer.find('.mtext-106').first().text().trim() || '$58.79';
+            var qtyVal = parseInt($pdpContainer.find('.num-product').val() || 1, 10);
+            var imgUrl = $pdpContainer.find('.item-slick3 img, .wrap-pic-w img').first().attr('src') || 'images/product-01.jpg';
+            
+            var $selects = $pdpContainer.find('select');
+            var sizeVal = $selects.length > 0 ? $selects.eq(0).val() : 'Size M';
+            var colorVal = $selects.length > 1 ? $selects.eq(1).val() : 'Default';
+
+            if (!sizeVal || sizeVal.indexOf('Choose') !== -1) sizeVal = 'Size M';
+            if (!colorVal || colorVal.indexOf('Choose') !== -1) colorVal = 'Default';
+
+            // 2. Save item to cartItems in localStorage
+            var cart = getCart();
+            var existingIndex = cart.findIndex(function(i) {
+                return i.name === nameProduct && i.size === sizeVal && i.color === colorVal;
+            });
+
+            if (existingIndex > -1) {
+                cart[existingIndex].quantity += qtyVal;
+            } else {
+                cart.push({
+                    id: $btn.attr('data-product-id') || 'GS001',
+                    name: nameProduct,
+                    price: priceText,
+                    quantity: qtyVal,
+                    image: imgUrl,
+                    size: sizeVal,
+                    color: colorVal
+                });
+            }
+            saveCart(cart);
+
+            // 3. Visual tactile button response
+            $btn.addClass('added-success').html('<i class="zmdi zmdi-check m-r-6"></i> Added to Cart ✓');
+
+            // 4. Trigger SweetAlert modal if available
+            if (typeof swal === 'function') {
+                swal(nameProduct, "is added to cart !", "success");
+            }
+
+            // 5. Trigger badge pulse event
+            $(document).trigger('cartUpdated');
+
+            setTimeout(function() {
+                $btn.removeClass('added-success').text(originalText);
+            }, 1800);
+        });
 
         // 4. Render shopping cart page if on shoping-cart.html
         renderCartPage();
@@ -2217,7 +2266,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             var rowHtml = 
                 '<tr class="table_row" style="transition: all 0.5s ease;">' +
                 '  <td class="column-1">' +
-                '    <div class="cart-item-image">' +
+                '    <div class="how-itemcart1 cart-item-image js-remove-cart-item" data-name="' + item.name + '" data-size="' + item.size + '" data-color="' + item.color + '">' +
                 '      <img src="' + item.image + '" alt="IMG">' +
                 '    </div>' +
                 '  </td>' +
@@ -2535,7 +2584,10 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 }
             }, 500);
             
-            // Trigger premium info toast notification
+            // Trigger sweetalert and info toast notification
+            if (typeof swal === 'function') {
+                swal(name, "has been removed from your cart.", "info");
+            }
             showPremiumToast('<strong>' + name + '</strong> has been removed from your cart.', 'info');
         }
     });
@@ -3471,6 +3523,11 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                             sessionStorage.removeItem('activeCouponCode');
                             updateCartBadges();
                             renderSideDrawerCart();
+
+                            // Dispatch purchase event to Adobe Client Data Layer
+                            if (typeof window.trackACDLPurchase === 'function') {
+                                window.trackACDLPurchase(orderData);
+                            }
 
                             // Fireworks / confetti explosion
                             triggerConfettiBurst();
@@ -4476,9 +4533,114 @@ function initTactileRipples() {
     });
 }
 
-// Initialize Batch 2
+// Feature 4: Quantity Value Bump Animation
+function initQuantityValueBump() {
+    $(document).on('click', '.btn-num-product-down, .btn-num-product-up', function() {
+        var $input = $(this).siblings('.num-product');
+        if ($input.length) {
+            $input.removeClass('value-bump');
+            // Force reflow for animation restart
+            void $input[0].offsetWidth;
+            $input.addClass('value-bump');
+            setTimeout(function() {
+                $input.removeClass('value-bump');
+            }, 350);
+        }
+    });
+}
+
+// Feature 5: Free Shipping Progress Bar Updates
+window.updateFreeShippingProgressBar = function() {
+    var cartItems = [];
+    try {
+        cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+    } catch (e) {
+        cartItems = [];
+    }
+
+    var subtotal = 0;
+    cartItems.forEach(function(item) {
+        var priceNum = parseFloat(String(item.price || '0').replace(/[^0-9.]/g, '')) || 0;
+        var qty = parseInt(item.quantity || 1, 10);
+        subtotal += priceNum * qty;
+    });
+
+    var threshold = 100; // Free shipping at $100
+    var percent = Math.min(100, Math.max(0, (subtotal / threshold) * 100));
+    var remaining = (threshold - subtotal).toFixed(2);
+
+    // Target cart page or side drawer containers
+    var $progressContainers = $('.shipping-progress-container');
+
+    if (!$progressContainers.length) {
+        // Inject into cart drawer top or shopping cart page top if container missing
+        var $targetCartPage = $('.table-shopping-cart').closest('.col-lg-10, .col-lg-8, .wrap-table-shopping-cart').first();
+        if ($targetCartPage.length && !$('#cart-page-shipping-progress').length) {
+            $targetCartPage.prepend('<div id="cart-page-shipping-progress" class="shipping-progress-container"></div>');
+            $progressContainers = $('#cart-page-shipping-progress');
+        }
+    }
+
+    if ($progressContainers.length) {
+        $progressContainers.each(function() {
+            var $c = $(this);
+            if (subtotal >= threshold) {
+                $c.addClass('unlocked').html(
+                    '<div class="shipping-progress-text">' +
+                    '  <span><i class="zmdi zmdi-truck m-r-6"></i> <strong>Congratulations!</strong> You unlocked <strong>FREE Shipping!</strong></span>' +
+                    '  <span>100%</span>' +
+                    '</div>' +
+                    '<div class="shipping-progress-bar-bg">' +
+                    '  <div class="shipping-progress-bar-fill" style="width: 100%;"></div>' +
+                    '</div>'
+                );
+            } else {
+                $c.removeClass('unlocked').html(
+                    '<div class="shipping-progress-text">' +
+                    '  <span>Add <strong>$' + remaining + '</strong> more for <strong>FREE Shipping!</strong></span>' +
+                    '  <span>' + Math.round(percent) + '%</span>' +
+                    '</div>' +
+                    '<div class="shipping-progress-bar-bg">' +
+                    '  <div class="shipping-progress-bar-fill" style="width: ' + percent + '%;"></div>' +
+                    '</div>'
+                );
+            }
+        });
+    }
+};
+
+// Feature 6: Notification Badge Pulse on Updates
+function initBadgePulseObserver() {
+    $(document).on('cartUpdated wishlistUpdated', function() {
+        var $badges = $('.icon-header-noti');
+        $badges.addClass('badge-pulse');
+        setTimeout(function() {
+            $badges.removeClass('badge-pulse');
+        }, 450);
+
+        if (typeof window.updateFreeShippingProgressBar === 'function') {
+            window.updateFreeShippingProgressBar();
+        }
+    });
+}
+
+// Initialize Batch 2 & Enhanced Micro-Animations
 $(document).ready(function() {
     initSmartLiveSearch();
     initCategoryFilterCounts();
     initTactileRipples();
+    initQuantityValueBump();
+    initBadgePulseObserver();
+
+    // Add dashboard-load class to nav on home page after 5 seconds
+    if ($('.section-slide').length > 0) {
+        setTimeout(function() {
+            $('nav.limiter-menu-desktop, .wrap-menu-desktop, .menu-desktop').addClass('dashboard-load');
+        }, 5000);
+    }
+
+    if (typeof window.updateFreeShippingProgressBar === 'function') {
+        window.updateFreeShippingProgressBar();
+    }
 });
+
