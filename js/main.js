@@ -4632,11 +4632,13 @@ $(document).ready(function() {
     initQuantityValueBump();
     initBadgePulseObserver();
 
-    // Add dashboard-load class to nav on home page after 5 seconds
+    // Add dashboard-load section after Our Blogs on home page after 4 seconds
     if ($('.section-slide').length > 0) {
         setTimeout(function() {
-            $('nav.limiter-menu-desktop, .wrap-menu-desktop, .menu-desktop').addClass('dashboard-load');
-        }, 5000);
+            if ($('.dashboard-load').length === 0) {
+                $('.sec-blog').after('<section class="dashboard-load"></section>');
+            }
+        }, 4000);
     }
 
     if (typeof window.updateFreeShippingProgressBar === 'function') {
