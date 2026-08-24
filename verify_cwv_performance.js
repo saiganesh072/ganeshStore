@@ -86,6 +86,12 @@ test('index.html LCP hero slider preloads high-priority and supports WebP', () =
     assert(fs.existsSync(path.join(rootDir, 'images', 'slide-01.webp')), 'Hero slider WebP companion image must exist in images directory');
 });
 
+test('Catalog pages actively serve WebP format via <picture> and <source type="image/webp"> in HTML markup', () => {
+    const productHtml = fs.readFileSync(path.join(rootDir, 'product.html'), 'utf8');
+    assert(productHtml.includes('<picture'), 'Product catalog must wrap images in <picture>');
+    assert(productHtml.includes('<source srcset="images/product-01.webp" type="image/webp">') || productHtml.includes('.webp" type="image/webp">'), 'Product catalog must provide WebP source in HTML markup');
+});
+
 test('All catalog and banner images specify explicit dimensions to guarantee 0.000 CLS', () => {
     const productHtml = fs.readFileSync(path.join(rootDir, 'product.html'), 'utf8');
     const imgMatches = productHtml.match(/<img[^>]+src=["']images\/product-[^"']+["'][^>]*>/g) || [];

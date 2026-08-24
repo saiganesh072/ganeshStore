@@ -57,6 +57,18 @@ Input, textarea : 14px/1.6 '', Arial, sans-serif;
   outline-offset: 2px;
 }
 
+/* Modern WebP Picture Tag Styling */
+.img-responsive-wrap {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.img-responsive-wrap img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 /*//////////////////////////////////////////////////////////////////
 [ FONT ]*/
 
