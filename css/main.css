@@ -34,6 +34,29 @@ Paragrap        : 18px/1.6 '', Arial, sans-serif;
 Input, textarea : 14px/1.6 '', Arial, sans-serif;
 -------------------------------------------------------------------*/
 
+/* Accessibility: Skip to Content Link */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 15px;
+  background: #222;
+  color: #fff !important;
+  padding: 12px 20px;
+  font-family: 'Poppins-Medium', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  z-index: 999999;
+  text-decoration: none !important;
+  transition: top 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.skip-link:focus {
+  top: 0;
+  outline: 3px solid #717fe0;
+  outline-offset: 2px;
+}
+
 /*//////////////////////////////////////////////////////////////////
 [ FONT ]*/
 

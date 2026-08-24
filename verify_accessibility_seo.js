@@ -62,13 +62,30 @@ assert(allHaveJsonLd, 'All HTML files embed schema.org JSON-LD Structured Data')
 assert(allHaveH1, 'All HTML files contain accessible <h1> heading hierarchy');
 assert(allTargetBlankSecure, 'All target="_blank" links include rel="noopener noreferrer" for security');
 
-// 3. CSS Accessibility & Focus Indicators
+// 3. CSS Accessibility & Focus Rules
 console.log('\n--- Suite 3: CSS WCAG 2.2 AA Accessibility & Focus Rules ---');
 const mainCss = fs.readFileSync(path.join(rootDir, 'css', 'main.css'), 'utf-8');
 assert(mainCss.includes('.sr-only'), 'CSS declares .sr-only accessible screen reader utility');
 assert(mainCss.includes(':focus-visible'), 'CSS declares accessible :focus-visible outline indicators');
 assert(mainCss.includes('prefers-reduced-motion'), 'CSS supports prefers-reduced-motion user preference');
 assert(mainCss.includes('min-width: 44px') || mainCss.includes('min-height: 44px'), 'CSS establishes mobile minimum touch target guidelines');
+assert(mainCss.includes('.skip-link'), 'CSS styles accessible .skip-link navigation utility');
+
+// 3b. HTML Landmarks & Skip Links
+console.log('\n--- Suite 3b: HTML5 Semantic Landmarks & Skip-to-Content Navigation ---');
+let allHaveSkipLink = true;
+let allHaveMainLandmark = true;
+htmlFiles.forEach(file => {
+    const content = fs.readFileSync(path.join(rootDir, file), 'utf-8');
+    if (!content.includes('class="skip-link"') || !content.includes('href="#main-content"')) {
+        allHaveSkipLink = false;
+    }
+    if (!content.includes('id="main-content"') || !content.includes('role="main"') || !content.includes('</main>')) {
+        allHaveMainLandmark = false;
+    }
+});
+assert(allHaveSkipLink, 'All 99 HTML files feature a focusable Skip-to-Main-Content link');
+assert(allHaveMainLandmark, 'All 99 HTML files wrap primary content in <main id="main-content" role="main">');
 
 // 4. Link & Asset Integrity
 console.log('\n--- Suite 4: Broken Link & Asset Resolution ---');
