@@ -904,6 +904,18 @@
         orders: {
             createOrder: async function (orderPayload) {
                 var user = BackendService.auth.getCurrentUser();
+                var rawItems = orderPayload.items || BackendService.cart.getCart();
+                var formattedItems = rawItems.map(function(item) {
+                    return {
+                        id: item.id || item.productId || 'GS001',
+                        name: item.name || 'Product',
+                        quantity: parseInt(item.quantity || item.qty || 1, 10),
+                        size: item.size || 'M',
+                        color: item.color || 'Default',
+                        image: item.image || item.img || 'images/product-01.jpg'
+                    };
+                });
+
                 var orderId = orderPayload.order_id || ('ORD-' + Math.floor(100000 + Math.random() * 900000));
                 var trackingNo = 'GS-TRK-' + Math.floor(10000000 + Math.random() * 90000000);
 
@@ -923,7 +935,7 @@
                     order_status: 'processing',
                     tracking_number: trackingNo,
                     estimated_delivery: estDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }),
-                    items: orderPayload.items || BackendService.cart.getCart(),
+                    items: formattedItems,
                     subtotal: parseFloat(orderPayload.subtotal) || 0,
                     discount: parseFloat(orderPayload.discount) || 0,
                     shipping_fee: parseFloat(orderPayload.shipping_fee) || 0,
@@ -931,6 +943,43 @@
                     total: parseFloat(orderPayload.total) || 0,
                     created_at: new Date().toISOString()
                 };
+
+                // Server-Side Pricing & Atomic RPC Order Placement
+                if (BackendService._isCloudAvailable && BackendService._client) {
+                    try {
+                        var rpcRes = await BackendService._client.rpc('create_authenticated_order', {
+                            order_payload: {
+                                user_id: orderRecord.user_id,
+                                customer_name: orderRecord.customer_name,
+                                email: orderRecord.email,
+                                phone: orderRecord.phone,
+                                shipping_address: orderRecord.shipping_address,
+                                shipping_method: orderRecord.shipping_method,
+                                payment_method: orderRecord.payment_method,
+                                coupon_code: orderPayload.coupon_code || orderPayload.coupon || '',
+                                items: formattedItems,
+                                notes: orderPayload.notes || ''
+                            }
+                        });
+
+                        if (rpcRes && rpcRes.data && rpcRes.data.success) {
+                            var srv = rpcRes.data;
+                            orderRecord.order_id = srv.order_id || orderRecord.order_id;
+                            orderRecord.tracking_number = srv.tracking_number || orderRecord.tracking_number;
+                            orderRecord.subtotal = parseFloat(srv.subtotal) || orderRecord.subtotal;
+                            orderRecord.discount = parseFloat(srv.discount) || orderRecord.discount;
+                            orderRecord.shipping_fee = parseFloat(srv.shipping_fee) || orderRecord.shipping_fee;
+                            orderRecord.tax = parseFloat(srv.tax) || orderRecord.tax;
+                            orderRecord.total = parseFloat(srv.total) || orderRecord.total;
+                            orderRecord.estimated_delivery = srv.estimated_delivery || orderRecord.estimated_delivery;
+                        }
+                    } catch (e) {
+                        console.warn('Server-side RPC order placement fallback:', e);
+                        try {
+                            await BackendService._client.from('orders').insert(orderRecord);
+                        } catch (err) {}
+                    }
+                }
 
                 // Save locally
                 var history = Storage.get('order_history', []);
@@ -947,15 +996,6 @@
                         loyaltyPoints: user.loyaltyPoints,
                         loyaltyTier: user.loyaltyTier
                     });
-                }
-
-                // Cloud Supabase Sync
-                if (BackendService._isCloudAvailable && BackendService._client) {
-                    try {
-                        await BackendService._client.from('orders').insert(orderRecord);
-                    } catch (e) {
-                        console.warn('Supabase cloud order insert error:', e);
-                    }
                 }
 
                 // Telemetry
@@ -1123,6 +1163,29 @@
         // COUPONS & DISCOUNTS VALIDATOR SUBSYSTEM
         // =================================================================
         coupons: {
+            validateCouponAsync: async function (code, subtotal) {
+                var cleanCode = (code || '').trim().toUpperCase();
+                var numSubtotal = parseFloat(subtotal) || 0;
+
+                if (BackendService._isCloudAvailable && BackendService._client) {
+                    try {
+                        var res = await BackendService._client.rpc('validate_coupon_code', {
+                            coupon_code: cleanCode,
+                            subtotal_amount: numSubtotal
+                        });
+                        if (res && res.data) {
+                            if (window.trackACDLPromoCode) {
+                                window.trackACDLPromoCode(cleanCode, res.data.discount_amount || 0, res.data.valid, res.data.message || '');
+                            }
+                            return res.data;
+                        }
+                    } catch (e) {
+                        console.warn('Server coupon validation RPC fallback:', e);
+                    }
+                }
+                return this.validateCoupon(cleanCode, numSubtotal);
+            },
+
             validateCoupon: function (code, subtotal) {
                 var cleanCode = (code || '').trim().toUpperCase();
                 var numSubtotal = parseFloat(subtotal) || 0;

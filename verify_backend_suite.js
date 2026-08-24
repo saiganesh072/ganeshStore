@@ -321,18 +321,22 @@ test('Newsletter & Contact Subsystem: Validation & Deduplication', async () => {
     assert.strictEqual(contactRes.success, true);
 });
 
-test('Coupons Subsystem: Promo Code Verification & Thresholds', () => {
+test('Coupons Subsystem: Promo Code Verification & Thresholds', async () => {
     // Percentage
     const c1 = BS.coupons.validateCoupon('SAVE10', 100);
     assert.strictEqual(c1.valid, true);
     assert.strictEqual(c1.discountAmount, 10);
 
+    // Async validation
+    const cAsync = await BS.coupons.validateCouponAsync('SAVE10', 100);
+    assert.strictEqual(cAsync.valid, true);
+
     // Fixed with minSpend Met
-    const c2 = BS.coupons.validateCoupon('GANESH20', 80);
+    const c2 = BS.coupons.validateCoupon('GANESH20', 60);
     assert.strictEqual(c2.valid, true);
     assert.strictEqual(c2.discountAmount, 20);
 
-    // Fixed with minSpend NOT Met
+    // Fixed with minSpend Not Met
     const c3 = BS.coupons.validateCoupon('GANESH20', 30);
     assert.strictEqual(c3.valid, false);
 
