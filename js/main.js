@@ -5732,6 +5732,93 @@ function initProductCatalogPagination() {
     renderPagination();
 }
 
+// =================================================================
+// RECOMMENDATION CONTAINERS (RECENTLY VIEWED & RELATED PRODUCTS)
+// =================================================================
+function initRecommendationContainers() {
+    // 1. Tag or establish #relatedProducts container
+    var $relatedSec = $('.sec-relate-product');
+    if ($relatedSec.length) {
+        $relatedSec.attr('id', 'relatedProducts');
+        $relatedSec.attr('data-recommendation-type', 'related-products');
+    }
+
+    // 2. Manage Recently Viewed Items on PDP
+    var $detailSec = $('.sec-product-detail');
+    if ($detailSec.length) {
+        var prodTitle = $('.js-name-detail').first().text().trim();
+        var prodPrice = $detailSec.find('.mtext-106').first().text().trim();
+        var prodImg = $('.item-slick3 img').first().attr('src') || 'images/product-01.jpg';
+        var currentUrl = window.location.pathname.split('/').pop() || 'product-detail.html';
+
+        if (prodTitle) {
+            var recentlyViewed = [];
+            try {
+                recentlyViewed = JSON.parse(localStorage.getItem('ganeshStore_recently_viewed') || '[]');
+            } catch (e) {}
+
+            // Remove current if exists, then unshift
+            recentlyViewed = recentlyViewed.filter(function(p) { return p.name !== prodTitle; });
+            recentlyViewed.unshift({
+                name: prodTitle,
+                price: prodPrice,
+                image: prodImg,
+                url: currentUrl
+            });
+            if (recentlyViewed.length > 6) recentlyViewed = recentlyViewed.slice(0, 6);
+
+            try {
+                localStorage.setItem('ganeshStore_recently_viewed', JSON.stringify(recentlyViewed));
+            } catch (e) {}
+
+            // 3. Render #recentlyViewedProducts section if items exist
+            var otherItems = recentlyViewed.filter(function(p) { return p.name !== prodTitle; });
+            if (otherItems.length > 0) {
+                if ($('#recentlyViewedProducts').length === 0) {
+                    var rvHtml = 
+                        '<section class="sec-recently-viewed bg0 p-t-30 p-b-80" id="recentlyViewedProducts" data-recommendation-type="recently-viewed">' +
+                        '  <div class="container">' +
+                        '    <div class="p-b-35">' +
+                        '      <h3 class="ltext-106 cl5 txt-center" style="font-family:Poppins-Bold;">Recently Viewed</h3>' +
+                        '    </div>' +
+                        '    <div class="row recently-viewed-grid" id="recentlyViewedGrid"></div>' +
+                        '  </div>' +
+                        '</section>';
+                    if ($relatedSec.length) {
+                        $relatedSec.after(rvHtml);
+                    } else {
+                        $detailSec.after(rvHtml);
+                    }
+                }
+
+                var cardsHtml = '';
+                otherItems.slice(0, 4).forEach(function(item) {
+                    var safeName = window.DOMSanitizer ? window.DOMSanitizer.escapeHTML(item.name) : item.name;
+                    var safePrice = window.DOMSanitizer ? window.DOMSanitizer.escapeHTML(item.price) : item.price;
+                    var safeUrl = window.DOMSanitizer ? window.DOMSanitizer.sanitizeUrl(item.url) : item.url;
+                    var safeImg = item.image || 'images/product-01.jpg';
+
+                    cardsHtml += 
+                        '<div class="col-sm-6 col-md-4 col-lg-3 p-b-35">' +
+                        '  <div class="block2">' +
+                        '    <div class="block2-pic hov-img0">' +
+                        '      <a href="' + safeUrl + '"><img src="' + safeImg + '" alt="' + safeName + '" loading="lazy" style="width:100%; height:auto; aspect-ratio:1200/1486; object-fit:cover;"></a>' +
+                        '    </div>' +
+                        '    <div class="block2-txt flex-w flex-t p-t-14">' +
+                        '      <div class="block2-txt-child1 flex-col-l">' +
+                        '        <a href="' + safeUrl + '" class="stext-104 cl4 hov-cl1 trans-04 js-name-b2 p-b-6" style="font-weight:600;">' + safeName + '</a>' +
+                        '        <span class="stext-105 cl3">' + safePrice + '</span>' +
+                        '      </div>' +
+                        '    </div>' +
+                        '  </div>' +
+                        '</div>';
+                });
+                $('#recentlyViewedGrid').html(cardsHtml);
+            }
+        }
+    }
+}
+
 // Initialize Batch 2 & Enhanced Luxury Features on Document Ready
 $(document).ready(function() {
     initSmartLiveSearch();
@@ -5746,6 +5833,7 @@ $(document).ready(function() {
     initStickyMobileAddToCart();
     initStockUrgencyEngine();
     initProductCatalogPagination();
+    initRecommendationContainers();
 
     // Add dashboard-load section after Our Blogs on home page after 4 seconds
     if ($('.section-slide').length > 0) {

@@ -196,6 +196,11 @@ try {
     assert(mainCssContent.includes('.catalog-pagination-container') && mainCssContent.includes('.pagination-btn'), 'main.css styles catalog pagination container and pill buttons.');
     assert(mainJsContent.includes('catalog-pagination-summary') && mainJsContent.includes('aria-label="Product Catalog Pagination"'), 'Pagination contains accessible summary and ARIA navigation labels.');
 
+    console.log('\n--- TEST GROUP 9: Semantic Recommendation Containers ---');
+    assert(mainJsContent.includes('initRecommendationContainers'), 'main.js defines initRecommendationContainers.');
+    assert(mainJsContent.includes("'data-recommendation-type', 'related-products'") || mainJsContent.includes('data-recommendation-type="related-products"'), 'Related products container declares data-recommendation-type="related-products".');
+    assert(mainJsContent.includes('data-recommendation-type="recently-viewed"'), 'Recently viewed container declares data-recommendation-type="recently-viewed".');
+
     console.log();
 } catch (e) {
     console.error('[ERROR] Failed to verify DataLayer or Build Pipeline:', e.message);
