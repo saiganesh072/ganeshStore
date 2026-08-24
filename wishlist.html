@@ -48,9 +48,7 @@
     <!--===============================================================================================-->
     <link rel="stylesheet" type="text/css" href="vendor/css-hamburgers/hamburgers.min.css" media="print" onload="this.media='all'" />
   <noscript><link rel="stylesheet" type="text/css" href="vendor/css-hamburgers/hamburgers.min.css" /></noscript>
-    <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="vendor/animsition/css/animsition.min.css" media="print" onload="this.media='all'" />
-  <noscript><link rel="stylesheet" type="text/css" href="vendor/animsition/css/animsition.min.css" /></noscript>
+    <noscript></noscript>
     <!--===============================================================================================-->
     <link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css" media="print" onload="this.media='all'" />
   <noscript><link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css" /></noscript>
@@ -84,7 +82,7 @@
     </script>
   		<link rel="canonical" href="https://ganeshstore.com/wishlist.html" />
 </head>
-  <body class="animsition">
+  <body>
   <a href="#main-content" class="skip-link">Skip to main content</a>
     <h1 class="sr-only">GaneshStore — wishlist</h1>
     <!-- Header -->
@@ -562,13 +560,12 @@
 
     <!--===============================================================================================-->
     <script src="vendor/jquery/jquery-3.2.1.min.js"></script>
-    <!--===============================================================================================-->
-    <script src="vendor/animsition/js/animsition.min.js"></script>
+    
     <!--===============================================================================================-->
     <script src="vendor/bootstrap/js/popper.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
     <!--===============================================================================================-->
-    <script src="vendor/select2/select2.min.js"></script>
+    <script src="vendor/select2/select2.min.js" defer></script>
     <script>
       $(".js-select2").each(function () {
         $(this).select2({
@@ -578,9 +575,9 @@
       });
     </script>
     <!--===============================================================================================-->
-    <script src="vendor/sweetalert/sweetalert.min.js"></script>
+    <script src="vendor/sweetalert/sweetalert.min.js" defer></script>
     <!--===============================================================================================-->
-    <script src="vendor/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="vendor/perfect-scrollbar/perfect-scrollbar.min.js" defer></script>
     <script>
       $(".js-pscroll").each(function () {
         $(this).css("position", "relative");
@@ -597,13 +594,13 @@
       });
     </script>
     <!--===============================================================================================-->
-    <script src="js/main.js?v=1.3"></script>
+    <script src="js/main.js?v=1.3" defer></script>
   
   <!-- Firebase & GaneshStore Auth Engine -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-  <script src="js/auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js" defer></script>
+  <script src="js/auth.js" defer></script>
 
 </body>
 </html>

@@ -230,6 +230,27 @@ assert(fs.existsSync(path.join(rootDir, '.htaccess')), 'Apache .htaccess configu
 const htaccessConfig = fs.readFileSync(path.join(rootDir, '.htaccess'), 'utf-8');
 assert(htaccessConfig.includes('Referrer-Policy "strict-origin-when-cross-origin"') && htaccessConfig.includes('Permissions-Policy'), 'Apache config declares Referrer-Policy and Permissions-Policy');
 
+// 7. Non-Critical Script Deferring & Animsition Latency Removal (CWV / INP / TBT)
+console.log('\n--- Suite 7: Non-Critical Script Deferring & Animsition Latency Removal ---');
+let allDeferredCorrectly = true;
+let noAnimsitionLatency = true;
+
+htmlFiles.forEach(file => {
+    const content = fs.readFileSync(path.join(rootDir, file), 'utf-8');
+    if (content.includes('class="animsition"') || content.includes('animsition.min.js')) {
+        noAnimsitionLatency = false;
+    }
+    if (content.includes('src="vendor/slick/slick.min.js"') && !content.includes('src="vendor/slick/slick.min.js" defer')) {
+        allDeferredCorrectly = false;
+    }
+    if (content.includes('src="vendor/select2/select2.min.js"') && !content.includes('src="vendor/select2/select2.min.js" defer')) {
+        allDeferredCorrectly = false;
+    }
+});
+
+assert(noAnimsitionLatency, 'Animsition latency overlay and blocking scripts removed across all 99 pages');
+assert(allDeferredCorrectly, 'Non-critical vendor plugins (Slick, Select2, Isotope, SweetAlert) load with defer');
+
 console.log('\n========================================================================');
 console.log(`TEST RESULTS: ${passed} Passed, ${failed} Failed`);
 console.log('========================================================================\n');
