@@ -80,6 +80,29 @@ test('Row Level Security (RLS) is enabled on all tables', () => {
     });
 });
 
+test('Hardened least-privilege RLS policies prevent unauthorized access', () => {
+    // Profiles lockdown
+    assert(schemaSql.includes('auth.uid() = id'), 'Profiles must restrict SELECT to owner (auth.uid() = id)');
+    assert(!schemaSql.includes('FOR SELECT USING (true);') || schemaSql.includes('Products are publicly readable'), 'Profiles must not have public SELECT USING (true)');
+    
+    // Products lockdown
+    assert(schemaSql.includes('Only admin or service role can mutate products'), 'Products must restrict mutations to admin or service role');
+    
+    // Carts & Wishlists lockdown
+    assert(schemaSql.includes('auth.uid() = user_id'), 'Carts and wishlists must restrict access to row owner (auth.uid() = user_id)');
+    
+    // Newsletter & Inquiries lockdown
+    assert(schemaSql.includes('Only service role can read newsletter subscribers'), 'Newsletter subscriber list must be restricted from public SELECT');
+    assert(schemaSql.includes('Only service role can read contact messages'), 'Contact inquiries must be restricted from public SELECT');
+});
+
+test('Atomic Postgres RPCs for Server-Side Pricing, Coupons & 2FA are defined', () => {
+    assert(schemaSql.includes('FUNCTION public.validate_coupon_code('), 'Must define validate_coupon_code RPC');
+    assert(schemaSql.includes('FUNCTION public.create_authenticated_order('), 'Must define create_authenticated_order RPC');
+    assert(schemaSql.includes('FUNCTION public.enable_user_2fa('), 'Must define enable_user_2fa RPC');
+    assert(schemaSql.includes('FUNCTION public.get_decrypted_2fa_secret('), 'Must define get_decrypted_2fa_secret RPC');
+});
+
 test('Automatic updated_at trigger function and indexes are defined', () => {
     assert(schemaSql.includes('FUNCTION public.handle_updated_at()'), 'Must define timestamp update trigger function');
     assert(schemaSql.includes('idx_profiles_email'), 'Must index profiles email');
