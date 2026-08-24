@@ -5529,6 +5529,61 @@ function initMiniCartDrawerEngine() {
     renderMiniCart();
 }
 
+// =================================================================
+// STICKY MOBILE ADD-TO-CART ENGINE
+// =================================================================
+function initStickyMobileAddToCart() {
+    var $detailSec = $('.sec-product-detail');
+    var $mainAtcBtn = $('.js-addcart-detail').first();
+    if ($detailSec.length === 0 || $mainAtcBtn.length === 0) return;
+
+    var prodTitle = $('.js-name-detail').first().text().trim() || 'Luxury Product';
+    var prodPrice = $detailSec.find('.mtext-106').first().text().trim() || '$0.00';
+    var prodImg = $('.item-slick3 img').first().attr('src') || 'images/product-01.jpg';
+
+    if ($('#stickyMobileAtc').length === 0) {
+        var stickyHtml = 
+            '<div id="stickyMobileAtc" class="sticky-mobile-atc-bar" role="region" aria-label="Quick Add to Cart">' +
+            '  <div class="sticky-atc-container">' +
+            '    <div class="sticky-atc-thumb"><img src="' + prodImg + '" alt="' + prodTitle + '"></div>' +
+            '    <div class="sticky-atc-info">' +
+            '      <span class="sticky-atc-title">' + prodTitle + '</span>' +
+            '      <span class="sticky-atc-price">' + prodPrice + '</span>' +
+            '    </div>' +
+            '    <button type="button" class="sticky-atc-btn" id="btnStickyMobileAtc" aria-label="Add ' + prodTitle + ' to Cart">' +
+            '      <i class="zmdi zmdi-shopping-cart"></i> Add to Cart' +
+            '    </button>' +
+            '  </div>' +
+            '</div>';
+        $('body').append(stickyHtml);
+    }
+
+    var $stickyBar = $('#stickyMobileAtc');
+
+    $(document).on('click', '#btnStickyMobileAtc', function(e) {
+        e.preventDefault();
+        $mainAtcBtn.trigger('click');
+    });
+
+    $(window).on('scroll resize', function() {
+        if ($(window).width() >= 992) {
+            $stickyBar.removeClass('active');
+            return;
+        }
+
+        var atcOffsetTop = $mainAtcBtn.offset().top + $mainAtcBtn.outerHeight();
+        var scrollTop = $(window).scrollTop();
+        var footerTop = $('footer').length ? $('footer').offset().top : $(document).height();
+        var windowBottom = scrollTop + $(window).height();
+
+        if (scrollTop > atcOffsetTop && windowBottom < footerTop + 60) {
+            $stickyBar.addClass('active');
+        } else {
+            $stickyBar.removeClass('active');
+        }
+    });
+}
+
 // Initialize Batch 2 & Enhanced Luxury Features on Document Ready
 $(document).ready(function() {
     initSmartLiveSearch();
@@ -5540,6 +5595,7 @@ $(document).ready(function() {
     initUniversalNewsletterSystem();
     initUniversalContactSystem();
     initMiniCartDrawerEngine();
+    initStickyMobileAddToCart();
 
     // Add dashboard-load section after Our Blogs on home page after 4 seconds
     if ($('.section-slide').length > 0) {

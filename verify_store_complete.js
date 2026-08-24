@@ -180,6 +180,12 @@ try {
     assert(mainJsContent.includes('mini-cart-plus') && mainJsContent.includes('mini-cart-minus'), 'Mini-cart drawer provides interactive +/- quantity modifiers.');
     assert(backendJsContent.includes('updateQuantity: function'), 'BackendService.cart supports updateQuantity.');
 
+    console.log('\n--- TEST GROUP 6: Sticky Mobile Add-to-Cart Bar ---');
+    const mainCssContent = fs.readFileSync(path.join(__dirname, 'css', 'main.css'), 'utf8');
+    assert(mainJsContent.includes('initStickyMobileAddToCart'), 'main.js defines initStickyMobileAddToCart.');
+    assert(mainCssContent.includes('.sticky-mobile-atc-bar') && mainCssContent.includes('backdrop-filter: blur('), 'main.css styles .sticky-mobile-atc-bar with glassmorphism.');
+    assert(mainCssContent.includes('@media (min-width: 992px)') && mainCssContent.includes('display: none !important;'), 'Sticky bar is hidden on desktop viewports.');
+
     console.log();
 } catch (e) {
     console.error('[ERROR] Failed to verify DataLayer or Build Pipeline:', e.message);
