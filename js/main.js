@@ -527,11 +527,68 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         // 4. Open modal
         $modal.find('.js-addcart-detail').off('click');
         $modal.addClass('show-modal1');
+        if (typeof trapModalFocus === 'function') {
+            trapModalFocus($modal, $btn);
+        }
     });
 
     $('.js-hide-modal1').on('click', function() {
-        $('.js-modal1').removeClass('show-modal1');
+        if (typeof closeAccessibleModal === 'function') {
+            closeAccessibleModal($('.js-modal1'));
+        } else {
+            $('.js-modal1').removeClass('show-modal1');
+        }
     });
+
+    /*==================================================================
+    [ Modal Accessibility Focus Trapping & Restoration (WCAG 2.2 AA) ]*/
+    var lastModalTrigger = null;
+
+    window.trapModalFocus = function($modal, $trigger) {
+        if ($trigger) lastModalTrigger = $trigger;
+        var focusableSel = 'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+        
+        setTimeout(function() {
+            var $focusables = $modal.find(focusableSel).filter(':visible');
+            if ($focusables.length) {
+                $focusables.first().focus();
+            }
+        }, 120);
+
+        $modal.off('keydown.trapFocus').on('keydown.trapFocus', function(e) {
+            if (e.key === 'Tab' || e.keyCode === 9) {
+                var $focusables = $modal.find(focusableSel).filter(':visible');
+                if (!$focusables.length) return;
+                var first = $focusables[0];
+                var last = $focusables[$focusables.length - 1];
+
+                if (e.shiftKey) {
+                    if (document.activeElement === first) {
+                        e.preventDefault();
+                        last.focus();
+                    }
+                } else {
+                    if (document.activeElement === last) {
+                        e.preventDefault();
+                        first.focus();
+                    }
+                }
+            } else if (e.key === 'Escape' || e.keyCode === 27) {
+                closeAccessibleModal($modal);
+            }
+        });
+    };
+
+    window.closeAccessibleModal = function($modal) {
+        $modal.removeClass('show-modal1 show-modal-search show-header-cart show-sidebar');
+        $modal.off('keydown.trapFocus');
+        if (lastModalTrigger && $(lastModalTrigger).length) {
+            try {
+                $(lastModalTrigger).focus();
+            } catch (err) {}
+            lastModalTrigger = null;
+        }
+    };
 
     /*==================================================================
     [ Click block2 image to go to PDP ]*/

@@ -154,6 +154,26 @@ assert(heroNotLazy, 'LCP above-the-fold hero images are eager loaded without laz
 const sampleProductHtml = fs.readFileSync(path.join(rootDir, 'product.html'), 'utf-8');
 assert(sampleProductHtml.includes('width="1200"') && sampleProductHtml.includes('height="1486"'), 'Product grid images declare explicit width and height attributes to prevent CLS');
 
+// 3d. Modal Accessibility & Keyboard Focus Trapping (WCAG 2.2 AA)
+console.log('\n--- Suite 3d: Modal Dialog ARIA & Keyboard Focus Trapping ---');
+let allModalsAriaCompliant = true;
+htmlFiles.forEach(file => {
+    const content = fs.readFileSync(path.join(rootDir, file), 'utf-8');
+    if (content.includes('js-modal1') && !content.includes('role="dialog"')) {
+        allModalsAriaCompliant = false;
+    }
+    if (content.includes('modal-search-header') && !content.includes('role="dialog"')) {
+        allModalsAriaCompliant = false;
+    }
+    if (content.includes('js-panel-cart') && !content.includes('role="dialog"')) {
+        allModalsAriaCompliant = false;
+    }
+});
+assert(allModalsAriaCompliant, 'Search modals, Quick View popups, and Cart drawers declare role="dialog" and aria-modal="true"');
+
+const jsMainContent = fs.readFileSync(path.join(rootDir, 'js', 'main.js'), 'utf-8');
+assert(jsMainContent.includes('trapModalFocus') && jsMainContent.includes('closeAccessibleModal'), 'main.js implements keyboard focus trapping and focus restoration on close');
+
 // 4. Link & Asset Integrity
 console.log('\n--- Suite 4: Broken Link & Asset Resolution ---');
 let brokenLinks = 0;
