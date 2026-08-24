@@ -62,6 +62,42 @@ assert(allHaveJsonLd, 'All HTML files embed schema.org JSON-LD Structured Data')
 assert(allHaveH1, 'All HTML files contain accessible <h1> heading hierarchy');
 assert(allTargetBlankSecure, 'All target="_blank" links include rel="noopener noreferrer" for security');
 
+// 2b. Granular JSON-LD Schemas (Breadcrumbs, Sitelinks Search, FAQPage, ContactPage)
+const pHome = fs.readFileSync(path.join(rootDir, 'index.html'), 'utf-8');
+assert(pHome.includes('"SearchAction"') && pHome.includes('"WebSite"'), 'index.html contains WebSite + SearchAction (Sitelinks Searchbox) schema');
+
+const pReturns = fs.readFileSync(path.join(rootDir, 'returns.html'), 'utf-8');
+assert(pReturns.includes('"FAQPage"'), 'returns.html contains FAQPage JSON-LD schema');
+
+const pShipping = fs.readFileSync(path.join(rootDir, 'shipping.html'), 'utf-8');
+assert(pShipping.includes('"FAQPage"'), 'shipping.html contains FAQPage JSON-LD schema');
+
+const pContact = fs.readFileSync(path.join(rootDir, 'contact.html'), 'utf-8');
+assert(pContact.includes('"ContactPage"'), 'contact.html contains ContactPage JSON-LD schema');
+
+let pdpBreadcrumbsValid = true;
+const pdpFiles = htmlFiles.filter(f => f.startsWith('p-') || f === 'product-detail.html' || f === 'product.html');
+pdpFiles.forEach(f => {
+    const c = fs.readFileSync(path.join(rootDir, f), 'utf-8');
+    if (!c.includes('"BreadcrumbList"')) pdpBreadcrumbsValid = false;
+});
+assert(pdpBreadcrumbsValid, 'All 67 product detail pages and catalog pages contain BreadcrumbList JSON-LD schema');
+
+let allJsonLdParseValid = true;
+htmlFiles.forEach(file => {
+    const html = fs.readFileSync(path.join(rootDir, file), 'utf-8');
+    const regex = /<script\s+type=["']application\/ld\+json["']>([\s\S]*?)<\/script>/gi;
+    let match;
+    while ((match = regex.exec(html)) !== null) {
+        try {
+            JSON.parse(match[1].trim());
+        } catch (e) {
+            allJsonLdParseValid = false;
+        }
+    }
+});
+assert(allJsonLdParseValid, 'All embedded JSON-LD blocks across all 99 pages parse as valid schema.org JSON');
+
 // 3. CSS Accessibility & Focus Rules
 console.log('\n--- Suite 3: CSS WCAG 2.2 AA Accessibility & Focus Rules ---');
 const mainCss = fs.readFileSync(path.join(rootDir, 'css', 'main.css'), 'utf-8');
