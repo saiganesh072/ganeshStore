@@ -590,6 +590,85 @@ Input, textarea : 14px/1.6 '', Arial, sans-serif;
   }
 }
 
+/* =================================================================
+   SKELETON SHIMMER PLACEHOLDER ENGINE
+   ================================================================= */
+@keyframes skeletonShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s infinite;
+  border-radius: 6px;
+}
+.skeleton-card {
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+.skeleton-card .skeleton-img {
+  width: 100%;
+  padding-top: 125%;
+  border-radius: 8px;
+}
+.skeleton-card .skeleton-title {
+  height: 18px;
+  width: 75%;
+  margin-top: 14px;
+  margin-bottom: 8px;
+}
+.skeleton-card .skeleton-price {
+  height: 16px;
+  width: 40%;
+}
+
+/* =================================================================
+   REAL STOCK URGENCY PILL
+   ================================================================= */
+.stock-urgency-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: Poppins-Medium, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  margin-top: 12px;
+  margin-bottom: 15px;
+  transition: all 0.3s ease;
+}
+.stock-urgency-badge.low-stock {
+  background: #fff3e0;
+  color: #e65100;
+  border: 1px solid #ffe082;
+  animation: lowStockPulse 2s infinite ease-in-out;
+}
+.stock-urgency-badge.in-stock {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+.stock-urgency-badge.out-of-stock {
+  background: #fce4ec;
+  color: #c2185b;
+  border: 1px solid #f8bbd0;
+}
+@keyframes lowStockPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(230, 81, 0, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(230, 81, 0, 0);
+  }
+}
+
 .main-menu > li:hover > .sub-menu {
   visibility: visible;
   opacity: 1;

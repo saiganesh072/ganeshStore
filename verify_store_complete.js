@@ -186,6 +186,11 @@ try {
     assert(mainCssContent.includes('.sticky-mobile-atc-bar') && mainCssContent.includes('backdrop-filter: blur('), 'main.css styles .sticky-mobile-atc-bar with glassmorphism.');
     assert(mainCssContent.includes('@media (min-width: 992px)') && mainCssContent.includes('display: none !important;'), 'Sticky bar is hidden on desktop viewports.');
 
+    console.log('\n--- TEST GROUP 7: Skeleton Loaders & Real Stock Urgency Badges ---');
+    assert(mainJsContent.includes('showProductGridSkeletons') && mainJsContent.includes('initStockUrgencyEngine'), 'main.js defines skeleton loader and stock urgency engines.');
+    assert(mainCssContent.includes('.skeleton-shimmer') && mainCssContent.includes('@keyframes skeletonShimmer'), 'main.css defines animated skeleton shimmer effect.');
+    assert(mainCssContent.includes('.stock-urgency-badge') && mainCssContent.includes('.low-stock'), 'main.css styles real stock urgency pulse badges.');
+
     console.log();
 } catch (e) {
     console.error('[ERROR] Failed to verify DataLayer or Build Pipeline:', e.message);

@@ -5584,6 +5584,53 @@ function initStickyMobileAddToCart() {
     });
 }
 
+// =================================================================
+// SKELETON LOADERS & REAL STOCK URGENCY ENGINE
+// =================================================================
+function showProductGridSkeletons($container, count) {
+    if (!$container || $container.length === 0) return;
+    count = count || 8;
+    var html = '';
+    for (var i = 0; i < count; i++) {
+        html += 
+            '<div class="col-sm-6 col-md-4 col-lg-3 p-b-35 skeleton-card-item">' +
+            '  <div class="skeleton-card">' +
+            '    <div class="skeleton-img skeleton-shimmer"></div>' +
+            '    <div class="skeleton-title skeleton-shimmer"></div>' +
+            '    <div class="skeleton-price skeleton-shimmer"></div>' +
+            '  </div>' +
+            '</div>';
+    }
+    $container.html(html);
+}
+window.showProductGridSkeletons = showProductGridSkeletons;
+
+function initStockUrgencyEngine() {
+    var $detailSec = $('.sec-product-detail');
+    if ($detailSec.length === 0) return;
+
+    var prodName = $('.js-name-detail').first().text().trim();
+    if (!prodName || !window.BackendService) return;
+
+    var prod = window.BackendService.products.getProductByName(prodName);
+    var stock = (prod && typeof prod.stock_quantity === 'number') ? prod.stock_quantity : ((prod && typeof prod.stock === 'number') ? prod.stock : 4);
+
+    if ($('.stock-urgency-badge').length === 0) {
+        var badgeHtml = '';
+        if (stock > 0 && stock <= 5) {
+            badgeHtml = '<div class="stock-urgency-badge low-stock" role="status"><i class="zmdi zmdi-fire"></i> Only ' + stock + ' items left in stock - order soon!</div>';
+        } else if (stock > 5) {
+            badgeHtml = '<div class="stock-urgency-badge in-stock" role="status"><i class="zmdi zmdi-check-circle"></i> In Stock & Ready for Express Dispatch</div>';
+        } else if (stock === 0) {
+            badgeHtml = '<div class="stock-urgency-badge out-of-stock" role="status"><i class="zmdi zmdi-time-restore"></i> Backorder - Reserve Now for Priority Allocation</div>';
+        }
+
+        if (badgeHtml) {
+            $detailSec.find('.mtext-106').first().after(badgeHtml);
+        }
+    }
+}
+
 // Initialize Batch 2 & Enhanced Luxury Features on Document Ready
 $(document).ready(function() {
     initSmartLiveSearch();
@@ -5596,6 +5643,7 @@ $(document).ready(function() {
     initUniversalContactSystem();
     initMiniCartDrawerEngine();
     initStickyMobileAddToCart();
+    initStockUrgencyEngine();
 
     // Add dashboard-load section after Our Blogs on home page after 4 seconds
     if ($('.section-slide').length > 0) {
