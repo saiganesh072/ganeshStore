@@ -212,6 +212,24 @@ htmlFiles.forEach(file => {
 });
 assert(allHaveCanonical, 'All HTML pages contain unified global canonical tags');
 
+// 6. HTTP Security Headers Configurations (Netlify, Vercel, Nginx, Apache)
+console.log('\n--- Suite 6: Production HTTP Security Headers & CSP Allowlist ---');
+assert(fs.existsSync(path.join(rootDir, '_headers')), 'Netlify _headers file exists');
+const netlifyHeaders = fs.readFileSync(path.join(rootDir, '_headers'), 'utf-8');
+assert(netlifyHeaders.includes('Content-Security-Policy-Report-Only') && netlifyHeaders.includes('Strict-Transport-Security'), 'Netlify headers include CSP Report-Only and HSTS');
+
+assert(fs.existsSync(path.join(rootDir, 'vercel.json')), 'Vercel vercel.json configuration exists');
+const vercelConfig = JSON.parse(fs.readFileSync(path.join(rootDir, 'vercel.json'), 'utf-8'));
+assert(Array.isArray(vercelConfig.headers) && vercelConfig.headers[0].headers.length >= 6, 'Vercel configuration declares all 6 essential security headers');
+
+assert(fs.existsSync(path.join(rootDir, 'nginx.conf')), 'Nginx production configuration exists');
+const nginxConfig = fs.readFileSync(path.join(rootDir, 'nginx.conf'), 'utf-8');
+assert(nginxConfig.includes('X-Frame-Options "DENY"') && nginxConfig.includes('X-Content-Type-Options "nosniff"'), 'Nginx config declares X-Frame-Options and X-Content-Type-Options');
+
+assert(fs.existsSync(path.join(rootDir, '.htaccess')), 'Apache .htaccess configuration exists');
+const htaccessConfig = fs.readFileSync(path.join(rootDir, '.htaccess'), 'utf-8');
+assert(htaccessConfig.includes('Referrer-Policy "strict-origin-when-cross-origin"') && htaccessConfig.includes('Permissions-Policy'), 'Apache config declares Referrer-Policy and Permissions-Policy');
+
 console.log('\n========================================================================');
 console.log(`TEST RESULTS: ${passed} Passed, ${failed} Failed`);
 console.log('========================================================================\n');
