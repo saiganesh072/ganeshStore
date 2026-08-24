@@ -167,9 +167,15 @@ try {
         'ACDL public event helpers (AddToCart, Purchase, RemoveFromCart, UserLogin) are exposed.'
     );
 
+    console.log('\n--- TEST GROUP 4: Production Build Pipeline & Asset Bundling ---');
+    assert(fs.existsSync(path.join(__dirname, 'build.js')), 'build.js production pipeline script exists.');
+    assert(fs.existsSync(path.join(__dirname, 'dist', 'css', 'bundle.min.css')), 'dist/css/bundle.min.css is generated.');
+    assert(fs.existsSync(path.join(__dirname, 'dist', 'js', 'core.min.js')), 'dist/js/core.min.js is generated.');
+    assert(fs.existsSync(path.join(__dirname, 'dist', 'manifest.json')), 'dist/manifest.json asset manifest exists.');
+
     console.log();
 } catch (e) {
-    console.error('[ERROR] Failed to verify DataLayer:', e.message);
+    console.error('[ERROR] Failed to verify DataLayer or Build Pipeline:', e.message);
     failedTests++;
 }
 
