@@ -54,42 +54,73 @@
     var pageType = getPageType();
     var pageName = getPageName(pageType);
 
-    // Prepare Page Details
+    // 4a. Prepare Enterprise Page Details
     var pageInfo = {
       pageName: pageName,
       pageType: pageType,
       pageTitle: document.title,
       pageURL: window.location.href,
       pagePath: window.location.pathname,
+      domain: window.location.hostname,
+      protocol: window.location.protocol,
       referrer: document.referrer,
-      language: document.documentElement.lang || navigator.language || 'en',
+      language: document.documentElement.lang || navigator.language || 'en-US',
+      currency: 'USD',
+      siteSection: pageType,
+      siteSubSection: document.title.split('-')[0]?.trim() || pageType,
+      environment: (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'development' : 'production',
       timestamp: Date.now()
     };
 
-    // Prepare Visitor Context
+    // 4b. Prepare Visitor & Device Details
     var visitorInfo = {
       userAgent: navigator.userAgent,
       viewportWidth: window.innerWidth,
       viewportHeight: window.innerHeight,
-      screenResolution: window.screen.width + 'x' + window.screen.height
+      screenResolution: window.screen.width + 'x' + window.screen.height,
+      deviceType: window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop'
     };
 
-    // Prepare E-commerce Context
+    // 4c. Prepare User Context
+    var rawWishlist = localStorage.getItem('wishlist');
+    var wishlistItems = [];
+    try { wishlistItems = JSON.parse(rawWishlist) || []; } catch(e) {}
+
+    var userInfo = {
+      loggedIn: localStorage.getItem('user') === 'loggedin',
+      userType: localStorage.getItem('user') === 'loggedin' ? 'authenticated' : 'guest',
+      wishlistItemsCount: wishlistItems.length
+    };
+
+    var userProfile = null;
+    try {
+      userProfile = JSON.parse(localStorage.getItem('userProfile'));
+    } catch (e) {}
+
+    if (userProfile) {
+      userInfo.userId = userProfile.id || userProfile.email || '';
+      userInfo.email = userProfile.email || '';
+      userInfo.name = userProfile.name || '';
+      userInfo.loyaltyTier = userProfile.loyaltyTier || 'Standard';
+      userInfo.accountCreated = userProfile.created_at || '2026-01-01';
+    }
+
+    // 4d. Prepare E-commerce Context
     var ecommerceInfo = {};
 
-    // 4a. Product Details Scraping (Product Detail Pages)
+    // Product Details Scraping (Product Detail Pages)
     if (pageType === 'product-detail') {
       var urlParams = new URLSearchParams(window.location.search);
       var urlSku = urlParams.get('SKUID') || urlParams.get('skuID') || urlParams.get('skuid') || urlParams.get('SKU') || urlParams.get('sku');
 
       var pName = document.querySelector('.js-name-detail')?.innerText?.trim() || '';
-      var pPrice = document.querySelector('.mtext-106')?.innerText?.trim() || '';
+      var pPriceText = document.querySelector('.mtext-106')?.innerText?.trim() || '';
+      var priceNum = parseFloat(pPriceText.replace(/[^\d.]/g, '')) || 0;
       var pId = document.querySelector('.js-addcart-detail')?.getAttribute('data-product-id') || '';
       
       var sku = urlSku || '';
-      var categories = [];
+      var categories = ['Fashion'];
       
-      // Scrape SKU and Categories from supplementary spans
       document.querySelectorAll('span').forEach(function (el) {
         var text = el.innerText || '';
         if (!sku && text.indexOf('SKU:') !== -1) {
@@ -111,7 +142,6 @@
 
       var finalSku = urlSku || sku || pId || 'GS001';
 
-      // Auto-append ?SKUID= to URL if missing
       if (!urlSku) {
         urlParams.set('SKUID', finalSku);
         var newUrl = window.location.pathname + '?' + urlParams.toString() + window.location.hash;
@@ -121,6 +151,9 @@
         pageInfo.pageURL = window.location.href;
       }
 
+      var selectedSize = document.querySelector('select[name="time"]')?.value || 'Size M';
+      var selectedColor = document.querySelectorAll('select[name="time"]')[1]?.value || 'Default';
+
       ecommerceInfo.productInfo = {
         id: pId,
         productId: pId,
@@ -128,12 +161,22 @@
         SKUID: finalSku,
         skuID: finalSku,
         name: pName,
-        price: pPrice,
-        categories: categories
+        price: pPriceText,
+        priceValue: priceNum,
+        currency: 'USD',
+        brand: 'GaneshStore',
+        stockStatus: 'in_stock',
+        rating: 4.8,
+        reviewsCount: 14,
+        categories: categories,
+        primaryCategory: categories[0] || 'Fashion',
+        selectedSize: selectedSize,
+        selectedColor: selectedColor,
+        imageUrl: document.querySelector('.item-slick3 img, .wrap-pic-w img')?.getAttribute('src') || 'images/product-01.jpg'
       };
     }
 
-    // 4b. Cart Status Scraping (Shopping Cart / All Pages LocalStorage check)
+    // Cart Status Scraping (All Pages LocalStorage check)
     var rawCart = localStorage.getItem('cartItems');
     var cartItems = [];
     if (rawCart) {
@@ -147,24 +190,36 @@
     if (cartItems.length > 0) {
       var totalAmount = 0;
       var cleanItems = cartItems.map(function (item) {
-        var itemPrice = parseFloat((item.price || '0').replace('$', '').trim());
+        var itemPrice = parseFloat((item.price || '0').replace(/[^\d.]/g, '')) || 0;
         var quantity = parseInt(item.quantity || 1, 10);
-        totalAmount += itemPrice * quantity;
+        var itemTotal = itemPrice * quantity;
+        totalAmount += itemTotal;
 
         return {
-          id: item.id || '',
+          id: item.id || 'GS001',
+          productId: item.id || 'GS001',
+          sku: item.id || 'GS001',
           name: item.name || '',
           price: item.price || '',
+          priceValue: itemPrice,
           quantity: quantity,
+          itemTotal: itemTotal,
           size: item.size || '',
-          color: item.color || ''
+          color: item.color || '',
+          brand: 'GaneshStore',
+          image: item.image || ''
         };
       });
 
       ecommerceInfo.cartInfo = {
+        cartId: 'cart_' + (cartItems[0]?.id || 'guest'),
         items: cleanItems,
+        totalUniqueItems: cleanItems.length,
         totalItemsCount: cleanItems.reduce(function (acc, curr) { return acc + curr.quantity; }, 0),
-        totalAmount: '$' + totalAmount.toFixed(2)
+        subtotal: totalAmount,
+        totalAmount: '$' + totalAmount.toFixed(2),
+        currency: 'USD',
+        isFreeShipping: totalAmount >= 100
       };
 
       // Push initial State update to ACDL
@@ -177,6 +232,7 @@
     var pageLoadPayload = {
       event: 'pageLoaded',
       page: pageInfo,
+      user: userInfo,
       visitor: visitorInfo,
       timestamp: Date.now()
     };
@@ -186,7 +242,7 @@
 
     window.adobeDataLayer.push(pageLoadPayload);
 
-    // 6. Print gorgeous developer console logs
+    // 6. Print developer console logs
     console.log(
       '%c📊 Adobe Client Data Layer - Event "pageLoaded" Pushed',
       'background: #107c41; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-family: sans-serif;',
@@ -276,13 +332,196 @@
     // State Update and Event Push
     window.adobeDataLayer.push(clickPayload);
 
-    // Print gorgeous console logs
+    // Print developer console logs
     console.log(
       '%c🖱️ Adobe Client Data Layer - Event "linkClicked" Pushed',
       'background: #0078d4; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-family: sans-serif;',
       clickPayload
     );
   }
+
+  // ==================================================================
+  // ACDL PUBLIC EVENT HELPERS FOR LAUNCH RULE ENGINE
+  // ==================================================================
+  
+  // Helper to push Add to Cart event to ACDL
+  window.trackACDLAddToCart = function (productInfo) {
+    window.adobeDataLayer = window.adobeDataLayer || [];
+    window.adobeDataLayer.push({
+      event: 'addToCart',
+      cartItem: productInfo,
+      timestamp: Date.now()
+    });
+    console.log(
+      '%c🛒 ACDL - Event "addToCart" Pushed',
+      'background: #e65100; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;',
+      productInfo
+    );
+  };
+
+  // Helper to push Remove from Cart event to ACDL
+  window.trackACDLRemoveFromCart = function (productInfo) {
+    window.adobeDataLayer = window.adobeDataLayer || [];
+    window.adobeDataLayer.push({
+      event: 'removeFromCart',
+      cartItem: productInfo,
+      timestamp: Date.now()
+    });
+    console.log(
+      '%c🗑️ ACDL - Event "removeFromCart" Pushed',
+      'background: #c62828; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;',
+      productInfo
+    );
+  };
+
+  // Helper to push Purchase Completed event to ACDL
+  window.trackACDLPurchase = function (transactionInfo) {
+    window.adobeDataLayer = window.adobeDataLayer || [];
+    window.adobeDataLayer.push({
+      event: 'purchaseCompleted',
+      transaction: transactionInfo,
+      timestamp: Date.now()
+    });
+    console.log(
+      '%c🎉 ACDL - Event "purchaseCompleted" Pushed',
+      'background: #2e7d32; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;',
+      transactionInfo
+    );
+  };
+
+  // Helper to push User Login event to ACDL
+  window.trackACDLUserLogin = function (userInfo) {
+    window.adobeDataLayer = window.adobeDataLayer || [];
+    window.adobeDataLayer.push({
+      event: 'userLogin',
+      user: userInfo,
+      timestamp: Date.now()
+    });
+    console.log(
+      '%c👤 ACDL - Event "userLogin" Pushed',
+      'background: #6a1b9a; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;',
+      userInfo
+    );
+  };
+
+  // Helper to push Search Initiated event to ACDL
+  window.trackACDLSearch = function (searchTerm, resultsCount, categoryFilter) {
+    window.adobeDataLayer = window.adobeDataLayer || [];
+    var payload = {
+      event: 'searchInitiated',
+      search: {
+        keyword: searchTerm || '',
+        resultsCount: typeof resultsCount === 'number' ? resultsCount : 0,
+        categoryFilter: categoryFilter || 'All',
+        timestamp: Date.now()
+      }
+    };
+    window.adobeDataLayer.push(payload);
+    console.log(
+      '%c🔍 ACDL - Event "searchInitiated" Pushed',
+      'background: #0288d1; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;',
+      payload
+    );
+  };
+
+  // Helper to push Checkout Step event to ACDL
+  window.trackACDLCheckoutStep = function (stepNumber, stepName, cartTotal, paymentMethod) {
+    window.adobeDataLayer = window.adobeDataLayer || [];
+    var payload = {
+      event: 'checkoutStep',
+      checkout: {
+        stepNumber: stepNumber || 1,
+        stepName: stepName || 'Billing & Shipping',
+        cartTotal: cartTotal || 0,
+        paymentMethod: paymentMethod || 'credit_card',
+        timestamp: Date.now()
+      }
+    };
+    window.adobeDataLayer.push(payload);
+    console.log(
+      '%c💳 ACDL - Event "checkoutStep" Pushed',
+      'background: #7b1fa2; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;',
+      payload
+    );
+  };
+
+  // Helper to push Promo Code Applied event to ACDL
+  window.trackACDLPromoCode = function (couponCode, discountAmount, isValid, rejectionReason) {
+    window.adobeDataLayer = window.adobeDataLayer || [];
+    var payload = {
+      event: 'promoCodeApplied',
+      promo: {
+        code: couponCode || '',
+        discount: discountAmount || 0,
+        isValid: !!isValid,
+        rejectionReason: rejectionReason || '',
+        timestamp: Date.now()
+      }
+    };
+    window.adobeDataLayer.push(payload);
+    console.log(
+      '%c🏷️ ACDL - Event "promoCodeApplied" Pushed',
+      'background: #f57c00; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;',
+      payload
+    );
+  };
+
+  // Helper to push Wishlist Toggle event to ACDL
+  window.trackACDLWishlistToggle = function (productInfo, action) {
+    window.adobeDataLayer = window.adobeDataLayer || [];
+    var payload = {
+      event: 'wishlistToggled',
+      wishlistItem: {
+        id: productInfo?.id || productInfo?.productId || 'GS001',
+        name: productInfo?.name || '',
+        price: productInfo?.price || '',
+        action: action || 'added',
+        timestamp: Date.now()
+      }
+    };
+    window.adobeDataLayer.push(payload);
+    console.log(
+      '%c❤️ ACDL - Event "wishlistToggled" Pushed',
+      'background: #d81b60; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;',
+      payload
+    );
+  };
+
+  // Helper to push Product View event to ACDL
+  window.trackACDLProductView = function (productInfo) {
+    window.adobeDataLayer = window.adobeDataLayer || [];
+    var payload = {
+      event: 'productView',
+      product: productInfo,
+      timestamp: Date.now()
+    };
+    window.adobeDataLayer.push(payload);
+    console.log(
+      '%c👁️ ACDL - Event "productView" Pushed',
+      'background: #00897b; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;',
+      payload
+    );
+  };
+
+  // Helper to push Filter Change event to ACDL
+  window.trackACDLFilterChange = function (filterType, filterValue, resultsCount) {
+    window.adobeDataLayer = window.adobeDataLayer || [];
+    var payload = {
+      event: 'filterApplied',
+      filter: {
+        type: filterType || 'category',
+        value: filterValue || 'all',
+        resultsCount: resultsCount || 0,
+        timestamp: Date.now()
+      }
+    };
+    window.adobeDataLayer.push(payload);
+    console.log(
+      '%c🎯 ACDL - Event "filterApplied" Pushed',
+      'background: #546e7a; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;',
+      payload
+    );
+  };
 
   // 8. Bootstrap initialization
   if (document.readyState === 'loading') {
@@ -296,3 +535,5 @@
   }
 
 })();
+
+

@@ -2,6 +2,17 @@
 <html lang="en">
   <head>
     <title>Shopping Cart | GaneshStore — Premium Fashion & Accessories</title>
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="GaneshStore" />
+    <meta property="og:title" content="Shopping Cart | GaneshStore — Premium Fashion & Accessories" />
+    <meta property="og:description" content="Review items in your shopping cart. Free shipping on orders over $100 at GaneshStore." />
+    <meta property="og:image" content="images/icons/logo-01.png" />
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Shopping Cart | GaneshStore — Premium Fashion & Accessories" />
+    <meta name="twitter:description" content="Review items in your shopping cart. Free shipping on orders over $100 at GaneshStore." />
+    <meta name="twitter:image" content="images/icons/logo-01.png" />
     <meta name="description" content="Review items in your shopping cart. Free shipping on orders over $100 at GaneshStore." />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -66,8 +77,26 @@
       async
     ></script>
     <script src="js/datalayer.js"></script>
+
+    <script type="application/ld+json">
+    {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "GaneshStore",
+  "url": "https://ganeshstore.com",
+  "logo": "images/icons/logo-01.png",
+  "description": "Curated luxury fashion atelier, accessories, footwear, and bespoke craftsmanship.",
+  "sameAs": [
+    "https://www.facebook.com/ganeshstore",
+    "https://www.instagram.com/ganeshstore",
+    "https://www.pinterest.com/ganeshstore"
+  ]
+}
+    </script>
+  		<link rel="canonical" href="https://ganeshstore.com/shoping-cart.html" />
 </head>
   <body class="animsition">
+    <h1 class="sr-only">Shopping Cart & Free Shipping Estimator</h1>
     <!-- Header -->
     <header class="header-v4">
     <!-- Announcement Bar -->
@@ -337,13 +366,14 @@
       <div class="bread-crumb flex-w p-l-25 p-r-15 p-t-30 p-lr-0-lg">
         <a href="index.html" class="stext-109 cl8 hov-cl1 trans-04">
           Home
+        <a href="index.html" class="stext-109 cl8 hov-cl1 trans-04">
+          Home
           <i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
         </a>
 
         <span class="stext-109 cl4"> Shoping Cart </span>
       </div>
     </div>
-
     <!-- Shoping Cart -->
     <form id="cart-form" class="bg0 p-t-75 p-b-85">
       <div class="container">
@@ -372,54 +402,6 @@
                     <th class="column-5">Total</th>
                     <th class="column-6" style="text-align: center;">Remove</th>
                   </tr>
-
-                  <!--<tr class="table_row">
-									<td class="column-1">
-										<div class="how-itemcart1">
-											<img src="images/item-cart-04.jpg" alt="IMG">
-										</div>
-									</td>
-									<td class="column-2">Fresh Strawberries</td>
-									<td class="column-3">$ 36.00</td>
-									<td class="column-4">
-										<div class="wrap-num-product flex-w m-l-auto m-r-0">
-											<div class="btn-num-product-down cl8 hov-btn3 trans-04 flex-c-m">
-												<i class="fs-16 zmdi zmdi-minus"></i>
-											</div>
-
-											<input class="mtext-104 cl3 txt-center num-product" type="number" name="num-product1" value="1">
-
-											<div class="btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m">
-												<i class="fs-16 zmdi zmdi-plus"></i>
-											</div>
-										</div>
-									</td>
-									<td class="column-5">$ 36.00</td>
-								</tr>
-
-								<tr class="table_row">
-									<td class="column-1">
-										<div class="how-itemcart1">
-											<img src="images/item-cart-05.jpg" alt="IMG">
-										</div>
-									</td>
-									<td class="column-2">Lightweight Jacket</td>
-									<td class="column-3">$ 16.00</td>
-									<td class="column-4">
-										<div class="wrap-num-product flex-w m-l-auto m-r-0">
-											<div class="btn-num-product-down cl8 hov-btn3 trans-04 flex-c-m">
-												<i class="fs-16 zmdi zmdi-minus"></i>
-											</div>
-
-											<input class="mtext-104 cl3 txt-center num-product" type="number" name="num-product2" value="1">
-
-											<div class="btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m">
-												<i class="fs-16 zmdi zmdi-plus"></i>
-											</div>
-										</div>
-									</td>
-									<td class="column-5">$ 16.00</td>
-								</tr>-->
                 </table>
               </div>
 
@@ -431,24 +413,31 @@
                     class="stext-104 cl2 plh4 size-117 bor13 p-lr-20 m-r-10 m-tb-5"
                     type="text"
                     name="coupon"
-                    placeholder="Coupon Code"
+                    placeholder="Coupon Code (e.g. GANESH20, SAVE10)"
                   />
 
                   <div
-                    class="flex-c-m stext-101 cl2 size-118 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-5"
+                    class="flex-c-m stext-101 cl2 size-118 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-5 js-apply-coupon"
                   >
                     Apply coupon
                   </div>
                 </div>
 
-                <div
-                class="flex-c-m stext-101 cl2 size-119 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-10 js-update-cart"
-              >
-                Update Cart
+                <div class="flex-w flex-m">
+                  <div
+                    class="flex-c-m stext-101 cl2 size-119 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-10 m-r-10 js-clear-cart"
+                  >
+                    Clear Cart
+                  </div>
+                  <div
+                    class="flex-c-m stext-101 cl2 size-119 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-10 js-update-cart"
+                  >
+                    Update Cart
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
           <div class="col-sm-10 col-lg-5 col-xl-5 m-lr-auto m-b-50">
             <div
@@ -462,21 +451,42 @@
                 </div>
 
                 <div class="size-209">
-                  <span class="mtext-110 cl2"> $79.65 </span>
+                  <span class="mtext-110 cl2 js-cart-subtotal"> $0.00 </span>
                 </div>
               </div>
 
-              <div class="flex-w flex-t bor12 p-t-15 p-b-30">
+              <div class="flex-w flex-t bor12 p-t-15 p-b-20 js-cart-discount-row" style="display: none; color: #0f766e;">
+                <div class="size-208">
+                  <span class="stext-110 font-weight-bold"> Discount: </span>
+                </div>
+                <div class="size-209">
+                  <span class="stext-110 font-weight-bold js-cart-discount-amount"> - $0.00 </span>
+                </div>
+              </div>
+
+              <div class="flex-w flex-t bor12 p-t-15 p-b-20">
                 <div class="size-208 w-full-ssm">
                   <span class="stext-110 cl2"> Shipping: </span>
                 </div>
 
                 <div class="size-209 p-r-18 p-r-0-sm w-full-ssm">
-                  <p class="stext-111 cl6 p-t-2">
-                    There are no shipping methods available. Please double check
-                    your address, or contact us if you need any help.
+                  <select class="shipping-estimator-select js-cart-shipping-select" id="cartShippingOption">
+                    <option value="standard" selected>Standard Delivery (Free over $100)</option>
+                    <option value="express">Express Priority (+$15.00)</option>
+                    <option value="pickup">Store Pickup (Free)</option>
+                  </select>
+                  <p class="stext-111 cl6 p-t-6 js-shipping-estimate-desc">
+                    Delivered in 3-5 business days across US & Worldwide.
                   </p>
+                </div>
+              </div>
 
+              <div class="flex-w flex-t bor12 p-t-15 p-b-15">
+                <div class="size-208">
+                  <span class="stext-110 cl6"> Estimated Tax: </span>
+                </div>
+                <div class="size-209">
+                  <span class="stext-110 cl2 js-cart-tax"> $0.00 </span>
                 </div>
               </div>
 
@@ -486,15 +496,16 @@
                 </div>
 
                 <div class="size-209 p-t-1">
-                  <span class="mtext-110 cl2"> $79.65 </span>
+                  <span class="mtext-110 cl2 js-cart-grand-total" style="font-family: Poppins-Bold; color: #717fe0; font-size: 22px;"> $0.00 </span>
                 </div>
               </div>
 
-              <button
+              <a
+                href="checkout.html"
                 class="flex-c-m stext-101 cl0 size-116 bg3 bor14 hov-btn3 p-lr-15 trans-04 pointer"
               >
                 Proceed to Checkout
-              </button>
+              </a>
             </div>
           </div>
         </div>
@@ -524,15 +535,12 @@
               <li class="p-b-10">
                 <a href="#" class="stext-107 cl7 hov-cl1 trans-04"> Women </a>
               </li>
-
               <li class="p-b-10">
                 <a href="#" class="stext-107 cl7 hov-cl1 trans-04"> Men </a>
               </li>
-
               <li class="p-b-10">
                 <a href="#" class="stext-107 cl7 hov-cl1 trans-04"> Shoes </a>
               </li>
-
               <li class="p-b-10">
                 <a href="#" class="stext-107 cl7 hov-cl1 trans-04"> Watches </a>
               </li>
@@ -548,17 +556,14 @@
                   Track Order
                 </a>
               </li>
-
               <li class="p-b-10">
                 <a href="#" class="stext-107 cl7 hov-cl1 trans-04"> Returns </a>
               </li>
-
               <li class="p-b-10">
                 <a href="#" class="stext-107 cl7 hov-cl1 trans-04">
                   Shipping
                 </a>
               </li>
-
               <li class="p-b-10">
                 <a href="#" class="stext-107 cl7 hov-cl1 trans-04"> FAQs </a>
               </li>
@@ -567,7 +572,6 @@
 
           <div class="col-sm-6 col-lg-3 p-b-50">
             <h4 class="stext-301 cl0 p-b-30">GET IN TOUCH</h4>
-
             <p class="stext-107 cl7 size-201">
               Any questions? Let us know in store at 8th floor, 379 Hudson St,
               New York, NY 10018 or call us on (+1) 96 716 6879
@@ -577,11 +581,9 @@
               <a href="#" class="fs-18 cl7 hov-cl1 trans-04 m-r-16">
                 <i class="fa fa-facebook"></i>
               </a>
-
               <a href="#" class="fs-18 cl7 hov-cl1 trans-04 m-r-16">
                 <i class="fa fa-instagram"></i>
               </a>
-
               <a href="#" class="fs-18 cl7 hov-cl1 trans-04 m-r-16">
                 <i class="fa fa-pinterest-p"></i>
               </a>
@@ -618,34 +620,28 @@
             <a href="#" class="m-all-1">
               <img src="images/icons/icon-pay-01.png" alt="ICON-PAY" />
             </a>
-
             <a href="#" class="m-all-1">
               <img src="images/icons/icon-pay-02.png" alt="ICON-PAY" />
             </a>
-
             <a href="#" class="m-all-1">
               <img src="images/icons/icon-pay-03.png" alt="ICON-PAY" />
             </a>
-
             <a href="#" class="m-all-1">
               <img src="images/icons/icon-pay-04.png" alt="ICON-PAY" />
             </a>
-
             <a href="#" class="m-all-1">
               <img src="images/icons/icon-pay-05.png" alt="ICON-PAY" />
             </a>
           </div>
 
           <p class="stext-107 cl6 txt-center">
-            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
             Copyright &copy;
             <script>
               document.write(new Date().getFullYear());
             </script>
             All rights reserved | This template is made with
             <i class="fa fa-heart-o" aria-hidden="true"></i> by
-            <a href="https://colorlib.com" target="_blank">Colorlib</a>
-            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+            <a href="https://colorlib.com" target="_blank" rel="noopener noreferrer">Colorlib</a>
           </p>
         </div>
       </div>

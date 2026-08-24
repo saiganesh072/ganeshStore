@@ -3,6 +3,17 @@
 
 <head>
   <title>GaneshStore — Premium Fashion & Accessories | Shop Now</title>
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="GaneshStore" />
+  <meta property="og:title" content="GaneshStore — Premium Fashion & Accessories | Shop Now" />
+  <meta property="og:description" content="Discover the latest in women's and men's luxury fashion, shoes, bags, and watches at GaneshStore. Free shipping on orders over $100." />
+  <meta property="og:image" content="images/product-01.jpg" />
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="GaneshStore — Premium Fashion & Accessories | Shop Now" />
+  <meta name="twitter:description" content="Discover the latest in women's and men's luxury fashion, shoes, bags, and watches at GaneshStore. Free shipping on orders over $100." />
+  <meta name="twitter:image" content="images/product-01.jpg" />
   <meta name="description" content="Discover the latest in women's and men's fashion, shoes, bags, and watches at GaneshStore. Free shipping on orders over $100." />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -46,32 +57,30 @@
     }
       (document, document.location.href.indexOf("adobe_authoring_enabled") !== -1, "body { opacity: 0 !important }", 3000);
   </script>
-<script type="text/javascript">
-(function() {
-  var didInit = false;
-  function initMunchkin() {
-    if(didInit === false) {
-      didInit = true;
-      Munchkin.init('132-PNL-231');
-    }
-  }
-  var s = document.createElement('script');
-  s.type = 'text/javascript';
-  s.async = true;
-  s.src = '//munchkin.marketo.net/munchkin.js';
-  s.onreadystatechange = function() {
-    if (this.readyState == 'complete' || this.readyState == 'loaded') {
-      initMunchkin();
-    }
-  };
-  s.onload = initMunchkin;
-  document.getElementsByTagName('head')[0].appendChild(s);
-})();
-</script>
+  <!-- Core Web Vitals LCP Preload -->
+  <link rel="preload" as="image" href="images/slide-01.jpg" fetchpriority="high" />
+
   <script src="https://assets.adobedtm.com/6268dc4b6b26/a79c12535bfd/launch-6b416d57c554-development.min.js"
     async></script>
 
   <script src="js/datalayer.js"></script>
+
+    <script type="application/ld+json">
+    {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "GaneshStore",
+  "url": "https://ganeshstore.com",
+  "logo": "images/icons/logo-01.png",
+  "description": "Curated luxury fashion atelier, accessories, footwear, and bespoke craftsmanship.",
+  "sameAs": [
+    "https://www.facebook.com/ganeshstore",
+    "https://www.instagram.com/ganeshstore",
+    "https://www.pinterest.com/ganeshstore"
+  ]
+}
+    </script>
+  		<link rel="canonical" href="https://ganeshstore.com/" />
 </head>
 
 <body class="animsition">
@@ -314,7 +323,7 @@
               </div>
 
               <div class="layer-slick1 animated visible-false" data-appear="fadeInUp" data-delay="800">
-                <h2 class="ltext-201 cl2 p-t-19 p-b-43 respon1">NEW ARRIVALS</h2>
+                <h1 class="ltext-201 cl2 p-t-19 p-b-43 respon1">NEW ARRIVALS</h2>
               </div>
 
               <div class="layer-slick1 animated visible-false" data-appear="zoomIn" data-delay="1600">
@@ -2500,7 +2509,7 @@
           </script>
           All rights reserved | This template is made with
           <i class="fa fa-heart-o" aria-hidden="true"></i> by
-          <a href="https://colorlib.com" target="_blank">Colorlib</a>
+          <a href="https://colorlib.com" target="_blank" rel="noopener noreferrer">Colorlib</a>
           <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
         </p>
       </div>

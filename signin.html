@@ -2,6 +2,18 @@
 <html lang="en">
   <head>
     <title>Sign In — GaneshStore</title>
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="GaneshStore" />
+    <meta property="og:title" content="Sign In — GaneshStore" />
+    <meta property="og:description" content="Explore signin at GaneshStore. Handcrafted luxury essentials with premium materials, verified customer reviews, and white-glove express delivery." />
+    <meta property="og:image" content="images/icons/logo-01.png" />
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Sign In — GaneshStore" />
+    <meta name="twitter:description" content="Explore signin at GaneshStore. Handcrafted luxury essentials with premium materials, verified customer reviews, and white-glove express delivery." />
+    <meta name="twitter:image" content="images/icons/logo-01.png" />
+    <meta name="description" content="Explore signin at GaneshStore. Handcrafted luxury essentials with premium materials, verified customer reviews, and white-glove express delivery." />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!--===============================================================================================-->
@@ -64,6 +76,7 @@
       src="https://assets.adobedtm.com/6268dc4b6b26/a79c12535bfd/launch-6b416d57c554-development.min.js"
       async
     ></script>
+    <script src="js/backend-service.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <style>
       :root {
@@ -83,71 +96,355 @@
         transition: all 0.3s ease;
       }
 
-      .Logouthead {
-        font-size: 24px;
-        font-weight: 700;
-        color: var(--primary-color);
-        text-align: center;
-        padding-bottom: 25px;
-        letter-spacing: -0.5px;
+      .account-header-card {
+        background: linear-gradient(135deg, #1f2438 0%, #0f121d 100%);
+        border-radius: 14px;
+        padding: 24px 20px;
+        color: #ffffff;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+        position: relative;
+        overflow: hidden;
       }
 
-      .LogoutName, .LogoutNumber {
-        font-size: 16px;
-        font-weight: 500;
-        color: #555555;
-        padding-bottom: 18px;
-        border-bottom: 1px solid #f2f2f2;
-        margin-bottom: 18px;
+      .account-avatar {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #717fe0 0%, #ec38bc 100%);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: 700;
+        text-transform: uppercase;
+        flex-shrink: 0;
+        box-shadow: 0 4px 14px rgba(113, 127, 224, 0.4);
+      }
+
+      .account-meta {
+        flex-grow: 1;
+      }
+
+      .account-name-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 4px;
+      }
+
+      .account-email-sub {
+        font-size: 13px;
+        color: #b0b8d0;
+        margin-bottom: 8px;
+      }
+
+      .account-tier-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        background: rgba(255, 255, 255, 0.15);
+        color: #ffd700;
+        border: 1px solid rgba(255, 215, 0, 0.3);
+      }
+
+      /* Account Center Tabs */
+      .account-nav-tabs {
+        display: flex;
+        border-bottom: 2px solid #f0f0f0;
+        margin-bottom: 25px;
+        gap: 6px;
+      }
+
+      .account-nav-btn {
+        padding: 10px 16px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #777;
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -2px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .account-nav-btn:hover {
+        color: #222;
+      }
+
+      .account-nav-btn.active {
+        color: #717fe0;
+        border-bottom-color: #717fe0;
+      }
+
+      /* Order Cards */
+      .account-order-card {
+        border: 1px solid #eef0f5;
+        border-radius: 12px;
+        padding: 18px;
+        margin-bottom: 16px;
+        background: #fdfdfd;
+        transition: all 0.25s ease;
+      }
+
+      .account-order-card:hover {
+        border-color: #717fe0;
+        box-shadow: 0 6px 18px rgba(113, 127, 224, 0.08);
+      }
+
+      .order-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #f0f0f0;
+        margin-bottom: 12px;
+      }
+
+      .order-id-num {
+        font-weight: 700;
+        font-size: 15px;
+        color: #222;
+      }
+
+      .order-status-pill {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        padding: 4px 10px;
+        border-radius: 20px;
+        background: #e8f5e9;
+        color: #2e7d32;
+      }
+
+      .order-status-pill.processing {
+        background: #fff3e0;
+        color: #e65100;
+      }
+
+      .order-status-pill.shipped {
+        background: #e3f2fd;
+        color: #0d47a1;
+      }
+
+      .order-items-preview {
+        font-size: 13px;
+        color: #666;
+        margin-bottom: 14px;
+        line-height: 1.4;
+      }
+
+      .order-card-footer {
         display: flex;
         justify-content: space-between;
         align-items: center;
       }
 
-      .AccountName, .AccountNumber {
-        color: var(--primary-color);
+      .order-total-price {
+        font-size: 16px;
+        font-weight: 700;
+        color: #111;
+      }
+
+      .btn-track-order {
+        padding: 6px 16px;
+        background: #717fe0;
+        color: #ffffff;
+        border-radius: 20px;
+        font-size: 12px;
         font-weight: 600;
-        font-family: 'Inter', sans-serif;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .btn-track-order:hover {
+        background: #5b69c5;
+        transform: translateY(-1px);
+      }
+
+      /* Quick Demo Account Switcher */
+      .demo-accounts-box {
+        background: #f8f9fc;
+        border: 1px dashed #d5daf0;
+        border-radius: 12px;
+        padding: 14px 16px;
+        margin-bottom: 22px;
+      }
+
+      .demo-accounts-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: #555;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .demo-account-pill {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        background: #ffffff;
+        border: 1px solid #dcdfe6;
+        font-size: 12px;
+        font-weight: 600;
+        color: #333;
+        margin-right: 6px;
+        margin-bottom: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .demo-account-pill:hover {
+        background: #717fe0;
+        color: #fff;
+        border-color: #717fe0;
+        transform: translateY(-1px);
+      }
+
+      /* Tracking Modal */
+      .tracking-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(8px);
+        z-index: 99999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .tracking-modal-content {
+        background: #ffffff;
+        border-radius: 16px;
+        max-width: 540px;
+        width: 100%;
+        padding: 30px 25px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        position: relative;
+        animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      @keyframes modalSlideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .tracking-timeline {
+        position: relative;
+        margin: 25px 0 10px;
+        padding-left: 24px;
+      }
+
+      .tracking-timeline::before {
+        content: '';
+        position: absolute;
+        left: 7px;
+        top: 8px;
+        bottom: 8px;
+        width: 2px;
+        background: #e0e0e0;
+      }
+
+      .timeline-step {
+        position: relative;
+        padding-bottom: 22px;
+      }
+
+      .timeline-dot {
+        position: absolute;
+        left: -24px;
+        top: 2px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #ccc;
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 2px #ccc;
+      }
+
+      .timeline-step.completed .timeline-dot {
+        background: #2e7d32;
+        box-shadow: 0 0 0 2px #2e7d32;
+      }
+
+      .timeline-step.active .timeline-dot {
+        background: #717fe0;
+        box-shadow: 0 0 0 2px #717fe0;
+        animation: pulseRing 1.5s infinite;
+      }
+
+      @keyframes pulseRing {
+        0% { box-shadow: 0 0 0 2px #717fe0; }
+        50% { box-shadow: 0 0 0 6px rgba(113, 127, 224, 0.3); }
+        100% { box-shadow: 0 0 0 2px #717fe0; }
+      }
+
+      .timeline-step-title {
+        font-weight: 600;
+        font-size: 14px;
+        color: #222;
+      }
+
+      .timeline-step-time {
+        font-size: 12px;
+        color: #888;
       }
 
       button.CLogout {
         color: #ffffff;
         font-weight: 600;
-        font-size: 15px;
+        font-size: 14px;
         text-transform: uppercase;
         width: 100%;
-        height: 48px;
-        background-color: var(--primary-color);
+        height: 44px;
+        background-color: #222222;
         border-radius: 10px;
         border: none;
         cursor: pointer;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
-      }
-
-      button.CLogout i {
-        transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        display: inline-block;
+        margin-top: 25px;
       }
 
       button.CLogout:hover {
-        background-color: #333333;
+        background-color: #d32f2f;
         transform: translateY(-1px);
-        box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-      }
-
-      button.CLogout:hover i {
-        transform: scale(1.15);
       }
 
       /* Premium Login Redesign styling */
       .auth-tabs {
         display: flex;
         border-bottom: 2px solid #f0f0f0;
+        margin-bottom: 20px;
+        position: relative;
+      }
+
         margin-bottom: 20px;
         position: relative;
       }
@@ -482,8 +779,26 @@
       }
     </style>
     <script src="js/datalayer.js"></script>
+
+    <script type="application/ld+json">
+    {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "GaneshStore",
+  "url": "https://ganeshstore.com",
+  "logo": "images/icons/logo-01.png",
+  "description": "Curated luxury fashion atelier, accessories, footwear, and bespoke craftsmanship.",
+  "sameAs": [
+    "https://www.facebook.com/ganeshstore",
+    "https://www.instagram.com/ganeshstore",
+    "https://www.pinterest.com/ganeshstore"
+  ]
+}
+    </script>
+  		<link rel="canonical" href="https://ganeshstore.com/signin.html" />
 </head>
   <body class="animsition">
+    <h1 class="sr-only">Client Sign In, 2-Step Verification & VIP Rewards</h1>
     <!-- Header -->
     <header class="header-v4">
     <!-- Announcement Bar -->
@@ -753,27 +1068,356 @@
     <!-- Content page -->
     <section class="p-t-30 p-b-80" style="background: linear-gradient(180deg, #fdfcf9 0%, #f6f0e4 100%);">
       <div class="container">
-        <div class="size-210 bor10 p-lr-50 p-t-55 p-b-70 p-lr-15-lg w-full-md mx-auto" style="background-color: #ffffff; border-radius: 16px; box-shadow: 0 12px 35px rgba(0,0,0,0.045); border: 1px solid #eaeaea;">
-          <!-- Account Profile Panel (Shown when logged in) -->
-          <div class="Logoutmain">
-            <div style="width: 70px; height: 70px; border-radius: 50%; background: #717fe0; color: white; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; margin: 0 auto 20px auto; text-transform: uppercase; box-shadow: 0 4px 10px rgba(113, 127, 224, 0.3);" class="js-logout-avatar">
-              U
+        <div class="size-210 bor10 p-lr-50 p-t-55 p-b-70 p-lr-15-lg w-full-md mx-auto" style="background-color: #ffffff; border-radius: 16px; box-shadow: 0 12px 35px rgba(0,0,0,0.045); border: 1px solid #eaeaea;">          <!-- Account Profile Panel (Shown when logged in) -->
+          <div class="Logoutmain" style="display: none;">
+            <!-- Header Summary Card -->
+            <div class="account-header-card">
+              <div class="account-avatar js-logout-avatar">SG</div>
+              <div class="account-meta">
+                <div class="account-name-title AccountName">Sai Ganesh</div>
+                <div class="account-email-sub AccountEmail">sai@ganeshstore.com</div>
+                <div class="account-tier-badge js-account-tier">
+                  <i class="zmdi zmdi-star"></i> Platinum VIP &bull; 2,450 Points
+                </div>
+              </div>
             </div>
-            <div class="Logouthead">Account Center</div>
-            
-            <div class="LogoutName">
-              <span>Name</span>
-              <span class="AccountName">Sai Ganesh</span>
+
+            <!-- Account Navigation Tabs -->
+            <div class="account-nav-tabs">
+              <button type="button" class="account-nav-btn active" onclick="switchAccountTab('orders', this)">
+                <i class="zmdi zmdi-dropbox"></i> My Orders
+              </button>
+              <button type="button" class="account-nav-btn" onclick="switchAccountTab('profile', this)">
+                <i class="zmdi zmdi-account"></i> Profile & Address
+              </button>
+              <button type="button" class="account-nav-btn" onclick="switchAccountTab('wishlist', this)">
+                <i class="zmdi zmdi-favorite"></i> Wishlist
+              </button>
+              <button type="button" class="account-nav-btn" onclick="switchAccountTab('rewards', this)">
+                <i class="zmdi zmdi-card-giftcard"></i> VIP Rewards
+              </button>
+              <button type="button" class="account-nav-btn" onclick="switchAccountTab('security', this)">
+                <i class="zmdi zmdi-shield-security"></i> Security & 2FA
+              </button>
             </div>
-            <div class="LogoutNumber">
-              <span>Details / ID</span>
-              <span class="AccountNumber">Not Logged In</span>
+
+            <!-- TAB 1: Order History & Tracking -->
+            <div id="acc-tab-orders" class="account-tab-content">
+              <div id="account-orders-list">
+                <!-- Dynamically populated via JS -->
+              </div>
             </div>
-            <button class="CLogout flex-c-m" onclick="logoutUser(event)"><i class="zmdi zmdi-power" style="margin-right: 8px; font-size: 18px;"></i> Logout</button>
+
+            <!-- TAB 2: Profile & Shipping Address -->
+            <div id="acc-tab-profile" class="account-tab-content" style="display: none;">
+              <form onsubmit="handleProfileUpdate(event)">
+                <div class="auth-input-group">
+                  <label class="auth-input-label">Full Name</label>
+                  <input class="auth-input-field" type="text" id="acc-edit-name" required />
+                </div>
+                <div class="auth-input-group">
+                  <label class="auth-input-label">Phone Number</label>
+                  <input class="auth-input-field" type="tel" id="acc-edit-phone" required />
+                </div>
+                <div class="auth-input-group">
+                  <label class="auth-input-label">Default Shipping Address</label>
+                  <input class="auth-input-field" type="text" id="acc-edit-address" placeholder="123 Luxury Way, New York, NY 10001" />
+                </div>
+                <button type="submit" class="btn-auth-submit" style="margin-top: 10px;">
+                  <i class="zmdi zmdi-check"></i> Save Changes
+                </button>
+              </form>
+            </div>
+
+            <!-- TAB 3: Wishlist Summary -->
+            <div id="acc-tab-wishlist" class="account-tab-content" style="display: none;">
+              <div id="account-wishlist-list">
+                <!-- Dynamically populated via JS -->
+              </div>
+            </div>
+
+            <!-- TAB 4: VIP Rewards -->
+            <div id="acc-tab-rewards" class="account-tab-content" style="display: none;">
+              <div class="demo-accounts-box" style="background: #fff8e1; border-color: #ffe082;">
+                <div class="demo-accounts-title" style="color: #f57f17;">
+                  <i class="zmdi zmdi-crown"></i> VIP Loyalty Benefits
+                </div>
+                <p style="font-size: 13px; color: #666; margin-bottom: 12px;" id="acc-rewards-desc">
+                  Enjoy 2x points on all purchases, automatic Free Express Shipping, and access to VIP exclusive drops.
+                </p>
+                <div style="font-size: 12px; font-weight: 700; color: #444; margin-bottom: 6px;">Available Promo Codes:</div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                  <span class="demo-account-pill" style="background: #fff; border-color: #ffd54f; font-weight: 700; color: #e65100;">GANESH20 ($20 OFF)</span>
+                  <span class="demo-account-pill" style="background: #fff; border-color: #ffd54f; font-weight: 700; color: #e65100;">SAVE10 (10% OFF)</span>
+                  <span class="demo-account-pill" style="background: #fff; border-color: #ffd54f; font-weight: 700; color: #e65100;">FREESHIP (FREE SHIPPING)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- TAB 5: Security & Google Authenticator 2FA -->
+            <div id="acc-tab-security" class="account-tab-content" style="display: none;">
+              <div style="background: #fdfdfd; border: 1px solid #eef0f5; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                  <div>
+                    <h5 style="font-weight: 700; color: #222; margin: 0 0 4px 0;"><i class="zmdi zmdi-shield-check" style="color: #717fe0;"></i> Google Authenticator (2FA)</h5>
+                    <p style="font-size: 13px; color: #777; margin: 0;">Protect your account with Time-based One-Time Passwords (TOTP).</p>
+                  </div>
+                  <span id="twofa-status-pill" style="padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; background: #eee; color: #666;">
+                    Disabled
+                  </span>
+                </div>
+
+                <!-- 2FA Setup Flow (Shown when Disabled) -->
+                <div id="twofa-setup-section" style="display: none; border-top: 1px solid #f0f0f0; padding-top: 15px; margin-top: 15px;">
+                  <p style="font-size: 13px; color: #444; margin-bottom: 15px;"><strong>Step 1:</strong> Scan this QR code with <strong>Google Authenticator</strong> (or Authy / 1Password):</p>
+                  <div style="text-align: center; margin-bottom: 15px;">
+                    <img id="twofa-qr-image" src="" alt="2FA QR Code" style="width: 180px; height: 180px; border-radius: 10px; border: 1px solid #ddd; padding: 5px; background: #fff;" />
+                  </div>
+                  <div style="background: #f5f7fa; padding: 10px 14px; border-radius: 8px; font-size: 12px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+                    <span>Secret Key: <strong id="twofa-secret-text" style="letter-spacing: 1px; color: #222;">...</strong></span>
+                    <button type="button" onclick="copySecretKey()" style="background: none; border: 1px solid #ccc; padding: 2px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">Copy</button>
+                  </div>
+
+                  <p style="font-size: 13px; color: #444; margin-bottom: 8px;"><strong>Step 2:</strong> Enter the 6-digit verification code generated by your app:</p>
+                  <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <input type="text" id="twofa-verify-input" class="auth-input-field" placeholder="000000" maxlength="6" style="text-align: center; font-size: 18px; letter-spacing: 4px; font-weight: 700; width: 160px;" />
+                    <button type="button" class="btn-auth-submit" style="width: auto; padding: 0 20px;" onclick="handleEnable2FA()">
+                      Activate 2FA
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 2FA Active Management (Shown when Enabled) -->
+                <div id="twofa-active-section" style="display: none; border-top: 1px solid #f0f0f0; padding-top: 15px; margin-top: 15px;">
+                  <p style="font-size: 13px; color: #2e7d32; margin-bottom: 15px;">
+                    <i class="zmdi zmdi-check-circle"></i> Two-Factor Authentication is currently protecting your account.
+                  </p>
+                  <button type="button" style="background: #fff; border: 1px solid #d32f2f; color: #d32f2f; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;" onclick="handleDisable2FA()">
+                    Disable 2FA
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Logout Action -->
+            <button class="CLogout flex-c-m" onclick="logoutUser(event)">
+              <i class="zmdi zmdi-power"></i> Sign Out
+            </button>
           </div>
 
           <!-- Auth Forms Panel (Shown when logged out) -->
           <div class="Loginmain">
+            <!-- Quick Demo Accounts Switcher -->
+            <div class="demo-accounts-box">
+              <div class="demo-accounts-title">
+                <i class="zmdi zmdi-flash"></i> Quick Test Demo Accounts (1-Click Login)
+              </div>
+              <span class="demo-account-pill" onclick="quickLoginDemo('sai@ganeshstore.com', 'password123')">
+                👑 Sai Ganesh (Platinum)
+              </span>
+              <span class="demo-account-pill" onclick="quickLoginDemo('olivia@vance.net', 'password123')">
+                ⭐ Olivia Vance (Gold)
+              </span>
+              <span class="demo-account-pill" onclick="quickLoginDemo('demo@ganeshstore.com', 'password123')">
+                ✨ Demo Customer (Silver)
+              </span>
+            </div>
+
+            <div class="auth-tabs">
+              <button type="button" class="auth-tab-btn active" id="btn-tab-signin" onclick="switchContactTab('signin')">Sign In</button>
+              <button type="button" class="auth-tab-btn" id="btn-tab-signup" onclick="switchContactTab('signup')">Create Account</button>
+              <div class="auth-tabs-slider"></div>
+            </div>
+
+            <!-- Inline Alert Feedback Banner -->
+            <div class="auth-alert-banner" id="contact-auth-banner">
+              <i class="zmdi zmdi-info-outline" id="c-banner-icon"></i>
+              <span id="c-banner-text">Welcome back!</span>
+            </div>
+
+            <!-- ================= Sign In Mode ================= -->
+            <div id="contact-signin-section">
+              <form id="contact-login-form" onsubmit="handleEmailLogin(event)">
+                <div class="auth-input-group">
+                  <label class="auth-input-label" for="c-login-email">Email Address</label>
+                  <input class="auth-input-field auth-email-input" type="email" id="c-login-email" required placeholder="name@example.com" />
+                </div>
+
+                <div class="auth-input-group">
+                  <label class="auth-input-label" for="c-login-password">Password</label>
+                  <input class="auth-input-field auth-password-input" type="password" id="c-login-password" required placeholder="••••••••" />
+                  <i class="zmdi zmdi-eye auth-password-toggle" onclick="toggleContactPassword('c-login-password', this)"></i>
+                </div>
+
+                <div class="auth-options">
+                  <label class="auth-remember">
+                    <input type="checkbox" id="c-login-remember" checked />
+                    <span>Remember me</span>
+                  </label>
+                  <a href="#" class="auth-forgot-link" onclick="handleForgotPassword(event)">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="btn-auth-submit btn-auth-submit-action">
+                  <span>Sign In</span>
+                  <i class="zmdi zmdi-arrow-right"></i>
+                </button>
+              </form>
+            </div>
+
+            <!-- ================= Sign Up Mode ================= -->
+            <div id="contact-signup-section" style="display: none;">
+              <form id="contact-register-form" onsubmit="handleEmailSignUp(event)">
+                <div class="auth-input-group">
+                  <label class="auth-input-label" for="c-signup-name">Full Name</label>
+                  <input class="auth-input-field" type="text" id="c-signup-name" required placeholder="Sai Ganesh" />
+                </div>
+
+                <div class="auth-input-group">
+                  <label class="auth-input-label" for="c-signup-email">Email Address</label>
+                  <input class="auth-input-field" type="email" id="c-signup-email" required placeholder="name@example.com" />
+                </div>
+
+                <div class="auth-input-group">
+                  <label class="auth-input-label" for="c-signup-password">Password</label>
+                  <input class="auth-input-field" type="password" id="c-signup-password" required placeholder="Min 6 characters" minlength="6" />
+                  <i class="zmdi zmdi-eye auth-password-toggle" onclick="toggleContactPassword('c-signup-password', this)"></i>
+                </div>
+
+                <div class="auth-options">
+                  <label class="auth-remember" style="font-size: 12px; line-height: 1.4;">
+                    <input type="checkbox" id="c-signup-agree" required />
+                    <span>I agree to the Terms of Service & Privacy Policy</span>
+                  </label>
+                </div>
+
+                <button type="submit" class="btn-auth-submit">
+                  <span>Create Account</span>
+                  <i class="zmdi zmdi-assignment-account"></i>
+                </button>
+              </form>
+            </div>
+
+            <div class="auth-divider">or continue with</div>
+
+            <!-- Google Authentication Trigger -->
+            <button type="button" class="btn-google-login" onclick="handleGoogleSignIn()">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20px" height="20px">
+                <path fill="#EA4335" d="M24 9.5c3.3 0 6.3 1.2 8.7 3.2l6.5-6.5C34.5 2.5 29.8 0 24 0 14.7 0 6.8 5.6 3.1 13.8l7.5 5.8C12.5 12.8 17.7 9.5 24 9.5z"/>
+                <path fill="#4285F4" d="M46.9 24.5c0-1.6-.1-3.2-.4-4.7H24v9.4h12.9c-.6 3.1-2.3 5.7-4.9 7.4l7.7 6c4.5-4.2 7.2-10.4 7.2-18.1z"/>
+                <path fill="#FBBC05" d="M10.6 28.5c-1-3-1-6.3 0-9.4l-7.5-5.8c-2.7 5.4-2.7 11.8 0 17.2l7.5-5.8z"/>
+                <path fill="#34A853" d="M24 48c6.5 0 11.9-2.2 15.9-5.9l-7.7-6c-2.2 1.5-5 2.3-8.2 2.3-6.3 0-11.5-4.2-13.4-10.1l-7.5 5.8C6.8 42.4 14.7 48 24 48z"/>
+                <div class="auth-input-group">
+                  <label class="auth-input-label">Full Name</label>
+                  <input class="auth-input-field" type="text" id="acc-edit-name" required />
+                </div>
+                <div class="auth-input-group">
+                  <label class="auth-input-label">Phone Number</label>
+                  <input class="auth-input-field" type="tel" id="acc-edit-phone" required />
+                </div>
+                <div class="auth-input-group">
+                  <label class="auth-input-label">Default Shipping Address</label>
+                  <input class="auth-input-field" type="text" id="acc-edit-address" placeholder="123 Luxury Way, New York, NY 10001" />
+                </div>
+                <button type="submit" class="btn-auth-submit" style="margin-top: 10px;">
+                  <i class="zmdi zmdi-check"></i> Save Changes
+                </button>
+              </form>
+            </div>
+
+            <!-- TAB 3: Wishlist Summary -->
+            <div id="acc-tab-wishlist" class="account-tab-content" style="display: none;">
+              <div id="account-wishlist-list">
+                <!-- Dynamically populated via JS -->
+              </div>
+            </div>
+
+            <!-- TAB 4: VIP Rewards -->
+            <div id="acc-tab-rewards" class="account-tab-content" style="display: none;">
+              <div class="demo-accounts-box" style="background: #fff8e1; border-color: #ffe082;">
+                <div class="demo-accounts-title" style="color: #f57f17;">
+                  <i class="zmdi zmdi-crown"></i> VIP Loyalty Benefits
+                </div>
+                <p style="font-size: 13px; color: #666; margin-bottom: 12px;" id="acc-rewards-desc">
+                  Enjoy 2x points on all purchases, automatic Free Express Shipping, and access to VIP exclusive drops.
+                </p>
+                <div style="font-size: 12px; font-weight: 700; color: #444; margin-bottom: 6px;">Available Promo Codes:</div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                  <span class="demo-account-pill" style="background: #fff; border-color: #ffd54f; font-weight: 700; color: #e65100;">GANESH20 ($20 OFF)</span>
+                  <span class="demo-account-pill" style="background: #fff; border-color: #ffd54f; font-weight: 700; color: #e65100;">SAVE10 (10% OFF)</span>
+                  <span class="demo-account-pill" style="background: #fff; border-color: #ffd54f; font-weight: 700; color: #e65100;">FREESHIP (FREE SHIPPING)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- TAB 5: Security & Google Authenticator 2FA -->
+            <div id="acc-tab-security" class="account-tab-content" style="display: none;">
+              <div style="background: #fdfdfd; border: 1px solid #eef0f5; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                  <div>
+                    <h5 style="font-weight: 700; color: #222; margin: 0 0 4px 0;"><i class="zmdi zmdi-shield-check" style="color: #717fe0;"></i> Google Authenticator (2FA)</h5>
+                    <p style="font-size: 13px; color: #777; margin: 0;">Protect your account with Time-based One-Time Passwords (TOTP).</p>
+                  </div>
+                  <span id="twofa-status-pill" style="padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; background: #eee; color: #666;">
+                    Disabled
+                  </span>
+                </div>
+
+                <!-- 2FA Setup Flow (Shown when Disabled) -->
+                <div id="twofa-setup-section" style="display: none; border-top: 1px solid #f0f0f0; padding-top: 15px; margin-top: 15px;">
+                  <p style="font-size: 13px; color: #444; margin-bottom: 15px;"><strong>Step 1:</strong> Scan this QR code with <strong>Google Authenticator</strong> (or Authy / 1Password):</p>
+                  <div style="text-align: center; margin-bottom: 15px;">
+                    <img id="twofa-qr-image" src="" alt="2FA QR Code" style="width: 180px; height: 180px; border-radius: 10px; border: 1px solid #ddd; padding: 5px; background: #fff;" />
+                  </div>
+                  <div style="background: #f5f7fa; padding: 10px 14px; border-radius: 8px; font-size: 12px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+                    <span>Secret Key: <strong id="twofa-secret-text" style="letter-spacing: 1px; color: #222;">...</strong></span>
+                    <button type="button" onclick="copySecretKey()" style="background: none; border: 1px solid #ccc; padding: 2px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">Copy</button>
+                  </div>
+
+                  <p style="font-size: 13px; color: #444; margin-bottom: 8px;"><strong>Step 2:</strong> Enter the 6-digit verification code generated by your app:</p>
+                  <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <input type="text" id="twofa-verify-input" class="auth-input-field" placeholder="000000" maxlength="6" style="text-align: center; font-size: 18px; letter-spacing: 4px; font-weight: 700; width: 160px;" />
+                    <button type="button" class="btn-auth-submit" style="width: auto; padding: 0 20px;" onclick="handleEnable2FA()">
+                      Activate 2FA
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 2FA Active Management (Shown when Enabled) -->
+                <div id="twofa-active-section" style="display: none; border-top: 1px solid #f0f0f0; padding-top: 15px; margin-top: 15px;">
+                  <p style="font-size: 13px; color: #2e7d32; margin-bottom: 15px;">
+                    <i class="zmdi zmdi-check-circle"></i> Two-Factor Authentication is currently protecting your account.
+                  </p>
+                  <button type="button" style="background: #fff; border: 1px solid #d32f2f; color: #d32f2f; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;" onclick="handleDisable2FA()">
+                    Disable 2FA
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Logout Action -->
+            <button class="CLogout flex-c-m" onclick="logoutUser(event)">
+              <i class="zmdi zmdi-power"></i> Sign Out
+            </button>
+          </div>
+
+          <!-- Auth Forms Panel (Shown when logged out) -->
+          <div class="Loginmain">
+            <!-- Quick Demo Accounts Switcher -->
+            <div class="demo-accounts-box">
+              <div class="demo-accounts-title">
+                <i class="zmdi zmdi-flash"></i> Quick Test Demo Accounts (1-Click Login)
+              </div>
+              <span class="demo-account-pill" onclick="quickLoginDemo('sai@ganeshstore.com', 'password123')">
+                👑 Sai Ganesh (Platinum)
+              </span>
+              <span class="demo-account-pill" onclick="quickLoginDemo('olivia@vance.net', 'password123')">
+                ⭐ Olivia Vance (Gold)
+              </span>
+              <span class="demo-account-pill" onclick="quickLoginDemo('demo@ganeshstore.com', 'password123')">
+                ✨ Demo Customer (Silver)
+              </span>
+            </div>
+
             <div class="auth-tabs">
               <button type="button" class="auth-tab-btn active" id="btn-tab-signin" onclick="switchContactTab('signin')">Sign In</button>
               <button type="button" class="auth-tab-btn" id="btn-tab-signup" onclick="switchContactTab('signup')">Create Account</button>
@@ -865,99 +1509,114 @@
       </div>
     </section>
 
+    <!-- Interactive Live Order Tracking Modal -->
+    <div class="tracking-modal-overlay" id="orderTrackingModal">
+      <div class="tracking-modal-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h4 style="font-weight: 700; font-size: 18px; color: #222; margin: 0;">
+            <i class="zmdi zmdi-truck" style="color: #717fe0; margin-right: 6px;"></i> Live Shipment Tracker
+          </h4>
+          <span style="font-size: 26px; cursor: pointer; color: #888;" onclick="closeTrackingModal()">&times;</span>
+        </div>
+
+        <div style="background: #f8f9fa; padding: 14px; border-radius: 10px; font-size: 13px; margin-bottom: 15px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+            <span style="color: #666;">Tracking Number:</span>
+            <strong style="color: #222;" id="trk-number">GS-TRK-892147</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+            <span style="color: #666;">Carrier:</span>
+            <strong style="color: #717fe0;">GaneshStore Express Priority</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: #666;">Estimated Delivery:</span>
+            <strong style="color: #2e7d32;" id="trk-est-delivery">Aug 26, 2026</strong>
+          </div>
+        </div>
+
+        <!-- 5-Step Timeline -->
+        <div class="tracking-timeline" id="trk-timeline-container">
+          <!-- Populated dynamically via JS -->
+        </div>
+
+        <button type="button" class="btn-auth-submit" style="margin-top: 15px; height: 42px;" onclick="closeTrackingModal()">
+          Close Tracker
+        </button>
+      </div>
+    </div>
+
+    <!-- Interactive 2-Step Google Authenticator Login Verification Modal -->
+    <div class="tracking-modal-overlay" id="twoFactorModal" style="display: none;">
+      <div class="tracking-modal-content" style="max-width: 420px; text-align: center;">
+        <div style="width: 56px; height: 56px; border-radius: 50%; background: #e8eaf6; color: #717fe0; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 15px auto;">
+          <i class="zmdi zmdi-shield-security"></i>
+        </div>
+        <h4 style="font-weight: 700; font-size: 18px; color: #222; margin-bottom: 6px;">2-Step Verification</h4>
+        <p style="font-size: 13px; color: #666; margin-bottom: 18px;">
+          Enter the 6-digit code from your <strong>Google Authenticator</strong> app for <span id="twofa-login-email-display" style="font-weight: 600; color: #222;">...</span>
+        </p>
+
+        <div id="twofa-modal-alert" class="auth-alert-banner error" style="display: none; margin-bottom: 15px;">
+          <i class="zmdi zmdi-alert-circle-o"></i>
+          <span id="twofa-modal-alert-text">Invalid code</span>
+        </div>
+
+        <input type="text" id="twofa-login-code-input" class="auth-input-field" placeholder="000000" maxlength="6" style="text-align: center; font-size: 24px; letter-spacing: 6px; font-weight: 700; margin-bottom: 15px;" />
+
+        <button type="button" class="btn-auth-submit" onclick="submit2FALoginCode()" style="margin-bottom: 10px;">
+          Verify & Sign In
+        </button>
+        <button type="button" style="background: none; border: none; color: #888; font-size: 13px; cursor: pointer;" onclick="close2FAModal()">
+          Cancel
+        </button>
+      </div>
+    </div>
+
     <!-- Footer -->
     <footer class="bg3 p-t-75 p-b-32">
       <div class="container">
         <div class="row">
           <div class="col-sm-6 col-lg-3 p-b-50">
             <h4 class="stext-301 cl0 p-b-30">Categories</h4>
-
             <ul>
-              <li class="p-b-10">
-                <a href="#" class="stext-107 cl7 hov-cl1 trans-04"> Women </a>
-              </li>
-
-              <li class="p-b-10">
-                <a href="#" class="stext-107 cl7 hov-cl1 trans-04"> Men </a>
-              </li>
-
-              <li class="p-b-10">
-                <a href="#" class="stext-107 cl7 hov-cl1 trans-04"> Shoes </a>
-              </li>
-
-              <li class="p-b-10">
-                <a href="#" class="stext-107 cl7 hov-cl1 trans-04"> Watches </a>
-              </li>
+              <li class="p-b-10"><a href="product.html?category=women" class="stext-107 cl7 hov-cl1 trans-04">Women</a></li>
+              <li class="p-b-10"><a href="product.html?category=men" class="stext-107 cl7 hov-cl1 trans-04">Men</a></li>
+              <li class="p-b-10"><a href="product.html?category=shoes" class="stext-107 cl7 hov-cl1 trans-04">Shoes</a></li>
+              <li class="p-b-10"><a href="product.html?category=watches" class="stext-107 cl7 hov-cl1 trans-04">Watches</a></li>
             </ul>
           </div>
 
           <div class="col-sm-6 col-lg-3 p-b-50">
-            <h4 class="stext-301 cl0 p-b-30">Help</h4>
-
+            <h4 class="stext-301 cl0 p-b-30">Help & Support</h4>
             <ul>
-              <li class="p-b-10">
-                <a href="#" class="stext-107 cl7 hov-cl1 trans-04">
-                  Track Order
-                </a>
-              </li>
-
-              <li class="p-b-10">
-                <a href="#" class="stext-107 cl7 hov-cl1 trans-04"> Returns </a>
-              </li>
-
-              <li class="p-b-10">
-                <a href="#" class="stext-107 cl7 hov-cl1 trans-04">
-                  Shipping
-                </a>
-              </li>
-
-              <li class="p-b-10">
-                <a href="#" class="stext-107 cl7 hov-cl1 trans-04"> FAQs </a>
-              </li>
+              <li class="p-b-10"><a href="signin.html" class="stext-107 cl7 hov-cl1 trans-04">Track Order</a></li>
+              <li class="p-b-10"><a href="#" class="stext-107 cl7 hov-cl1 trans-04">Returns & Refunds</a></li>
+              <li class="p-b-10"><a href="#" class="stext-107 cl7 hov-cl1 trans-04">Shipping Policy</a></li>
+              <li class="p-b-10"><a href="#" class="stext-107 cl7 hov-cl1 trans-04">FAQs</a></li>
             </ul>
           </div>
 
           <div class="col-sm-6 col-lg-3 p-b-50">
             <h4 class="stext-301 cl0 p-b-30">GET IN TOUCH</h4>
-
             <p class="stext-107 cl7 size-201">
-              Any questions? Let us know in store at 8th floor, 379 Hudson St,
-              New York, NY 10018 or call us on (+1) 96 716 6879
+              Any questions? Contact our luxury concierge at 8th floor, 379 Hudson St, New York, NY 10018 or call (+1) 96 716 6879.
             </p>
-
             <div class="p-t-27">
-              <a href="#" class="fs-18 cl7 hov-cl1 trans-04 m-r-16">
-                <i class="fa fa-facebook"></i>
-              </a>
-
-              <a href="#" class="fs-18 cl7 hov-cl1 trans-04 m-r-16">
-                <i class="fa fa-instagram"></i>
-              </a>
-
-              <a href="#" class="fs-18 cl7 hov-cl1 trans-04 m-r-16">
-                <i class="fa fa-pinterest-p"></i>
-              </a>
+              <a href="#" class="fs-18 cl7 hov-cl1 trans-04 m-r-16"><i class="fa fa-facebook"></i></a>
+              <a href="#" class="fs-18 cl7 hov-cl1 trans-04 m-r-16"><i class="fa fa-instagram"></i></a>
+              <a href="#" class="fs-18 cl7 hov-cl1 trans-04 m-r-16"><i class="fa fa-pinterest-p"></i></a>
             </div>
           </div>
 
           <div class="col-sm-6 col-lg-3 p-b-50">
             <h4 class="stext-301 cl0 p-b-30">Newsletter</h4>
-
-            <form>
+            <form id="signin-newsletter-form">
               <div class="wrap-input1 w-full p-b-4">
-                <input
-                  class="input1 bg-none plh1 stext-107 cl7"
-                  type="text"
-                  name="email"
-                  placeholder="email@example.com"
-                />
+                <input class="input1 bg-none plh1 stext-107 cl7" type="email" name="email" placeholder="email@example.com" required />
                 <div class="focus-input1 trans-04"></div>
               </div>
-
               <div class="p-t-18">
-                <button
-                  class="flex-c-m stext-101 cl0 size-103 bg1 bor1 hov-btn2 p-lr-15 trans-04"
-                >
+                <button type="submit" class="flex-c-m stext-101 cl0 size-103 bg1 bor1 hov-btn2 p-lr-15 trans-04">
                   Subscribe
                 </button>
               </div>
@@ -966,38 +1625,8 @@
         </div>
 
         <div class="p-t-40">
-          <div class="flex-c-m flex-w p-b-18">
-            <a href="#" class="m-all-1">
-              <img src="images/icons/icon-pay-01.png" alt="ICON-PAY" />
-            </a>
-
-            <a href="#" class="m-all-1">
-              <img src="images/icons/icon-pay-02.png" alt="ICON-PAY" />
-            </a>
-
-            <a href="#" class="m-all-1">
-              <img src="images/icons/icon-pay-03.png" alt="ICON-PAY" />
-            </a>
-
-            <a href="#" class="m-all-1">
-              <img src="images/icons/icon-pay-04.png" alt="ICON-PAY" />
-            </a>
-
-            <a href="#" class="m-all-1">
-              <img src="images/icons/icon-pay-05.png" alt="ICON-PAY" />
-            </a>
-          </div>
-
           <p class="stext-107 cl6 txt-center">
-            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-            Copyright &copy;
-            <script>
-              document.write(new Date().getFullYear());
-            </script>
-            All rights reserved | This template is made with
-            <i class="fa fa-heart-o" aria-hidden="true"></i> by
-            <a href="https://colorlib.com" target="_blank">Colorlib</a>
-            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+            Copyright &copy; 2026 GaneshStore. All rights reserved.
           </p>
         </div>
       </div>
@@ -1010,57 +1639,28 @@
       </span>
     </div>
 
-    <!--===============================================================================================-->
-    <script src="js/homeDatalayer.js"></script>
-    <!--===============================================================================================-->
+    <!-- Vendor JavaScript Assets -->
     <script src="vendor/jquery/jquery-3.2.1.min.js"></script>
-    <!--===============================================================================================-->
     <script src="vendor/animsition/js/animsition.min.js"></script>
-    <!--===============================================================================================-->
     <script src="vendor/bootstrap/js/popper.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
-    <!--===============================================================================================-->
     <script src="vendor/select2/select2.min.js"></script>
-    <script>
-      $(".js-select2").each(function () {
-        $(this).select2({
-          minimumResultsForSearch: 20,
-          dropdownParent: $(this).next(".dropDownSelect2"),
-        });
-      });
-    </script>
-    <!--===============================================================================================-->
-    <script src="vendor/MagnificPopup/jquery.magnific-popup.min.js"></script>
-    <!--===============================================================================================-->
     <script src="vendor/perfect-scrollbar/perfect-scrollbar.min.js"></script>
-    <script>
-      $(".js-pscroll").each(function () {
-        $(this).css("position", "relative");
-        $(this).css("overflow", "hidden");
-        var ps = new PerfectScrollbar(this, {
-          wheelSpeed: 1,
-          scrollingThreshold: 1000,
-          wheelPropagation: false,
-        });
-
-        $(window).on("resize", function () {
-          ps.update();
-        });
-      });
-    </script>
-    <!--===============================================================================================-->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAKFWBqlKAGCeS1rMVoaNlwyayu0e0YRes"></script>
-    <script src="js/map-custom.js"></script>
-    <!--===============================================================================================-->
     <script src="js/main.js"></script>
+
+    <!-- Account Dashboard & Google Authenticator Dynamic Engine -->
     <script>
+      var currentGeneratedSecret = null;
+      var pendingLoginUserId = null;
+
+      // Switch Sign In / Sign Up tabs
       function switchContactTab(tab) {
         const loginTab = document.getElementById('btn-tab-signin');
         const signupTab = document.getElementById('btn-tab-signup');
         const loginSec = document.getElementById('contact-signin-section');
         const signupSec = document.getElementById('contact-signup-section');
-        const banner = document.getElementById('contact-auth-banner');
         const slider = document.querySelector('.auth-tabs-slider');
+        const banner = document.getElementById('contact-auth-banner');
 
         banner.style.display = 'none';
 
@@ -1068,121 +1668,127 @@
           loginTab.classList.add('active');
           signupTab.classList.remove('active');
           if (slider) slider.style.transform = 'translateX(0%)';
-
-          // Animate signup out (slide right)
-          signupSec.style.opacity = '0';
-          signupSec.style.transform = 'translateX(20px)';
-
-          setTimeout(() => {
-            signupSec.style.display = 'none';
-
-            // Prepare login (slide in from left)
-            loginSec.style.display = 'block';
-            loginSec.style.opacity = '0';
-            loginSec.style.transform = 'translateX(-20px)';
-
-            // Trigger reflow
-            loginSec.offsetHeight;
-
-            // Animate login in
-            loginSec.style.opacity = '1';
-            loginSec.style.transform = 'translateX(0)';
-          }, 150);
+          signupSec.style.display = 'none';
+          loginSec.style.display = 'block';
         } else {
           loginTab.classList.remove('active');
           signupTab.classList.add('active');
           if (slider) slider.style.transform = 'translateX(100%)';
-
-          // Animate login out (slide left)
-          loginSec.style.opacity = '0';
-          loginSec.style.transform = 'translateX(-20px)';
-
-          setTimeout(() => {
-            loginSec.style.display = 'none';
-
-            // Prepare signup (slide in from right)
-            signupSec.style.display = 'block';
-            signupSec.style.opacity = '0';
-            signupSec.style.transform = 'translateX(20px)';
-
-            // Trigger reflow
-            signupSec.offsetHeight;
-
-            // Animate signup in
-            signupSec.style.opacity = '1';
-            signupSec.style.transform = 'translateX(0)';
-          }, 150);
+          loginSec.style.display = 'none';
+          signupSec.style.display = 'block';
         }
       }
 
-      function toggleContactPassword(id, icon) {
-        const input = document.getElementById(id);
-        if (input.type === 'password') {
-          input.type = 'text';
-          icon.classList.remove('zmdi-eye');
-          icon.classList.add('zmdi-eye-off');
+      // Quick 1-click Demo Login
+      function quickLoginDemo(email, pass) {
+        document.getElementById('c-login-email').value = email;
+        document.getElementById('c-login-password').value = pass;
+        if (typeof window.handleEmailLogin === 'function') {
+          window.handleEmailLogin();
+        }
+      }
+
+      // Account Center Tab Switcher
+      function switchAccountTab(tabName, btnElement) {
+        $('.account-nav-btn').removeClass('active');
+        $(btnElement).addClass('active');
+        $('.account-tab-content').hide();
+        $('#acc-tab-' + tabName).fadeIn(200);
+
+        if (tabName === 'security') {
+          var user = window.BackendService ? window.BackendService.auth.getCurrentUser() : null;
+          if (user) init2FAPanel(user);
+        }
+      }
+
+      // Initialize 2FA Security Panel
+      function init2FAPanel(user) {
+        if (user.two_factor_enabled) {
+          $('#twofa-status-pill').text('Active').css({ background: '#e8f5e9', color: '#2e7d32' });
+          $('#twofa-setup-section').hide();
+          $('#twofa-active-section').show();
         } else {
-          input.type = 'password';
-          icon.classList.remove('zmdi-eye-off');
-          icon.classList.add('zmdi-eye');
-        }
-      }
+          $('#twofa-status-pill').text('Disabled').css({ background: '#eee', color: '#666' });
+          $('#twofa-active-section').hide();
+          $('#twofa-setup-section').show();
 
-      function showContactMessage(type, message) {
-        const banner = document.getElementById('contact-auth-banner');
-        const textSpan = document.getElementById('c-banner-text');
-        const icon = document.getElementById('c-banner-icon');
-
-        banner.className = 'auth-alert-banner ' + type;
-        textSpan.textContent = message;
-        banner.style.display = 'flex';
-
-        if (type === 'success') {
-          icon.className = 'zmdi zmdi-check-circle';
-        } else {
-          icon.className = 'zmdi zmdi-alert-circle-o';
-          // Trigger shake feedback
-          banner.classList.remove('shake');
-          banner.offsetHeight; // trigger reflow
-          banner.classList.add('shake');
-        }
-      }
-
-      function getCookieValue(name) {
-        let result = document.cookie.match(
-          "(^|[^;]+)\\s*" + name + "\\s*=\\s*([^;]+)"
-        );
-        return result ? decodeURIComponent(result.pop()) : "";
-      }
-
-      // Check current login state and show appropriate UI panel
-      function loginfun() {
-        const userState = localStorage.getItem("user");
-        const customerName = getCookieValue("CustomerName");
-        
-        if (userState === "loggedin" && customerName) {
-          document.getElementsByClassName("Loginmain")[0].style.display = "none";
-          document.getElementsByClassName("Logoutmain")[0].style.display = "block";
-          
-          document.getElementsByClassName("AccountName")[0].innerText = customerName;
-          
-          const customerNum = getCookieValue("CustomerNumber");
-          document.getElementsByClassName("AccountNumber")[0].innerText = customerNum || "Member";
-          
-          // Generate user avatar initials dynamically
-          const initials = customerName.substring(0, 2).toUpperCase();
-          const avatarElement = document.querySelector(".js-logout-avatar");
-          if (avatarElement) {
-            avatarElement.innerText = initials;
+          // Generate a new secret and QR
+          if (window.BackendService) {
+            var setup = window.BackendService.auth.generate2FASecret(user.email);
+            currentGeneratedSecret = setup.secret;
+            $('#twofa-qr-image').attr('src', setup.qrCodeUrl);
+            $('#twofa-secret-text').text(setup.secret);
           }
-        } else {
-          document.getElementsByClassName("Loginmain")[0].style.display = "block";
-          document.getElementsByClassName("Logoutmain")[0].style.display = "none";
         }
       }
-      
-      // Hook login sync directly
-      loginfun();
+
+      function copySecretKey() {
+        if (currentGeneratedSecret) {
+          navigator.clipboard.writeText(currentGeneratedSecret).then(function() {
+            alert('Secret key copied to clipboard! Paste it into Google Authenticator.');
+          });
+        }
+      }
+
+      // Enable Google Authenticator
+      function handleEnable2FA() {
+        var token = $('#twofa-verify-input').val().trim();
+        if (!token || token.length !== 6) {
+          alert('Please enter the 6-digit code from Google Authenticator.');
+          return;
+        }
+
+        if (window.BackendService && currentGeneratedSecret) {
+          window.BackendService.auth.enable2FA(currentGeneratedSecret, token).then(function(res) {
+            alert(res.message);
+            var user = window.BackendService.auth.getCurrentUser();
+            init2FAPanel(user);
+          }).catch(function(err) {
+            alert(err.message);
+          });
+        }
+      }
+
+      // Disable 2FA
+      function handleDisable2FA() {
+        var confirmDisable = confirm('Are you sure you want to disable 2-Factor Authentication?');
+        if (!confirmDisable) return;
+
+        if (window.BackendService) {
+          window.BackendService.auth.disable2FA().then(function(res) {
+            alert(res.message);
+            var user = window.BackendService.auth.getCurrentUser();
+            init2FAPanel(user);
+          }).catch(function(err) {
+            alert(err.message);
+          });
+        }
+      }
+
+      // Submit 2FA Code on Login
+      function submit2FALoginCode() {
+        var code = $('#twofa-login-code-input').val().trim();
+        if (!code || code.length !== 6) {
+          $('#twofa-modal-alert-text').text('Please enter a 6-digit code.');
+          $('#twofa-modal-alert').show();
+          return;
+        }
+
+        if (window.BackendService && pendingLoginUserId) {
+          window.BackendService.auth.verifyLogin2FA(pendingLoginUserId, code).then(function(user) {
+            $('#twoFactorModal').hide();
+            loginfun();
+          }).catch(function(err) {
+            $('#twofa-modal-alert-text').text(err.message);
+            $('#twofa-modal-alert').show();
+          });
+        }
+      }
+
+      function close2FAModal() {
+        $('#twoFactorModal').hide();
+        pendingLoginUserId = null;
+      }
     </script>
   
   <!-- Firebase & GaneshStore Auth Engine -->

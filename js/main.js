@@ -1970,7 +1970,9 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
     // Helper to get cart from localStorage
     function getCart() {
         try {
-            return JSON.parse(localStorage.getItem('cartItems')) || [];
+            return JSON.parse(localStorage.getItem('cartItems')) || 
+                   JSON.parse(localStorage.getItem('ganeshCartItems')) || 
+                   JSON.parse(localStorage.getItem('cart')) || [];
         } catch (e) {
             return [];
         }
@@ -1979,10 +1981,16 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
     // Helper to save cart to localStorage
     function saveCart(cart) {
         localStorage.setItem('cartItems', JSON.stringify(cart));
+        localStorage.setItem('ganeshCartItems', JSON.stringify(cart));
+        localStorage.setItem('cart', JSON.stringify(cart));
         updateCartBadges();
         if (typeof syncCartToSupabase === 'function') {
             syncCartToSupabase();
         }
+        if (typeof window.updateFreeShippingProgressBar === 'function') {
+            window.updateFreeShippingProgressBar();
+        }
+        $(document).trigger('cartUpdated');
     }
 
     // Helper to update all header cart badges
@@ -2080,8 +2088,8 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         // 4. Render shopping cart page if on shoping-cart.html
         renderCartPage();
 
-        // 5. Handle Coupon Code Submission
-        $(document).on('click', '.size-118', function(e) {
+        // 5. Handle Coupon Code Submission on Shopping Cart
+        $(document).on('click', '.js-apply-coupon, .size-118', function(e) {
             e.preventDefault();
             var $btn = $(this);
             if ($btn.hasClass('is-loading')) return;
@@ -2101,24 +2109,54 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             setTimeout(function() {
                 $btn.removeClass('is-loading');
                 
-                if (couponCode === 'GEMINI20' || couponCode === 'GANESH20') {
-                    activeDiscountPercentage = 20;
-                    sessionStorage.setItem('activeDiscountPercentage', '20');
+                var cart = getCart();
+                var subtotal = 0;
+                cart.forEach(function(item) {
+                    var p = parseFloat(item.price.replace(/[^\d.]/g, '')) || 0;
+                    subtotal += p * (parseInt(item.quantity) || 1);
+                });
+
+                var couponResult = null;
+                if (window.BackendService && window.BackendService.coupons) {
+                    couponResult = window.BackendService.coupons.validateCoupon(couponCode, subtotal);
+                } else {
+                    if (couponCode === 'GANESH20' || couponCode === 'GEMINI20') {
+                        couponResult = { valid: true, code: couponCode, discount_type: 'percentage', discount_value: 20, discount_amount: subtotal * 0.2 };
+                    } else if (couponCode === 'SAVE10') {
+                        couponResult = { valid: true, code: couponCode, discount_type: 'percentage', discount_value: 10, discount_amount: subtotal * 0.1 };
+                    } else {
+                        couponResult = { valid: false, message: 'Invalid or expired coupon code' };
+                    }
+                }
+
+                if (couponResult && couponResult.valid) {
+                    activeDiscountPercentage = couponResult.discount_type === 'percentage' ? couponResult.discount_value : Math.round((couponResult.discount_amount / (subtotal || 1)) * 100);
+                    sessionStorage.setItem('activeDiscountPercentage', activeDiscountPercentage.toString());
                     sessionStorage.setItem('activeCouponCode', couponCode);
+                    sessionStorage.setItem('activeDiscountAmount', couponResult.discount_amount.toString());
                     updateCartPageTotals();
                     if (typeof swal === 'function') {
-                        swal("Coupon Applied!", "Coupon '" + couponCode + "' successfully applied. You received a 20% discount on all items!", "success");
+                        swal("Coupon Applied!", "Coupon '" + couponCode + "' applied! You saved $" + couponResult.discount_amount.toFixed(2), "success");
                     }
+                    showPremiumToast('Coupon applied! Saved $' + couponResult.discount_amount.toFixed(2), 'success');
                 } else {
                     activeDiscountPercentage = 0;
                     sessionStorage.removeItem('activeDiscountPercentage');
                     sessionStorage.removeItem('activeCouponCode');
+                    sessionStorage.removeItem('activeDiscountAmount');
                     updateCartPageTotals();
+                    var errMsg = (couponResult && couponResult.message) ? couponResult.message : "The coupon code '" + couponCode + "' is invalid or expired.";
                     if (typeof swal === 'function') {
-                        swal("Invalid Coupon", "The coupon code '" + couponCode + "' is invalid, expired, or does not exist.", "error");
+                        swal("Invalid Coupon", errMsg, "error");
                     }
+                    showPremiumToast(errMsg, 'error');
                 }
-            }, 1200);
+            }, 800);
+        });
+
+        // 5.2 Handle shipping method selection on cart page
+        $(document).on('change', '.js-cart-shipping-select', function() {
+            updateCartPageTotals();
         });
 
         // 5.5 Handle Update Cart click dynamic simulation refresh
@@ -2138,7 +2176,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 // Trigger page updates
                 renderCartPage();
                 showPremiumToast('Shopping cart updated successfully!', 'success');
-            }, 1000);
+            }, 800);
         });
 
         // 6. Handle Proceed to Checkout form submission (redirect to dedicated checkout page)
@@ -2294,7 +2332,15 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 '    </div>' +
                 '  </td>' +
                 '  <td class="column-5 stext-115">' + totalStr + '</td>' +
-                '  <td class="column-6" style="text-align: center; vertical-align: middle;">' +
+                '  <td class="column-6" style="text-align: center; vertical-align: middle; white-space: nowrap;">' +
+                '    <button class="btn-save-later-cart js-save-for-later" title="Save for Later" ' +
+                '            data-name="' + item.name + '" ' +
+                '            data-price="' + item.price + '" ' +
+                '            data-image="' + item.image + '" ' +
+                '            data-size="' + item.size + '" ' +
+                '            data-color="' + item.color + '">' +
+                '      <i class="zmdi zmdi-favorite-outline"></i>' +
+                '    </button>' +
                 '    <button class="btn-remove-cart js-remove-cart-item" title="Remove from Cart" ' +
                 '            data-name="' + item.name + '" ' +
                 '            data-size="' + item.size + '" ' +
@@ -2324,25 +2370,44 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         });
         
         var discountAmount = subtotal * (activeDiscountPercentage / 100);
-        var finalTotal = subtotal - discountAmount;
+        var storedDiscountAmt = parseFloat(sessionStorage.getItem('activeDiscountAmount'));
+        if (!isNaN(storedDiscountAmt) && storedDiscountAmt > 0) {
+            discountAmount = Math.min(storedDiscountAmt, subtotal);
+        }
+
+        var shippingOpt = $('#cartShippingOption').val() || 'standard';
+        var shippingFee = shippingOpt === 'express' ? 15.00 : 0.00;
+        var tax = 0.00; // standard tax
+        var finalTotal = Math.max(0, subtotal - discountAmount) + shippingFee + tax;
         
+        // Update labels
+        $('.js-cart-subtotal').text('$ ' + subtotal.toFixed(2));
+        if (discountAmount > 0) {
+            $('.js-cart-discount-row').show();
+            $('.js-cart-discount-amount').text('- $ ' + discountAmount.toFixed(2));
+        } else {
+            $('.js-cart-discount-row').hide();
+        }
+        $('.js-cart-tax').text('$ ' + tax.toFixed(2));
+        $('.js-cart-grand-total').text('$ ' + finalTotal.toFixed(2));
+
         var $totals = $('.mtext-110');
         if ($totals.length >= 2) {
             $totals.eq(0).text('$ ' + subtotal.toFixed(2));
             $totals.eq(1).text('$ ' + finalTotal.toFixed(2));
-        } else {
-            $totals.text('$ ' + finalTotal.toFixed(2));
         }
 
-        // Render dynamic discount summary item elegantly
-        $('.js-coupon-notice').remove();
-        if (activeDiscountPercentage > 0) {
-            var noticeHtml = 
-                '<div class="flex-w flex-t p-t-8 p-b-8 js-coupon-notice" style="border-top: 1px dashed rgba(15, 118, 110, 0.2); margin-top: 8px;">' +
-                '  <div class="size-208"><span class="stext-110" style="color: #0f766e; font-family: Poppins-Medium;">Discount (20%):</span></div>' +
-                '  <div class="size-209"><span class="stext-110" style="color: #0f766e; font-family: Poppins-Medium;">- $ ' + discountAmount.toFixed(2) + '</span></div>' +
-                '</div>';
-            $('.bor12.p-t-15.p-b-30').first().before(noticeHtml);
+        // Sync Free Shipping Progress Bar
+        var freeShippingThreshold = 100.00;
+        var percent = Math.min(100, Math.round((subtotal / freeShippingThreshold) * 100));
+        var remaining = freeShippingThreshold - subtotal;
+        
+        $('#shipping-bar-fill').css('width', percent + '%');
+        $('#shipping-percent-txt').text(percent + '%');
+        if (remaining <= 0) {
+            $('#shipping-status-msg').html('🎉 Congratulations! You unlocked <strong>FREE Standard Shipping</strong>!');
+        } else {
+            $('#shipping-status-msg').html('Add $' + remaining.toFixed(2) + ' more to unlock <strong>FREE Shipping</strong>!');
         }
     }
 
@@ -2590,6 +2655,61 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             }
             showPremiumToast('<strong>' + name + '</strong> has been removed from your cart.', 'info');
         }
+    });
+
+    // Handle Save for Later action (moves item from cart to wishlist)
+    $(document).on('click', '.js-save-for-later', function(e) {
+        e.preventDefault();
+        var $row = $(this).closest('.table_row');
+        var name = $(this).attr('data-name') || $row.find('.js-cart-item-name').text().trim();
+        var price = $(this).attr('data-price') || $row.find('.column-3').text().trim();
+        var image = $(this).attr('data-image') || $row.find('.cart-item-image img').attr('src') || 'images/product-01.jpg';
+        var size = $(this).attr('data-size') || $row.find('.js-cart-item-size').text().trim();
+        var color = $(this).attr('data-color') || $row.find('.js-cart-item-color').text().trim();
+
+        // 1. Add to wishlist
+        var wishlist = getWishlist();
+        if (!wishlist.some(function(i) { return i.name === name; })) {
+            wishlist.push({
+                name: name,
+                price: price,
+                image: image,
+                link: 'product-detail.html'
+            });
+            saveWishlist(wishlist);
+        }
+
+        // 2. Remove from cart
+        var cart = getCart();
+        var itemIndex = cart.findIndex(function(i) {
+            return i.name === name && (i.size || '') === (size || '') && (i.color || '') === (color || '');
+        });
+
+        if (itemIndex > -1) {
+            cart.splice(itemIndex, 1);
+            saveCart(cart);
+            $row.addClass('row-removing');
+            setTimeout(function() {
+                $row.remove();
+                if (getCart().length === 0) {
+                    renderCartPage();
+                } else {
+                    updateCartPageTotals();
+                }
+            }, 400);
+
+            showPremiumToast('<strong>' + name + '</strong> moved to your Wishlist! ❤️', 'wishlist-added');
+        }
+    });
+
+    // Handle 1-Click Clear Cart action
+    $(document).on('click', '.js-clear-cart', function(e) {
+        e.preventDefault();
+        var cart = getCart();
+        if (cart.length === 0) return;
+        saveCart([]);
+        renderCartPage();
+        showPremiumToast('Your shopping cart has been cleared.', 'info');
     });
 
     // Sync cart and wishlist with Supabase database
@@ -3087,8 +3207,57 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             }
         });
 
-        // 3. Render Checkout Summary Card & Mobile Summary
+        // 3. Step Progress Tracker Helper
+        function updateCheckoutStep(step) {
+            for (var i = 1; i <= 4; i++) {
+                var $node = $('#step-node-' + i);
+                $node.removeClass('active completed');
+                if (i < step) {
+                    $node.addClass('completed');
+                } else if (i === step) {
+                    $node.addClass('active');
+                }
+            }
+        }
+
+        // 4. Saved User Profile Autofill Banner
+        var savedProfile = null;
+        try {
+            savedProfile = JSON.parse(localStorage.getItem('userProfile')) || (window.BackendService && window.BackendService.auth ? window.BackendService.auth.getCurrentUser() : null);
+        } catch(e) {}
+
+        if (savedProfile && (savedProfile.first_name || savedProfile.name || savedProfile.email)) {
+            var fName = savedProfile.first_name || (savedProfile.name ? savedProfile.name.split(' ')[0] : '');
+            var lName = savedProfile.last_name || (savedProfile.name && savedProfile.name.split(' ').length > 1 ? savedProfile.name.split(' ').slice(1).join(' ') : '');
+            var email = savedProfile.email || '';
+            var phone = savedProfile.phone || '';
+            var address = savedProfile.address || '';
+            var city = savedProfile.city || '';
+            var state = savedProfile.state || '';
+            var zip = savedProfile.zip || savedProfile.postcode || '';
+
+            if (fName) $('input[name="firstname"]').val(fName).addClass('field-valid');
+            if (lName) $('input[name="lastname"]').val(lName).addClass('field-valid');
+            if (email) $('input[name="checkout-email"]').val(email).addClass('field-valid');
+            if (phone) $('input[name="phone"]').val(phone).addClass('field-valid');
+            if (address) $('input[name="address"]').val(address).addClass('field-valid');
+            if (city) $('input[name="city"]').val(city).addClass('field-valid');
+            if (state) $('input[name="state"]').val(state).addClass('field-valid');
+            if (zip) $('input[name="postcode"]').val(zip).addClass('field-valid');
+
+            $('#savedProfileName').text((fName + ' ' + lName).trim() || email);
+            $('#savedProfileBanner').show();
+        }
+
+        $('#btnEditSavedInfo').on('click', function() {
+            $('#savedProfileBanner').slideUp(200);
+            $('input[name="firstname"]').focus();
+        });
+
+        // 5. Render Checkout Summary Card & Mobile Summary
         var activeCouponDiscount = parseInt(sessionStorage.getItem('activeDiscountPercentage')) || 0; // percentage
+        var activeCouponDiscountAmount = parseFloat(sessionStorage.getItem('activeDiscountAmount')) || 0;
+        var activeCouponCode = sessionStorage.getItem('activeCouponCode') || '';
         var shippingFee = 0; // standard is free
 
         function renderCheckoutSummary() {
@@ -3129,18 +3298,31 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             shippingFee = isExpress ? 15.00 : 0.00;
 
             // Calculate Coupon Discount
-            var discountVal = subtotal * (activeCouponDiscount / 100);
-            var finalTotal = subtotal - discountVal + shippingFee;
+            var discountVal = 0;
+            if (activeCouponDiscountAmount > 0) {
+                discountVal = Math.min(activeCouponDiscountAmount, subtotal);
+            } else if (activeCouponDiscount > 0) {
+                discountVal = subtotal * (activeCouponDiscount / 100);
+            }
+
+            var taxVal = 0.00;
+            var finalTotal = Math.max(0, subtotal - discountVal) + shippingFee + taxVal;
 
             // Sync Totals in summary card
             $('.js-checkout-subtotal').text('$ ' + subtotal.toFixed(2));
             $('.js-checkout-shipping').text(shippingFee > 0 ? '$ 15.00' : 'Free');
+            $('#checkoutTaxAmount').text('$ ' + taxVal.toFixed(2));
             
-            if (activeCouponDiscount > 0) {
+            if (discountVal > 0) {
                 $('.js-checkout-discount-row').show();
                 $('#checkoutDiscountAmount').text('- $ ' + discountVal.toFixed(2));
+                if (activeCouponCode) {
+                    $('#activeCouponName').text(activeCouponCode);
+                    $('#activeCouponPill').show();
+                }
             } else {
                 $('.js-checkout-discount-row').hide();
+                $('#activeCouponPill').hide();
             }
 
             $('.js-checkout-total').text('$ ' + finalTotal.toFixed(2));
@@ -3150,24 +3332,20 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
 
         renderCheckoutSummary();
 
-        // Pre-populate stored coupon if any
-        var storedCoupon = sessionStorage.getItem('activeCouponCode');
-        if (storedCoupon) {
-            var $couponInput = $('input[name="checkout_coupon"]');
-            $couponInput.val(storedCoupon);
-            if (activeCouponDiscount > 0) {
-                $couponInput.addClass('field-valid');
-            }
+        // 6. Pre-populate stored coupon if any
+        if (activeCouponCode) {
+            $('input[name="checkout_coupon"]').val(activeCouponCode).addClass('field-valid');
         }
 
-        // 4. Shipping Radio Selector click bindings
+        // 7. Shipping Radio Selector click bindings
         $('input[name="shipping_method_option"]').on('change', function() {
             $('.shipping-method-option').removeClass('active-method');
             $(this).closest('.shipping-method-option').addClass('active-method');
+            updateCheckoutStep(2);
             renderCheckoutSummary();
         });
 
-        // 5. Autocomplete address list simulator
+        // 8. Autocomplete address list simulator
         var addressSuggestions = [
             "123 Main St, New York, NY 10001",
             "456 Broadway, New York, NY 10012",
@@ -3215,9 +3393,19 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             }
         });
 
-        // 6. Interactive credit card updates & flips
+        // 9. Interactive credit card updates, flips & Live Card Brand Detection
         var $creditCard = $('#creditCard');
         
+        function detectCardBrand(num) {
+            var clean = num.replace(/\D/g, '');
+            if (/^4/.test(clean)) return { brand: 'VISA', color: '#1a1f71' };
+            if (/^(5[1-5]|2[2-7])/.test(clean)) return { brand: 'MASTERCARD', color: '#eb001b' };
+            if (/^3[47]/.test(clean)) return { brand: 'AMEX', color: '#007bc1' };
+            if (/^(608|6521|6522|508)/.test(clean)) return { brand: 'RUPAY', color: '#097939' };
+            if (/^6(?:011|5|4)/.test(clean)) return { brand: 'DISCOVER', color: '#ff6000' };
+            return { brand: 'VISA', color: 'rgba(255,255,255,0.85)' };
+        }
+
         $('#inputCardName').on('input', function() {
             var val = $(this).val().trim();
             $('#cardNameLabel').text(val ? val.toUpperCase() : 'YOUR NAME');
@@ -3229,6 +3417,10 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             var maskedVal = formatted ? formatted.join(' ') : '';
             $(this).val(maskedVal);
             $('#cardNoLabel').text(maskedVal ? maskedVal : '•••• •••• •••• ••••');
+
+            // Detect brand dynamically
+            var detected = detectCardBrand(val);
+            $('#cardBrandLogo').text(detected.brand);
         });
 
         $('#inputCardExpiry').on('input', function() {
@@ -3250,7 +3442,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             $('#cardCvvLabel').text(val ? val : '•••');
         });
 
-        // 7. Payment Tab Switching
+        // 10. Payment Tab Switching (5 Gateways: card, upi, paypal, netbanking, cod)
         $('.payment-tab-btn').on('click', function() {
             var tab = $(this).attr('data-tab');
             $('.payment-tab-btn').removeClass('active-tab');
@@ -3258,9 +3450,18 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
 
             $('.payment-panel').removeClass('active-panel');
             $('#panel-' + tab).addClass('active-panel');
+            updateCheckoutStep(3);
         });
 
-        // 8. Live input validation handlers
+        // Net Banking Bank Selection
+        $(document).on('click', '.bank-option-card', function() {
+            $('.bank-option-card').removeClass('active');
+            $(this).addClass('active');
+            var selectedBank = $(this).attr('data-bank');
+            showPremiumToast('Selected Bank: ' + selectedBank, 'info');
+        });
+
+        // 11. Live input validation handlers
         $('#checkoutForm input').on('input change blur', function() {
             var $input = $(this);
             var val = $input.val().trim();
@@ -3276,7 +3477,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             } else if ($input.attr('name') === 'card_expiry' && $('.payment-tab-btn.active-tab').attr('data-tab') === 'card') {
                 isValid = val.length === 5 && val.indexOf('/') === 2;
             } else if ($input.attr('name') === 'card_cvv' && $('.payment-tab-btn.active-tab').attr('data-tab') === 'card') {
-                isValid = val.length === 3;
+                isValid = val.length >= 3;
             }
 
             if (isValid && val) {
@@ -3288,29 +3489,100 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             }
         });
 
-        // 9. Coupon validation trigger
+        // 12. Coupon validation trigger
         $('.js-checkout-apply-coupon').on('click', function() {
             var $input = $('input[name="checkout_coupon"]');
             var code = $input.val().trim().toUpperCase();
 
-            if (code === 'GANESH20' || code === 'GEMINI20') {
-                activeCouponDiscount = 20;
-                sessionStorage.setItem('activeDiscountPercentage', '20');
+            if (!code) {
+                showPremiumToast('Please enter a coupon code.', 'warning');
+                return;
+            }
+
+            var currentCart = getCart();
+            var subtotal = 0;
+            currentCart.forEach(function(item) {
+                var p = parseFloat(item.price.replace(/[^\d.]/g, '')) || 0;
+                subtotal += p * (parseInt(item.quantity) || 1);
+            });
+
+            var couponResult = null;
+            if (window.BackendService && window.BackendService.coupons) {
+                couponResult = window.BackendService.coupons.validateCoupon(code, subtotal);
+            } else {
+                if (code === 'GANESH20' || code === 'GEMINI20') {
+                    couponResult = { valid: true, code: code, discount_type: 'percentage', discount_value: 20, discount_amount: subtotal * 0.2 };
+                } else if (code === 'SAVE10') {
+                    couponResult = { valid: true, code: code, discount_type: 'percentage', discount_value: 10, discount_amount: subtotal * 0.1 };
+                } else {
+                    couponResult = { valid: false, message: 'Invalid or expired coupon code' };
+                }
+            }
+
+            if (couponResult && couponResult.valid) {
+                activeCouponCode = code;
+                activeCouponDiscount = couponResult.discount_type === 'percentage' ? couponResult.discount_value : 0;
+                activeCouponDiscountAmount = couponResult.discount_amount;
+                sessionStorage.setItem('activeDiscountPercentage', activeCouponDiscount.toString());
+                sessionStorage.setItem('activeDiscountAmount', activeCouponDiscountAmount.toString());
                 sessionStorage.setItem('activeCouponCode', code);
                 $input.removeClass('field-error').addClass('field-valid');
-                showPremiumToast('Coupon applied! Enjoy 20% discount.', 'success');
+                showPremiumToast('Coupon applied! Enjoy $' + activeCouponDiscountAmount.toFixed(2) + ' discount.', 'success');
                 renderCheckoutSummary();
             } else {
+                activeCouponCode = '';
                 activeCouponDiscount = 0;
+                activeCouponDiscountAmount = 0;
                 sessionStorage.removeItem('activeDiscountPercentage');
+                sessionStorage.removeItem('activeDiscountAmount');
                 sessionStorage.removeItem('activeCouponCode');
                 $input.removeClass('field-valid').addClass('field-error');
-                showPremiumToast('Invalid coupon code.', 'error');
+                var msg = (couponResult && couponResult.message) ? couponResult.message : 'Invalid coupon code.';
+                showPremiumToast(msg, 'error');
                 renderCheckoutSummary();
             }
         });
 
-        // 10. UPI Scan verification handler
+        // 12.5 Remove active coupon pill
+        $('#btnRemoveCoupon').on('click', function(e) {
+            e.preventDefault();
+            activeCouponCode = '';
+            activeCouponDiscount = 0;
+            activeCouponDiscountAmount = 0;
+            sessionStorage.removeItem('activeDiscountPercentage');
+            sessionStorage.removeItem('activeDiscountAmount');
+            sessionStorage.removeItem('activeCouponCode');
+            $('input[name="checkout_coupon"]').val('').removeClass('field-valid field-error');
+            showPremiumToast('Coupon removed.', 'info');
+            renderCheckoutSummary();
+        });
+
+        // 13. Express Fast Checkout (Apple Pay & Google Pay)
+        $('.js-btn-express-apple, .js-btn-express-gpay').on('click', function(e) {
+            e.preventDefault();
+            var isApple = $(this).hasClass('js-btn-express-apple');
+            var provider = isApple ? 'Apple Pay' : 'Google Pay';
+
+            // If contact fields are blank, provide guest defaults
+            if (!$('input[name="firstname"]').val()) $('input[name="firstname"]').val('Valued');
+            if (!$('input[name="lastname"]').val()) $('input[name="lastname"]').val('Customer');
+            if (!$('input[name="checkout-email"]').val()) $('input[name="checkout-email"]').val('guest@ganeshstore.com');
+            if (!$('input[name="phone"]').val()) $('input[name="phone"]').val('+1 (555) 019-2834');
+            if (!$('input[name="address"]').val()) $('input[name="address"]').val('742 Evergreen Terrace');
+            if (!$('input[name="city"]').val()) $('input[name="city"]').val('Springfield');
+            if (!$('input[name="state"]').val()) $('input[name="state"]').val('OR');
+            if (!$('input[name="postcode"]').val()) $('input[name="postcode"]').val('97477');
+
+            showPremiumToast('Authenticating with ' + provider + '...', 'info');
+            
+            // Set payment method and trigger order
+            window.expressPaymentProvider = provider;
+            setTimeout(function() {
+                $('.js-btn-place-order').trigger('click');
+            }, 600);
+        });
+
+        // 14. UPI Scan verification handler
         $('.js-verify-upi-payment').on('click', function() {
             var $btn = $(this);
             $btn.addClass('is-loading').text('Verifying...');
@@ -3319,31 +3591,78 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 $btn.removeClass('is-loading').text('Verified ✓').css('background-color', '#0f766e');
                 showPremiumToast('UPI Transaction Verified Successfully!', 'success');
                 $btn.data('verified', true);
-            }, 1500);
+            }, 1200);
         });
 
-        // 11. PayPal Popup simulation
+        // 15. PayPal Popup simulation
         $('.js-paypal-checkout-btn').on('click', function() {
-            showPremiumToast('Redirecting to PayPal securely...', 'info');
+            showPremiumToast('Connecting to PayPal sandbox...', 'info');
             setTimeout(function() {
-                if (confirm("Simulate PayPal Sandbox Authorization?")) {
-                    window.paypalAuthorized = true;
-                    showPremiumToast('PayPal authorization completed successfully.', 'success');
-                    $('.js-btn-place-order').trigger('click');
-                }
-            }, 1000);
+                window.paypalAuthorized = true;
+                showPremiumToast('PayPal authorization approved!', 'success');
+                $('.js-btn-place-order').trigger('click');
+            }, 800);
         });
 
-        // 12. Mobile summary toggler
+        // 16. Mobile summary toggler
         $('.mobile-summary-toggle').on('click', function() {
             $(this).toggleClass('expanded');
             $('.mobile-summary-collapse').toggleClass('open');
         });
 
-        // 13. Printable Invoice PDF handler
+        // 17. Printable Invoice PDF handler & Track Package modal handler
         $(document).on('click', '#btnPrintInvoice', function(e) {
             e.preventDefault();
             window.print();
+        });
+
+        window.openTrackingModal = function(trackingNumber) {
+            var $modal = $('#orderTrackingModal');
+            var trk = trackingNumber || $('#receiptTrackingNumber').text() || 'GS-TRK-892415';
+            
+            if (!$modal.length) {
+                showPremiumToast('Tracking: ' + trk + ' (Status: In Transit - On Schedule)', 'info');
+                return;
+            }
+            
+            $('#trk-number').text(trk);
+            var est = new Date(Date.now() + 86400000 * 3).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            $('#trk-est-delivery').text(est);
+
+            var milestones = [
+                { title: 'Order Confirmed', desc: 'Payment verified & order queued', done: true, time: 'Just now' },
+                { title: 'Quality Verification', desc: 'Hand-inspected by GaneshStore Atelier', done: true, time: 'In Progress' },
+                { title: 'Dispatched & Carrier Handover', desc: 'Picked up by FedEx Express Priority', done: false, time: 'Pending' },
+                { title: 'Out for Delivery', desc: 'Assigned to regional courier', done: false, time: 'Pending' },
+                { title: 'Delivered', desc: 'Direct-to-door white glove delivery', done: false, time: 'Estimated ' + est }
+            ];
+
+            var $tl = $('#trk-timeline-container');
+            $tl.empty();
+            milestones.forEach(function(m) {
+                var item = 
+                    '<div class="tracking-item ' + (m.done ? 'completed' : '') + '">' +
+                    '  <div class="tracking-item-dot"><i class="zmdi ' + (m.done ? 'zmdi-check' : 'zmdi-circle-o') + '"></i></div>' +
+                    '  <div class="tracking-item-content">' +
+                    '    <h5>' + m.title + '</h5>' +
+                    '    <p>' + m.desc + '</p>' +
+                    '    <span class="tracking-time">' + m.time + '</span>' +
+                    '  </div>' +
+                    '</div>';
+                $tl.append(item);
+            });
+
+            $modal.fadeIn(200);
+        };
+
+        window.closeTrackingModal = function() {
+            $('#orderTrackingModal').fadeOut(200);
+        };
+
+        $(document).on('click', '#btnTrackThisPackage', function(e) {
+            e.preventDefault();
+            var trkNo = $('#receiptTrackingNumber').text() || 'GS-TRK-892415';
+            window.openTrackingModal(trkNo);
         });
 
         // Confetti explosion script helper
@@ -3374,7 +3693,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             }
         }
 
-        // 14. Place Order Submission
+        // 18. Place Order Submission
         $('.js-btn-place-order').on('click', function(e) {
             e.preventDefault();
 
@@ -3389,7 +3708,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             });
 
             if (hasErrors) {
-                showPremiumToast('Please complete all required fields.', 'error');
+                showPremiumToast('Please complete all required address & contact fields.', 'error');
                 $('.checkout-form-section').addClass('field-error');
                 setTimeout(function() {
                     $('.checkout-form-section').removeClass('field-error');
@@ -3398,32 +3717,42 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             }
 
             // Verify specific payment tab method authorization
-            var activeTab = $('.payment-tab-btn.active-tab').attr('data-tab');
-            if (activeTab === 'card') {
-                var cc = $('#inputCardNumber').val().replace(/\s/g, '');
-                var exp = $('#inputCardExpiry').val();
-                var cvv = $('#inputCardCvv').val();
-                if (cc.length !== 16 || exp.length !== 5 || cvv.length !== 3) {
-                    showPremiumToast('Please enter valid credit card details.', 'error');
-                    return;
-                }
-            } else if (activeTab === 'upi') {
-                if (!$('.js-verify-upi-payment').data('verified')) {
-                    showPremiumToast('Please scan the QR code and verify your transaction.', 'error');
-                    return;
-                }
-            } else if (activeTab === 'paypal') {
-                if (!window.paypalAuthorized) {
-                    showPremiumToast('Please click "Pay with PayPal" to authorize the transaction.', 'error');
-                    return;
+            var activeTab = $('.payment-tab-btn.active-tab').attr('data-tab') || 'card';
+            var effectivePayment = window.expressPaymentProvider || activeTab.toUpperCase();
+
+            if (!window.expressPaymentProvider) {
+                if (activeTab === 'card') {
+                    var cc = $('#inputCardNumber').val().replace(/\s/g, '');
+                    var exp = $('#inputCardExpiry').val();
+                    var cvv = $('#inputCardCvv').val();
+                    if (cc.length !== 16 || exp.length !== 5 || cvv.length < 3) {
+                        showPremiumToast('Please enter valid 16-digit credit card details.', 'error');
+                        return;
+                    }
+                } else if (activeTab === 'upi') {
+                    if (!$('.js-verify-upi-payment').data('verified')) {
+                        showPremiumToast('Please verify your UPI QR payment before proceeding.', 'error');
+                        return;
+                    }
+                } else if (activeTab === 'paypal') {
+                    if (!window.paypalAuthorized) {
+                        showPremiumToast('Please click "Pay with PayPal" to authorize the transaction.', 'error');
+                        return;
+                    }
+                } else if (activeTab === 'netbanking') {
+                    var selBank = $('.bank-option-card.active').attr('data-bank');
+                    effectivePayment = 'NET_BANKING (' + (selBank || 'HDFC') + ')';
+                } else if (activeTab === 'cod') {
+                    effectivePayment = 'CASH_ON_DELIVERY';
                 }
             }
 
             // Launch secure loader
             var $overlay = $('#processingOverlay');
             $overlay.show();
+            updateCheckoutStep(4);
 
-            // Animate steps
+            // Animate processing steps
             setTimeout(function() {
                 $('#proc-step-1').removeClass('active-step').addClass('step-completed').find('i').removeClass('zmdi-circle-o').addClass('zmdi-check-circle');
                 $('#proc-step-2').addClass('active-step');
@@ -3436,18 +3765,20 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                         $('#proc-step-3').removeClass('active-step').addClass('step-completed').find('i').removeClass('zmdi-circle-o').addClass('zmdi-check-circle');
                         $('#proc-step-4').addClass('active-step');
 
-                        // Save details to database
+                        // Build order payload
                         var currentCart = getCart();
                         var orderId = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
+                        var trackingNumber = 'GS-TRK-' + Math.floor(100000 + Math.random() * 900000);
                         var subtotalStr = $('.js-checkout-subtotal').text().replace(/[^\d.]/g, '');
                         var subtotalNum = parseFloat(subtotalStr) || 0;
-                        var discountNum = subtotalNum * (activeCouponDiscount / 100);
-                        var totalNum = subtotalNum - discountNum + shippingFee;
+                        var discountNum = activeCouponDiscountAmount > 0 ? Math.min(activeCouponDiscountAmount, subtotalNum) : subtotalNum * (activeCouponDiscount / 100);
+                        var taxNum = 0.00;
+                        var totalNum = Math.max(0, subtotalNum - discountNum) + shippingFee + taxNum;
 
                         var emailVal = $('input[name="checkout-email"]').val().trim();
                         var fullNameVal = $('input[name="firstname"]').val().trim() + ' ' + $('input[name="lastname"]').val().trim();
                         var addrVal = $('input[name="address"]').val().trim() + ', ' + $('input[name="city"]').val().trim() + ', ' + $('input[name="state"]').val().trim() + ' ' + $('input[name="postcode"]').val().trim();
-                        var shipMethodVal = $('input[name="shipping_method_option"]:checked').val() === 'express' ? 'Express Delivery' : 'Standard Delivery';
+                        var shipMethodVal = $('input[name="shipping_method_option"]:checked').val() === 'express' ? 'Express Priority' : 'Standard Delivery';
                         
                         var activeProfile = null;
                         try {
@@ -3456,16 +3787,20 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
 
                         var orderData = {
                             order_id: orderId,
-                            user_id: activeProfile ? activeProfile.id : null,
+                            tracking_number: trackingNumber,
+                            user_id: activeProfile ? (activeProfile.id || activeProfile.uid) : null,
                             customer_name: fullNameVal,
                             email: emailVal,
                             shipping_address: addrVal,
                             shipping_method: shipMethodVal,
-                            payment_method: activeTab.toUpperCase(),
+                            payment_method: effectivePayment,
                             items: currentCart,
                             subtotal: subtotalNum,
                             discount: discountNum,
-                            total: totalNum
+                            shipping_fee: shippingFee,
+                            tax: taxNum,
+                            total: totalNum,
+                            created_at: new Date().toISOString()
                         };
 
                         function completeTransaction() {
@@ -3475,11 +3810,12 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                             $('.mobile-summary-toggle').hide();
                             $('.mobile-summary-collapse').removeClass('open').hide();
 
-                            // Populate invoice details
+                            // Populate invoice receipt details
                             $('#receiptOrderId').text(orderId);
+                            $('#receiptTrackingNumber').text(trackingNumber);
                             $('#receiptDate').text(new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }));
                             $('#receiptEmail').text(emailVal);
-                            $('#receiptPayment').text(activeTab.toUpperCase());
+                            $('#receiptPayment').text(effectivePayment);
                             $('#receiptAddress').text(addrVal);
 
                             // Populate items table
@@ -3517,9 +3853,10 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                             history.push(orderData);
                             localStorage.setItem('order_history', JSON.stringify(history));
 
-                            // Clear cart and coupon
+                            // Clear cart and coupon session
                             saveCart([]);
                             sessionStorage.removeItem('activeDiscountPercentage');
+                            sessionStorage.removeItem('activeDiscountAmount');
                             sessionStorage.removeItem('activeCouponCode');
                             updateCartBadges();
                             renderSideDrawerCart();
@@ -3531,33 +3868,37 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
 
                             // Fireworks / confetti explosion
                             triggerConfettiBurst();
-                            showPremiumToast('Invoice has been sent to ' + emailVal, 'success');
+                            showPremiumToast('Order confirmed! Invoice & Tracking sent to ' + emailVal, 'success');
                         }
 
-                        // Save to Supabase Cloud Database if configured
-                        if (window.supabaseClient) {
+                        // Create order through BackendService or Supabase if available
+                        if (window.BackendService && window.BackendService.orders) {
+                            window.BackendService.orders.createOrder(orderData)
+                                .then(function() {
+                                    completeTransaction();
+                                })
+                                .catch(function(err) {
+                                    console.warn("BackendService order creation warning:", err);
+                                    completeTransaction();
+                                });
+                        } else if (window.supabaseClient) {
                             window.supabaseClient
                                 .from('orders')
                                 .insert(orderData)
                                 .then(function(res) {
-                                    if (res.error) {
-                                        console.warn("Supabase Order saving failed, falling back to local storage:", res.error.message);
-                                    } else {
-                                        console.log("Order saved to Supabase cloud successfully.");
-                                    }
                                     completeTransaction();
                                 })
                                 .catch(function(err) {
-                                    console.warn("Supabase Order saving caught exception, falling back to local:", err);
+                                    console.warn("Supabase order insert fallback:", err);
                                     completeTransaction();
                                 });
                         } else {
                             completeTransaction();
                         }
 
-                    }, 1000);
-                }, 1000);
-            }, 1000);
+                    }, 800);
+                }, 800);
+            }, 800);
 
         });
     }
@@ -4436,93 +4777,280 @@ $(document).ready(function() {
 
 
 /*==================================================================
-[ LUXURY FEATURES BATCH 2 ]*/
+[ LUXURY FEATURES BATCH 2 - COMPLETE MASTER SUITE ]*/
 
-// Feature 1: Smart Live Search Overlay
+// Master Store Catalog for instant global search across all pages
+var GANESH_STORE_CATALOG = [
+    { id: '1', name: 'Esprit Ruffle Shirt', price: '$16.64', category: 'Women', tag: '.women', img: 'images/product-01.jpg', url: 'p-Esprit-Ruffle-Shirt.html' },
+    { id: '2', name: 'Herschel supply', price: '$35.31', category: 'Women', tag: '.women', img: 'images/product-02.jpg', url: 'p-Herschel-supply.html' },
+    { id: '3', name: 'Only Check Trouser', price: '$25.50', category: 'Men', tag: '.men', img: 'images/product-03.jpg', url: 'p-Only-Check-Trouser.html' },
+    { id: '4', name: 'Classic Trench Coat', price: '$75.00', category: 'Women', tag: '.women', img: 'images/product-04.jpg', url: 'p-Classic-Trench-Coat.html' },
+    { id: '5', name: 'Front Pocket Jumper', price: '$34.75', category: 'Women', tag: '.women', img: 'images/product-05.jpg', url: 'p-Front-Pocket-Jumper.html' },
+    { id: '6', name: 'Vintage Inspired Classic', price: '$93.20', category: 'Watches', tag: '.watches', img: 'images/product-06.jpg', url: 'p-Vintage-Inspired-Classic.html' },
+    { id: '7', name: 'Shirt in Stretch Cotton', price: '$52.66', category: 'Women', tag: '.women', img: 'images/product-07.jpg', url: 'p-Shirt-in-Stretch-Cotton.html' },
+    { id: '8', name: 'Pieces Metallic Printed', price: '$18.96', category: 'Women', tag: '.women', img: 'images/product-08.jpg', url: 'p-Pieces-Metallic-Printed.html' },
+    { id: '9', name: 'Converse All Star Hi Plimsolls', price: '$75.00', category: 'Shoes', tag: '.shoes', img: 'images/product-09.jpg', url: 'p-Converse-All-Star-Hi-Plimsolls.html' },
+    { id: '10', name: 'Femme T-Shirt In Stripe', price: '$25.85', category: 'Women', tag: '.women', img: 'images/product-10.jpg', url: 'p-Femme-T-Shirt-In-Stripe.html' },
+    { id: '11', name: 'Herschel supply men', price: '$63.16', category: 'Men', tag: '.men', img: 'images/product-11.jpg', url: 'p-Herschel-supply-men.html' },
+    { id: '12', name: 'Herschel supply watch', price: '$63.15', category: 'Watches', tag: '.watches', img: 'images/product-12.jpg', url: 'p-Herschel-supply-watch.html' },
+    { id: '13', name: 'T-Shirt with Sleeve', price: '$18.49', category: 'Women', tag: '.women', img: 'images/product-13.jpg', url: 'p-T-Shirt-with-Sleeve.html' },
+    { id: '14', name: 'Pretty Little Thing', price: '$54.79', category: 'Women', tag: '.women', img: 'images/product-14.jpg', url: 'p-Pretty-Little-Thing.html' },
+    { id: '15', name: 'Mini Silver Mesh Watch', price: '$86.85', category: 'Watches', tag: '.watches', img: 'images/product-15.jpg', url: 'p-Mini-Silver-Mesh-Watch.html' },
+    { id: '16', name: 'Square Neck Back', price: '$29.64', category: 'Women', tag: '.women', img: 'images/product-16.jpg', url: 'p-Square-Neck-Back.html' }
+];
+
+// Feature 1: Smart Live Search Overlay Engine
 function initSmartLiveSearch() {
-    var overlayHtml = '<div class="luxury-search-overlay">' +
-        '  <div class="luxury-search-close"><i class="zmdi zmdi-close"></i></div>' +
+    var overlayHtml = '<div class="luxury-search-overlay" id="luxurySearchOverlay">' +
+        '  <div class="luxury-search-close" id="luxurySearchClose" title="Close Search (Esc)"><i class="zmdi zmdi-close"></i></div>' +
         '  <div class="luxury-search-input-wrap">' +
-        '    <input type="text" class="luxury-search-input" placeholder="Search for luxury...">' +
+        '    <i class="zmdi zmdi-search luxury-search-input-icon"></i>' +
+        '    <input type="text" class="luxury-search-input" id="luxurySearchInput" placeholder="Search for luxury items, watches, shirts..." autocomplete="off">' +
+        '    <i class="zmdi zmdi-close-circle luxury-search-clear" id="luxurySearchClear" title="Clear input"></i>' +
         '  </div>' +
-        '  <div class="luxury-trending-searches">' +
-        '    <div class="luxury-trending-title">Trending Now</div>' +
-        '    <div class="luxury-trending-pill">Trench Coat</div>' +
-        '    <div class="luxury-trending-pill">Leather Jacket</div>' +
-        '    <div class="luxury-trending-pill">Silver Watch</div>' +
-        '    <div class="luxury-trending-pill">Summer Dress</div>' +
+        '  <div class="luxury-trending-searches" id="luxuryTrendingSearches">' +
+        '    <div class="luxury-trending-title"><i class="zmdi zmdi-trending-up"></i> Trending Now</div>' +
+        '    <div class="luxury-trending-pill" data-search="Trench Coat">Trench Coat</div>' +
+        '    <div class="luxury-trending-pill" data-search="Watch">Luxury Watches</div>' +
+        '    <div class="luxury-trending-pill" data-search="Shirt">Cotton Shirts</div>' +
+        '    <div class="luxury-trending-pill" data-search="Shoes">Sneakers & Shoes</div>' +
+        '    <div class="luxury-trending-pill" data-search="Trouser">Check Trousers</div>' +
+        '    <div class="luxury-trending-pill" data-search="Jumper">Front Pocket Jumper</div>' +
+        '  </div>' +
+        '  <div class="luxury-search-results-wrap" id="luxurySearchResultsWrap" style="display: none;">' +
+        '    <div class="luxury-search-results-header">' +
+        '      <span class="luxury-search-count" id="luxurySearchCount">Found 0 products</span>' +
+        '      <a href="product.html" class="luxury-search-view-all" id="luxurySearchViewAll">View Full Catalog &rarr;</a>' +
+        '    </div>' +
+        '    <div class="luxury-search-grid" id="luxurySearchGrid"></div>' +
+        '  </div>' +
+        '  <div class="luxury-search-empty" id="luxurySearchEmpty" style="display: none;">' +
+        '    <div class="luxury-search-empty-icon"><i class="zmdi zmdi-search-for"></i></div>' +
+        '    <h4 class="luxury-search-empty-title">No matching products found</h4>' +
+        '    <p class="luxury-search-empty-sub">Try searching with a different keyword or explore our collection.</p>' +
+        '    <a href="product.html" class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04 pointer" style="max-width: 200px; margin: 0 auto; border-radius: 25px;">Browse All</a>' +
         '  </div>' +
         '</div>';
     
-    if (!$('.luxury-search-overlay').length) {
+    if (!$('#luxurySearchOverlay').length) {
         $('body').append(overlayHtml);
     }
 
-    // Intercept original search modal trigger
+    var $overlay = $('#luxurySearchOverlay');
+    var $input = $('#luxurySearchInput');
+    var $clearBtn = $('#luxurySearchClear');
+    var $trending = $('#luxuryTrendingSearches');
+    var $resultsWrap = $('#luxurySearchResultsWrap');
+    var $resultsGrid = $('#luxurySearchGrid');
+    var $resultsCount = $('#luxurySearchCount');
+    var $viewAllBtn = $('#luxurySearchViewAll');
+    var $empty = $('#luxurySearchEmpty');
+
+    // Function to render search results in real time
+    function executeLiveSearch(query) {
+        var cleanQ = (query || '').trim().toLowerCase();
+
+        if (!cleanQ) {
+            $clearBtn.hide();
+            $trending.fadeIn(200);
+            $resultsWrap.hide();
+            $empty.hide();
+            return;
+        }
+
+        $clearBtn.show();
+        $trending.hide();
+
+        // Intelligent typo tolerance & fuzzy matching
+        function isMatch(name, cat, q) {
+            name = (name || '').toLowerCase();
+            cat = (cat || '').toLowerCase();
+            if (name.indexOf(q) > -1 || cat.indexOf(q) > -1) return true;
+            
+            var qTokens = q.split(/\s+/).filter(Boolean);
+            if (qTokens.length > 1) {
+                var allFound = qTokens.every(function(tok) {
+                    return name.indexOf(tok) > -1 || cat.indexOf(tok) > -1;
+                });
+                if (allFound) return true;
+            }
+            
+            if (q.length >= 3) {
+                var pIdx = 0;
+                for (var i = 0; i < name.length && pIdx < q.length; i++) {
+                    if (name[i] === q[pIdx]) pIdx++;
+                }
+                if (pIdx === q.length) return true;
+            }
+            return false;
+        }
+
+        var matches = GANESH_STORE_CATALOG.filter(function(item) {
+            return isMatch(item.name, item.category, cleanQ);
+        });
+
+        if (matches.length > 0) {
+            $empty.hide();
+            $resultsCount.text('Found ' + matches.length + (matches.length === 1 ? ' product' : ' products'));
+            $viewAllBtn.attr('href', 'product.html?search=' + encodeURIComponent(cleanQ));
+            
+            var gridHtml = '';
+            matches.forEach(function(p) {
+                gridHtml += '<a href="' + p.url + '" class="luxury-search-card">' +
+                    '  <div class="luxury-search-card-thumb-wrap">' +
+                    '    <img src="' + p.img + '" alt="' + p.name + '" class="luxury-search-card-thumb">' +
+                    '  </div>' +
+                    '  <div class="luxury-search-card-body">' +
+                    '    <span class="luxury-search-card-cat">' + p.category + '</span>' +
+                    '    <h5 class="luxury-search-card-name">' + p.name + '</h5>' +
+                    '    <span class="luxury-search-card-price">' + p.price + '</span>' +
+                    '  </div>' +
+                    '</a>';
+            });
+            
+            $resultsGrid.html(gridHtml);
+            $resultsWrap.fadeIn(200);
+        } else {
+            $resultsWrap.hide();
+            $empty.fadeIn(200);
+        }
+
+        // ACDL Standard Telemetry Push
+        if (window.trackACDLSearch) {
+            window.trackACDLSearch(cleanQ, matches.length, 'All');
+        } else if (window.adobeDataLayer && typeof window.adobeDataLayer.push === 'function') {
+            window.adobeDataLayer.push({
+                event: 'searchInitiated',
+                search: {
+                    keyword: cleanQ,
+                    resultsCount: matches.length,
+                    categoryFilter: 'All',
+                    timestamp: Date.now()
+                }
+            });
+        }
+    }
+
+    var searchDebounceTimer = null;
+
+    // Real-time input listener with debouncing
+    $input.on('input', function() {
+        var query = $(this).val();
+        clearTimeout(searchDebounceTimer);
+        searchDebounceTimer = setTimeout(function() {
+            executeLiveSearch(query);
+        }, 150);
+    });
+
+    // Enter key redirects to product.html?search=...
+    $input.on('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            var q = $(this).val().trim();
+            if (q) {
+                window.location.href = 'product.html?search=' + encodeURIComponent(q);
+            }
+        }
+    });
+
+    // Intercept original search modal triggers across all pages
     $(document).off('click', '.js-show-modal-search').on('click', '.js-show-modal-search', function(e) {
         e.preventDefault();
         e.stopPropagation();
-        $('.luxury-search-overlay').addClass('active');
+        $overlay.addClass('active');
+        $('body').css('overflow', 'hidden');
         setTimeout(function() {
-            $('.luxury-search-input').focus();
-        }, 400);
+            $input.focus();
+        }, 300);
     });
 
-    $(document).on('click', '.luxury-search-close', function() {
-        $('.luxury-search-overlay').removeClass('active');
-        $('.luxury-search-input').val('');
+    // Close button click
+    $(document).on('click', '#luxurySearchClose', function() {
+        $overlay.removeClass('active');
+        $('body').css('overflow', '');
+        $input.val('');
+        executeLiveSearch('');
+    });
+
+    // Clear button click
+    $(document).on('click', '#luxurySearchClear', function() {
+        $input.val('').focus();
+        executeLiveSearch('');
     });
 
     // Close on ESC
     $(document).on('keydown', function(e) {
-        if (e.key === "Escape") {
-            $('.luxury-search-overlay').removeClass('active');
+        if (e.key === 'Escape' && $overlay.hasClass('active')) {
+            $overlay.removeClass('active');
+            $('body').css('overflow', '');
         }
     });
 
-    // Auto-fill input when clicking trending pill
+    // Trending pill click
     $(document).on('click', '.luxury-trending-pill', function() {
-        $('.luxury-search-input').val($(this).text()).focus();
-        // In a real app, this would trigger the actual search
+        var term = $(this).attr('data-search') || $(this).text();
+        $input.val(term).focus();
+        executeLiveSearch(term);
     });
 }
 
-// Feature 2: Category Filter Counts
+// Feature 2: Category Filter Counts with Live Isotope Synchronization
 function initCategoryFilterCounts() {
-    $('.filter-tope-group button').each(function() {
-        var filter = $(this).attr('data-filter');
-        if (filter === '*') {
-            var count = $('.isotope-item').length;
-            if (count && $(this).find('.filter-count').length === 0) {
-                $(this).append('<span class="filter-count"> (' + count + ')</span>');
+    function updateCounts() {
+        $('.filter-tope-group button').each(function() {
+            var $btn = $(this);
+            var filter = $btn.attr('data-filter');
+            var count = 0;
+
+            if (filter === '*') {
+                var $items = $('.isotope-item');
+                count = $items.length > 0 ? $items.length : GANESH_STORE_CATALOG.length;
+            } else if (filter) {
+                var $matches = $(filter);
+                if ($matches.length > 0) {
+                    count = $matches.length;
+                } else {
+                    // Fallback to catalog count
+                    var cleanTag = filter.replace('.', '').toLowerCase();
+                    count = GANESH_STORE_CATALOG.filter(function(item) {
+                        return item.tag.toLowerCase() === filter.toLowerCase() ||
+                               item.category.toLowerCase() === cleanTag;
+                    }).length;
+                }
             }
-        } else if (filter) {
-            var count = $(filter).length;
-            if (count && $(this).find('.filter-count').length === 0) {
-                $(this).append('<span class="filter-count"> (' + count + ')</span>');
+
+            $btn.find('.filter-count').remove();
+            if (count > 0) {
+                $btn.append('<span class="filter-count"> (' + count + ')</span>');
             }
-        }
-    });
+        });
+    }
+
+    updateCounts();
+
+    // Re-verify counts after dynamic image/isotope layout settling
+    setTimeout(updateCounts, 600);
 }
 
-// Feature 3: Tactile Haptic Ripples on Quantity Controls
+// Feature 3: Tactile Haptic Ripples on Quantity Controls & Buttons
 function initTactileRipples() {
     $('.btn-num-product-down, .btn-num-product-up').addClass('luxury-ripple-btn');
     
-    $(document).on('mousedown', '.luxury-ripple-btn', function(e) {
+    $(document).off('mousedown', '.luxury-ripple-btn').on('mousedown', '.luxury-ripple-btn', function(e) {
         var $btn = $(this);
         var offset = $btn.offset();
         var x = e.pageX - offset.left;
         var y = e.pageY - offset.top;
         
         var $ripple = $('<span class="luxury-ripple-effect"></span>');
+        var d = Math.max($btn.outerWidth(), $btn.outerHeight()) * 1.5;
         $ripple.css({
             top: y + 'px',
             left: x + 'px',
-            width: $btn.height() + 'px',
-            height: $btn.height() + 'px',
-            marginTop: -($btn.height() / 2) + 'px',
-            marginLeft: -($btn.height() / 2) + 'px'
+            width: d + 'px',
+            height: d + 'px',
+            marginTop: -(d / 2) + 'px',
+            marginLeft: -(d / 2) + 'px'
         });
         
         $btn.append($ripple);
@@ -4539,8 +5067,7 @@ function initQuantityValueBump() {
         var $input = $(this).siblings('.num-product');
         if ($input.length) {
             $input.removeClass('value-bump');
-            // Force reflow for animation restart
-            void $input[0].offsetWidth;
+            void $input[0].offsetWidth; // Force reflow
             $input.addClass('value-bump');
             setTimeout(function() {
                 $input.removeClass('value-bump');
@@ -4549,11 +5076,13 @@ function initQuantityValueBump() {
     });
 }
 
-// Feature 5: Free Shipping Progress Bar Updates
+// Feature 5: Free Shipping Progress Bar Updates ($100 Threshold)
 window.updateFreeShippingProgressBar = function() {
     var cartItems = [];
     try {
-        cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+        cartItems = JSON.parse(localStorage.getItem('cartItems')) || 
+                    JSON.parse(localStorage.getItem('ganeshCartItems')) || 
+                    JSON.parse(localStorage.getItem('cart')) || [];
     } catch (e) {
         cartItems = [];
     }
@@ -4569,11 +5098,9 @@ window.updateFreeShippingProgressBar = function() {
     var percent = Math.min(100, Math.max(0, (subtotal / threshold) * 100));
     var remaining = (threshold - subtotal).toFixed(2);
 
-    // Target cart page or side drawer containers
     var $progressContainers = $('.shipping-progress-container');
 
     if (!$progressContainers.length) {
-        // Inject into cart drawer top or shopping cart page top if container missing
         var $targetCartPage = $('.table-shopping-cart').closest('.col-lg-10, .col-lg-8, .wrap-table-shopping-cart').first();
         if ($targetCartPage.length && !$('#cart-page-shipping-progress').length) {
             $targetCartPage.prepend('<div id="cart-page-shipping-progress" class="shipping-progress-container"></div>');
@@ -4624,13 +5151,180 @@ function initBadgePulseObserver() {
     });
 }
 
-// Initialize Batch 2 & Enhanced Micro-Animations
+// Feature 7: Universal Product Review & Rating Aggregation System
+function initUniversalReviewSystem() {
+    var $reviewForm = $('#reviews form, .tab-pane#reviews form');
+    if (!$reviewForm.length) return;
+
+    var productName = $('.js-name-detail').text().trim() || $('h4.mtext-105').text().trim() || document.title.split('-')[0].trim();
+
+    // Populate existing reviews on load
+    if (window.BackendService && productName) {
+        window.BackendService.reviews.getProductReviews(productName).then(function(reviews) {
+            if (reviews && reviews.length > 0) {
+                $('a[href="#reviews"]').text('Reviews (' + reviews.length + ')');
+            }
+        });
+    }
+
+    $reviewForm.on('submit', function(e) {
+        e.preventDefault();
+        var $form = $(this);
+        var rating = $form.find('input[name="rating"]').val() || $form.find('.wrap-rating .zmdi-star').length || 5;
+        var comment = $form.find('textarea[name="review"], #review').val().trim();
+        var name = $form.find('input[name="name"], #name').val().trim() || 'Valued Client';
+        var email = $form.find('input[name="email"], #email').val().trim() || 'customer@ganeshstore.com';
+
+        if (!comment) {
+            if (typeof showPremiumToast === 'function') {
+                showPremiumToast('Please write a short review before submitting.', 'error');
+            } else {
+                alert('Please write a short review before submitting.');
+            }
+            return;
+        }
+
+        var reviewData = {
+            name: name,
+            reviewer_name: name,
+            email: email,
+            rating: parseInt(rating, 10) || 5,
+            comment: comment,
+            verified_purchase: true
+        };
+
+        if (window.BackendService) {
+            window.BackendService.reviews.addReview(productName, reviewData).then(function(newRev) {
+                var starsHtml = '';
+                for (var s = 1; s <= 5; s++) {
+                    starsHtml += s <= newRev.rating ? '<i class="zmdi zmdi-star"></i> ' : '<i class="zmdi zmdi-star-outline"></i> ';
+                }
+
+                var reviewCardHtml = 
+                    '<div class="flex-w flex-t p-b-35" style="animation: fadeIn 0.4s ease; border-bottom: 1px solid #f0f0f0; margin-bottom: 25px;">' +
+                    '  <div class="wrap-pic-s size-109 bor0 of-hidden m-r-18 m-t-6" style="background:#717fe0; color:#fff; border-radius:50%; width:44px; height:44px; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:16px;">' +
+                    '    ' + (name.substring(0, 2).toUpperCase()) +
+                    '  </div>' +
+                    '  <div class="size-207">' +
+                    '    <div class="flex-w flex-sb-m p-b-10">' +
+                    '      <span class="mtext-107 cl2 p-r-20">' + name + ' <span style="font-size:11px; background:#e8f5e9; color:#2e7d32; padding:2px 8px; border-radius:12px; font-weight:700; margin-left:6px;"><i class="zmdi zmdi-check-circle"></i> Verified Buyer</span></span>' +
+                    '      <span class="fs-18 cl11" style="color: #f5a623;">' + starsHtml + '</span>' +
+                    '    </div>' +
+                    '    <p class="stext-102 cl6">' + comment + '</p>' +
+                    '  </div>' +
+                    '</div>';
+
+                var $revContainer = $form.closest('.p-b-30');
+                if ($revContainer.find('.flex-w.flex-t').length > 0) {
+                    $revContainer.find('.flex-w.flex-t').first().before(reviewCardHtml);
+                } else {
+                    $form.before(reviewCardHtml);
+                }
+
+                $form.find('textarea, input[type="text"], input[type="email"]').val('');
+                $form.find('.wrap-rating i').removeClass('zmdi-star').addClass('zmdi-star-outline');
+
+                if (typeof showPremiumToast === 'function') {
+                    showPremiumToast('Thank you! Your verified review has been published. ✨', 'success');
+                } else {
+                    alert('Thank you! Your verified review has been published. ✨');
+                }
+
+                window.BackendService.reviews.getProductReviews(productName).then(function(allRevs) {
+                    $('a[href="#reviews"]').text('Reviews (' + allRevs.length + ')');
+                });
+            });
+        }
+    });
+}
+
+// Feature 8: Universal Footer Newsletter Engine
+function initUniversalNewsletterSystem() {
+    $('footer form, #signin-newsletter-form').off('submit').on('submit', function(e) {
+        e.preventDefault();
+        var $form = $(this);
+        var $input = $form.find('input[type="email"], input[name="email"], input[type="text"]');
+        var email = $input.val().trim();
+
+        if (!email || email.indexOf('@') === -1) {
+            if (typeof showPremiumToast === 'function') {
+                showPremiumToast('Please enter a valid email address.', 'error');
+            } else {
+                alert('Please enter a valid email address.');
+            }
+            return;
+        }
+
+        if (window.BackendService) {
+            window.BackendService.newsletter.subscribe(email, 'footer').then(function(res) {
+                $input.val('');
+                if (typeof showPremiumToast === 'function') {
+                    showPremiumToast(res.message, 'success');
+                } else {
+                    alert(res.message);
+                }
+            }).catch(function(err) {
+                if (typeof showPremiumToast === 'function') {
+                    showPremiumToast(err.message, 'error');
+                } else {
+                    alert(err.message);
+                }
+            });
+        }
+    });
+}
+
+// Feature 9: Universal Contact Messages Engine
+function initUniversalContactSystem() {
+    $('.how-bor2 form, #contact-form, form[action*="contact"]').on('submit', function(e) {
+        e.preventDefault();
+        var $form = $(this);
+        var email = $form.find('input[name="email"], input[type="email"]').val().trim();
+        var msg = $form.find('textarea[name="msg"], textarea[name="message"], textarea').val().trim();
+        var name = $form.find('input[name="name"]').val() ? $form.find('input[name="name"]').val().trim() : (email ? email.split('@')[0] : 'Guest');
+
+        if (!email || !msg) {
+            if (typeof showPremiumToast === 'function') {
+                showPremiumToast('Please provide your email and message.', 'error');
+            } else {
+                alert('Please provide your email and message.');
+            }
+            return;
+        }
+
+        if (window.BackendService) {
+            window.BackendService.contact.sendMessage({
+                name: name,
+                email: email,
+                message: msg
+            }).then(function(res) {
+                $form.find('input, textarea').val('');
+                if (typeof showPremiumToast === 'function') {
+                    showPremiumToast(res.message, 'success');
+                } else {
+                    alert(res.message);
+                }
+            }).catch(function(err) {
+                if (typeof showPremiumToast === 'function') {
+                    showPremiumToast(err.message, 'error');
+                } else {
+                    alert(err.message);
+                }
+            });
+        }
+    });
+}
+
+// Initialize Batch 2 & Enhanced Luxury Features on Document Ready
 $(document).ready(function() {
     initSmartLiveSearch();
     initCategoryFilterCounts();
     initTactileRipples();
     initQuantityValueBump();
     initBadgePulseObserver();
+    initUniversalReviewSystem();
+    initUniversalNewsletterSystem();
+    initUniversalContactSystem();
 
     // Add dashboard-load section after Our Blogs on home page after 4 seconds
     if ($('.section-slide').length > 0) {
@@ -4645,4 +5339,6 @@ $(document).ready(function() {
         window.updateFreeShippingProgressBar();
     }
 });
+
+
 

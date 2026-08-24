@@ -1,0 +1,19 @@
+# ====================================================================
+# GANESH STORE - ROBOTS.TXT
+# Standard Search Engine Crawling Directives
+# ====================================================================
+
+User-agent: *
+Allow: /
+Allow: /images/
+Allow: /css/
+Allow: /js/
+Allow: /fonts/
+
+# Disallow sensitive / session-specific checkout & customer pages
+Disallow: /checkout.html
+Disallow: /order-history.html
+Disallow: /signin.html
+
+# Sitemap Location
+Sitemap: https://ganeshstore.com/sitemap.xml

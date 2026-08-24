@@ -120,12 +120,16 @@ function syncUserProfileWithSupabase(uid, name, email) {
                 return idProfile;
               } else {
                 // Profile doesn't exist, create a new record!
-                const newProfileId = (uid && uid.includes('-') && uid.length === 36) ? uid : crypto.randomUUID();
+                const newProfileId = (uid && uid.includes('-') && uid.length === 36) ? uid : (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : 'usr_' + Date.now());
                 const newProfile = {
                   id: newProfileId,
                   full_name: name || email.split('@')[0],
                   email: email,
-                  phone_number: "1234567890" // default placeholder phone to avoid non-null constraint on old database schemas
+                  phone_number: "1234567890",
+                  loyalty_tier: "Bronze",
+                  loyalty_points: 100,
+                  two_factor_enabled: false,
+                  two_factor_secret: null
                 };
                 
                 return window.supabaseClient
@@ -160,7 +164,7 @@ function syncUserProfileWithSupabase(uid, name, email) {
       .catch(err => {
         console.error("❌ Supabase sync error:", err);
         // Fail-safe local backup profile
-        const localProfile = { id: uid, full_name: name, email: email, phone_number: "1234567890" };
+        const localProfile = { id: uid, full_name: name, email: email, phone_number: "1234567890", loyalty_tier: "Bronze", loyalty_points: 100, two_factor_enabled: false };
         localStorage.setItem('userProfile', JSON.stringify(localProfile));
         localStorage.setItem('user', 'loggedin');
         return localProfile;
@@ -473,7 +477,16 @@ window.handleEmailLogin = function(event) {
       }
       
       const name = existingUser.name || email.split('@')[0];
-      const uid = existingUser.uid || generateCustomerId(email);
+      const uid = existingUser.id || existingUser.uid || generateCustomerId(email);
+      
+      // Google Authenticator 2FA Check
+      if (existingUser.two_factor_enabled && existingUser.two_factor_secret) {
+        window.pendingLoginUserId = uid;
+        $('#twofa-login-email-display').text(email);
+        $('#twoFactorModal').css('display', 'flex');
+        $('#twofa-login-code-input').val('').focus();
+        return;
+      }
       
       const mockUser = { uid, email, displayName: name, photoURL: null };
       localStorage.setItem('ganeshStore_user_mock', JSON.stringify(mockUser));

@@ -4,6 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sample HTML Page</title>
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="GaneshStore" />
+    <meta property="og:title" content="Sample HTML Page" />
+    <meta property="og:description" content="Explore demo at GaneshStore. Handcrafted luxury essentials with premium materials, verified customer reviews, and white-glove express delivery." />
+    <meta property="og:image" content="images/slide-01.jpg" />
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Sample HTML Page" />
+    <meta name="twitter:description" content="Explore demo at GaneshStore. Handcrafted luxury essentials with premium materials, verified customer reviews, and white-glove express delivery." />
+    <meta name="twitter:image" content="images/slide-01.jpg" />
+    <meta name="description" content="Explore demo at GaneshStore. Handcrafted luxury essentials with premium materials, verified customer reviews, and white-glove express delivery." />
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -35,6 +47,23 @@
       }
     </style>
     <script src="js/datalayer.js"></script>
+
+    <script type="application/ld+json">
+    {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "GaneshStore",
+  "url": "https://ganeshstore.com",
+  "logo": "images/icons/logo-01.png",
+  "description": "Curated luxury fashion atelier, accessories, footwear, and bespoke craftsmanship.",
+  "sameAs": [
+    "https://www.facebook.com/ganeshstore",
+    "https://www.instagram.com/ganeshstore",
+    "https://www.pinterest.com/ganeshstore"
+  ]
+}
+    </script>
+  	<link rel="canonical" href="https://ganeshstore.com/demo.html" />
 </head>
   <body>
     <header>
