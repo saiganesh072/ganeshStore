@@ -695,6 +695,22 @@
                 return filtered;
             },
 
+            updateQuantity: function (name, size, color, newQty) {
+                var cart = this.getCart();
+                var qty = parseInt(newQty, 10);
+                var item = cart.find(function (i) {
+                    return i.name === name && (i.size || '') === (size || '') && (i.color || '') === (color || '');
+                });
+                if (item) {
+                    if (qty <= 0) {
+                        return this.removeFromCart(name, size, color);
+                    }
+                    item.quantity = qty;
+                    this.saveCart(cart);
+                }
+                return cart;
+            },
+
             clearCart: function () {
                 this.saveCart([]);
                 return [];

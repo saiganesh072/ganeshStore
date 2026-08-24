@@ -173,6 +173,13 @@ try {
     assert(fs.existsSync(path.join(__dirname, 'dist', 'js', 'core.min.js')), 'dist/js/core.min.js is generated.');
     assert(fs.existsSync(path.join(__dirname, 'dist', 'manifest.json')), 'dist/manifest.json asset manifest exists.');
 
+    console.log('\n--- TEST GROUP 5: Mini-Cart Drawer Interactive Quantity Controls ---');
+    const mainJsContent = fs.readFileSync(path.join(__dirname, 'js', 'main.js'), 'utf8');
+    const backendJsContent = fs.readFileSync(path.join(__dirname, 'js', 'backend-service.js'), 'utf8');
+    assert(mainJsContent.includes('initMiniCartDrawerEngine'), 'main.js defines initMiniCartDrawerEngine.');
+    assert(mainJsContent.includes('mini-cart-plus') && mainJsContent.includes('mini-cart-minus'), 'Mini-cart drawer provides interactive +/- quantity modifiers.');
+    assert(backendJsContent.includes('updateQuantity: function'), 'BackendService.cart supports updateQuantity.');
+
     console.log();
 } catch (e) {
     console.error('[ERROR] Failed to verify DataLayer or Build Pipeline:', e.message);

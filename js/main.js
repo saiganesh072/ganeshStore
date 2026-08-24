@@ -5376,6 +5376,107 @@ function initUniversalContactSystem() {
     });
 }
 
+// =================================================================
+// LUXURY MINI-CART DRAWER INTERACTIVE ENGINE
+// =================================================================
+function initMiniCartDrawerEngine() {
+    function renderMiniCart() {
+        if (!window.BackendService) return;
+        var cart = window.BackendService.cart.getCart();
+        var $cartWrap = $('.header-cart-wrapitem');
+        if ($cartWrap.length === 0) return;
+
+        if (!cart || cart.length === 0) {
+            $cartWrap.html(
+                '<li class="p-t-30 p-b-30 text-center w-full" style="list-style:none;">' +
+                '  <div style="font-size:36px; color:#c5c5c5; margin-bottom:12px;"><i class="zmdi zmdi-shopping-cart"></i></div>' +
+                '  <p class="stext-115 cl6 m-b-15">Your shopping bag is currently empty.</p>' +
+                '  <a href="product.html" class="flex-c-m stext-101 cl0 size-107 bg3 bor2 hov-btn3 p-lr-15 trans-04 m-auto" style="width:160px; height:40px; border-radius:20px;">Shop Catalog</a>' +
+                '</li>'
+            );
+            $('.header-cart-total').text('Total: $0.00');
+            return;
+        }
+
+        var html = '';
+        var total = 0;
+
+        cart.forEach(function(item) {
+            var priceNum = parseFloat(String(item.price).replace(/[^0-9.]/g, '')) || 0;
+            var qty = parseInt(item.quantity, 10) || 1;
+            total += priceNum * qty;
+
+            var safeName = window.DOMSanitizer ? window.DOMSanitizer.escapeHTML(item.name) : item.name;
+            var safeSize = window.DOMSanitizer ? window.DOMSanitizer.escapeHTML(item.size || 'M') : (item.size || 'M');
+            var safeColor = window.DOMSanitizer ? window.DOMSanitizer.escapeHTML(item.color || 'Default') : (item.color || 'Default');
+            var imgSrc = item.image || 'images/item-cart-01.jpg';
+
+            html += 
+                '<li class="header-cart-item flex-w flex-t m-b-16 p-b-12" style="border-bottom:1px solid #f4f4f4; width:100%; position:relative;">' +
+                '  <div class="header-cart-item-img" style="width:60px; height:80px; flex-shrink:0; overflow:hidden; border-radius:6px; margin-right:16px;">' +
+                '    <img src="' + imgSrc + '" alt="' + safeName + '" style="width:100%; height:100%; object-fit:cover;">' +
+                '  </div>' +
+                '  <div class="header-cart-item-txt" style="flex:1; min-width:0;">' +
+                '    <a href="' + (item.link || 'product.html') + '" class="header-cart-item-name stext-104 cl4 hov-cl1 trans-04 dis-block" style="font-weight:600; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + safeName + '</a>' +
+                '    <span class="stext-105 cl3 dis-block m-t-2" style="font-weight:700;">$' + priceNum.toFixed(2) + '</span>' +
+                '    <div class="mini-cart-qty-row flex-w flex-m m-t-8" style="gap:6px;">' +
+                '      <button type="button" class="mini-cart-qty-btn mini-cart-minus" data-name="' + safeName + '" data-size="' + safeSize + '" data-color="' + safeColor + '" aria-label="Decrease ' + safeName + ' quantity" style="width:24px; height:24px; border-radius:50%; border:1px solid #e0e0e0; background:#f8f9fa; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; font-size:14px; transition:all 0.2s;">-</button>' +
+                '      <span class="mini-cart-qty-val" style="min-width:24px; text-align:center; font-weight:600; font-size:13px;">' + qty + '</span>' +
+                '      <button type="button" class="mini-cart-qty-btn mini-cart-plus" data-name="' + safeName + '" data-size="' + safeSize + '" data-color="' + safeColor + '" aria-label="Increase ' + safeName + ' quantity" style="width:24px; height:24px; border-radius:50%; border:1px solid #e0e0e0; background:#f8f9fa; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; font-size:14px; transition:all 0.2s;">+</button>' +
+                '      <button type="button" class="mini-cart-remove-btn" data-name="' + safeName + '" data-size="' + safeSize + '" data-color="' + safeColor + '" aria-label="Remove ' + safeName + '" style="margin-left:auto; background:none; border:none; color:#999; cursor:pointer; font-size:16px; padding:2px 6px; transition:color 0.2s;"><i class="zmdi zmdi-delete"></i></button>' +
+                '    </div>' +
+                '  </div>' +
+                '</li>';
+        });
+
+        $cartWrap.html(html);
+        $('.header-cart-total').text('Total: $' + total.toFixed(2));
+
+        if (typeof window.updateFreeShippingProgressBar === 'function') {
+            window.updateFreeShippingProgressBar();
+        }
+    }
+
+    // Bind Quantity Stepper and Delete Handlers
+    $(document).on('click', '.mini-cart-plus', function(e) {
+        e.preventDefault();
+        var name = $(this).data('name');
+        var size = $(this).data('size');
+        var color = $(this).data('color');
+        var cart = window.BackendService.cart.getCart();
+        var item = cart.find(function(i) { return i.name === name && (i.size || 'M') === (size || 'M') && (i.color || 'Default') === (color || 'Default'); });
+        var currentQty = item ? (parseInt(item.quantity, 10) || 1) : 1;
+        window.BackendService.cart.updateQuantity(name, size, color, currentQty + 1);
+        renderMiniCart();
+    });
+
+    $(document).on('click', '.mini-cart-minus', function(e) {
+        e.preventDefault();
+        var name = $(this).data('name');
+        var size = $(this).data('size');
+        var color = $(this).data('color');
+        var cart = window.BackendService.cart.getCart();
+        var item = cart.find(function(i) { return i.name === name && (i.size || 'M') === (size || 'M') && (i.color || 'Default') === (color || 'Default'); });
+        var currentQty = item ? (parseInt(item.quantity, 10) || 1) : 1;
+        window.BackendService.cart.updateQuantity(name, size, color, currentQty - 1);
+        renderMiniCart();
+    });
+
+    $(document).on('click', '.mini-cart-remove-btn', function(e) {
+        e.preventDefault();
+        var name = $(this).data('name');
+        var size = $(this).data('size');
+        var color = $(this).data('color');
+        window.BackendService.cart.removeFromCart(name, size, color);
+        renderMiniCart();
+    });
+
+    // Re-render on drawer trigger and cart updates
+    $(document).on('click', '.js-show-cart', renderMiniCart);
+    $(document).on('cartUpdated', renderMiniCart);
+    renderMiniCart();
+}
+
 // Initialize Batch 2 & Enhanced Luxury Features on Document Ready
 $(document).ready(function() {
     initSmartLiveSearch();
@@ -5386,6 +5487,7 @@ $(document).ready(function() {
     initUniversalReviewSystem();
     initUniversalNewsletterSystem();
     initUniversalContactSystem();
+    initMiniCartDrawerEngine();
 
     // Add dashboard-load section after Our Blogs on home page after 4 seconds
     if ($('.section-slide').length > 0) {
