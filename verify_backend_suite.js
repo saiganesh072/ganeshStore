@@ -361,6 +361,21 @@ test('Products Catalog API: ID & Name Lookup', () => {
     assert.strictEqual(p2.priceNum, 75.00);
 });
 
+test('DOMSanitizer Subsystem: XSS Prevention & HTML Entity Escaping', () => {
+    const dirtyScript = '<script>alert("xss")</script>';
+    const escapedScript = BS.DOMSanitizer.escapeHTML(dirtyScript);
+    assert(!escapedScript.includes('<script>'), 'Must escape script opening tag');
+    assert(escapedScript.includes('&lt;script&gt;'), 'Must replace with HTML entities');
+
+    const dirtyImg = '<img src=x onerror="fetch(\'http://evil.com\')">';
+    const escapedImg = BS.DOMSanitizer.escapeHTML(dirtyImg);
+    assert(!escapedImg.includes('<img'), 'Must escape img tag');
+
+    const maliciousUrl = 'javascript:alert(document.cookie)';
+    const cleanUrl = BS.DOMSanitizer.sanitizeUrl(maliciousUrl);
+    assert.strictEqual(cleanUrl, '#', 'Must neutralize javascript: URI vectors');
+});
+
 
 // --------------------------------------------------------------------
 // SUITE 3: Signin Page & Frontend Integration

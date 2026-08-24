@@ -77,6 +77,31 @@
     };
 
     // =================================================================
+    // DOM SANITIZATION & ANTI-XSS ESCAPING ENGINE
+    // =================================================================
+    var DOMSanitizer = {
+        escapeHTML: function (str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#x27;')
+                .replace(/\//g, '&#x2F;');
+        },
+        sanitizeUrl: function (url) {
+            if (!url) return '#';
+            var clean = String(url).trim();
+            if (/^(javascript|vbscript|data:text\/html)/i.test(clean)) {
+                return '#';
+            }
+            return clean;
+        }
+    };
+    window.DOMSanitizer = DOMSanitizer;
+
+    // =================================================================
     // RFC 6238 TOTP / GOOGLE AUTHENTICATOR HELPER ENGINE
     // =================================================================
     var TOTP = {
@@ -863,16 +888,16 @@
             },
 
             addReview: async function (productName, reviewData) {
-                var cleanName = (productName || '').trim();
+                var cleanName = DOMSanitizer.escapeHTML((productName || '').trim());
                 var cacheKey = 'reviews_' + cleanName.replace(/\s+/g, '_');
                 var currentReviews = await this.getProductReviews(cleanName);
 
                 var newRev = {
                     product_name: cleanName,
-                    reviewer_name: reviewData.name || reviewData.reviewer_name || 'Verified Buyer',
-                    email: reviewData.email || 'customer@ganeshstore.com',
+                    reviewer_name: DOMSanitizer.escapeHTML(reviewData.name || reviewData.reviewer_name || 'Verified Buyer'),
+                    email: DOMSanitizer.escapeHTML(reviewData.email || 'customer@ganeshstore.com'),
                     rating: parseInt(reviewData.rating, 10) || 5,
-                    comment: reviewData.comment || reviewData.review || '',
+                    comment: DOMSanitizer.escapeHTML(reviewData.comment || reviewData.review || ''),
                     verified_purchase: true,
                     created_at: new Date().toISOString()
                 };
@@ -1262,7 +1287,10 @@
                 var clean = (name || '').trim().toLowerCase();
                 return MASTER_CATALOG.find(function (p) { return p.name.toLowerCase() === clean; }) || null;
             }
-        }
+        },
+
+        // DOM Sanitization
+        DOMSanitizer: DOMSanitizer
     };
 
     // Auto initialize BackendService on window load

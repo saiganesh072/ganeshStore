@@ -5257,17 +5257,21 @@ function initUniversalReviewSystem() {
                     starsHtml += s <= newRev.rating ? '<i class="zmdi zmdi-star"></i> ' : '<i class="zmdi zmdi-star-outline"></i> ';
                 }
 
+                var safeName = (window.DOMSanitizer ? window.DOMSanitizer.escapeHTML(name) : name.replace(/[&<>"']/g, ''));
+                var safeComment = (window.DOMSanitizer ? window.DOMSanitizer.escapeHTML(comment) : comment.replace(/[&<>"']/g, ''));
+                var initials = (name.substring(0, 2).toUpperCase()).replace(/[^A-Z0-9]/g, '');
+
                 var reviewCardHtml = 
                     '<div class="flex-w flex-t p-b-35" style="animation: fadeIn 0.4s ease; border-bottom: 1px solid #f0f0f0; margin-bottom: 25px;">' +
                     '  <div class="wrap-pic-s size-109 bor0 of-hidden m-r-18 m-t-6" style="background:#717fe0; color:#fff; border-radius:50%; width:44px; height:44px; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:16px;">' +
-                    '    ' + (name.substring(0, 2).toUpperCase()) +
+                    '    ' + (initials || 'GS') +
                     '  </div>' +
                     '  <div class="size-207">' +
                     '    <div class="flex-w flex-sb-m p-b-10">' +
-                    '      <span class="mtext-107 cl2 p-r-20">' + name + ' <span style="font-size:11px; background:#e8f5e9; color:#2e7d32; padding:2px 8px; border-radius:12px; font-weight:700; margin-left:6px;"><i class="zmdi zmdi-check-circle"></i> Verified Buyer</span></span>' +
+                    '      <span class="mtext-107 cl2 p-r-20">' + safeName + ' <span style="font-size:11px; background:#e8f5e9; color:#2e7d32; padding:2px 8px; border-radius:12px; font-weight:700; margin-left:6px;"><i class="zmdi zmdi-check-circle"></i> Verified Buyer</span></span>' +
                     '      <span class="fs-18 cl11" style="color: #f5a623;">' + starsHtml + '</span>' +
                     '    </div>' +
-                    '    <p class="stext-102 cl6">' + comment + '</p>' +
+                    '    <p class="stext-102 cl6">' + safeComment + '</p>' +
                     '  </div>' +
                     '</div>';
 
