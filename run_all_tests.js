@@ -7,7 +7,8 @@ const suites = [
     'verify_backend_suite.js',
     'verify_store_complete.js',
     'verify_premium_treatments_v2.js',
-    'verify_audit_goals_and_acdl.js'
+    'verify_audit_goals_and_acdl.js',
+    'verify_cwv_performance.js'
 ];
 
 console.log('========================================================================');
@@ -29,5 +30,5 @@ suites.forEach((suite, idx) => {
 });
 
 console.log('========================================================================');
-console.log('🎉 100% SUCCESS: ALL 7 TEST SUITES (238 TOTAL TESTS) PASSED PERFECTLY!');
+console.log('🎉 100% SUCCESS: ALL 8 TEST SUITES (247 TOTAL TESTS) PASSED PERFECTLY!');
 console.log('========================================================================\n');
