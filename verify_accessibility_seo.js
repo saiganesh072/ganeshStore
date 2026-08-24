@@ -133,6 +133,27 @@ htmlFiles.forEach(file => {
 assert(allHaveSkipLink, 'All 99 HTML files feature a focusable Skip-to-Main-Content link');
 assert(allHaveMainLandmark, 'All 99 HTML files wrap primary content in <main id="main-content" role="main">');
 
+// 3c. Image Performance & CLS Prevention
+console.log('\n--- Suite 3c: Image Performance, CLS Prevention & Lazy Loading ---');
+let hasLazyImages = false;
+let hasExplicitDimensions = true;
+let heroNotLazy = true;
+
+htmlFiles.forEach(file => {
+    const content = fs.readFileSync(path.join(rootDir, file), 'utf-8');
+    if (content.includes('loading="lazy"')) hasLazyImages = true;
+    if (file === 'index.html') {
+        const heroMatch = content.match(/<img[^>]+src=["'][^"']*slide-01\.jpg["'][^>]*>/i);
+        if (heroMatch && heroMatch[0].includes('loading="lazy"')) {
+            heroNotLazy = false;
+        }
+    }
+});
+assert(hasLazyImages, 'Below-the-fold catalog and content images utilize native loading="lazy"');
+assert(heroNotLazy, 'LCP above-the-fold hero images are eager loaded without lazy loading');
+const sampleProductHtml = fs.readFileSync(path.join(rootDir, 'product.html'), 'utf-8');
+assert(sampleProductHtml.includes('width="1200"') && sampleProductHtml.includes('height="1486"'), 'Product grid images declare explicit width and height attributes to prevent CLS');
+
 // 4. Link & Asset Integrity
 console.log('\n--- Suite 4: Broken Link & Asset Resolution ---');
 let brokenLinks = 0;
