@@ -288,6 +288,19 @@
 
                 user.two_factor_enabled = true;
                 user.two_factor_secret = secret;
+
+                // Encrypt secret at rest via Supabase pgcrypto RPC if cloud is connected
+                if (BackendService._isCloudAvailable && BackendService._client) {
+                    try {
+                        await BackendService._client.rpc('enable_user_2fa', {
+                            p_user_id: user.id,
+                            p_secret_text: secret
+                        });
+                    } catch (e) {
+                        console.warn('Supabase encrypted 2FA RPC fallback:', e);
+                    }
+                }
+
                 await this.updateProfile({
                     two_factor_enabled: true,
                     two_factor_secret: secret
