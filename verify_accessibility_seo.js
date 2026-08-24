@@ -70,6 +70,16 @@ assert(mainCss.includes(':focus-visible'), 'CSS declares accessible :focus-visib
 assert(mainCss.includes('prefers-reduced-motion'), 'CSS supports prefers-reduced-motion user preference');
 assert(mainCss.includes('min-width: 44px') || mainCss.includes('min-height: 44px'), 'CSS establishes mobile minimum touch target guidelines');
 assert(mainCss.includes('.skip-link'), 'CSS styles accessible .skip-link navigation utility');
+assert(mainCss.includes('font-display: swap'), 'main.css includes font-display: swap on all typography font-face declarations');
+
+const faCss = fs.readFileSync(path.join(rootDir, 'fonts/font-awesome-4.7.0/css/font-awesome.min.css'), 'utf-8');
+assert(faCss.includes('font-display:swap') || faCss.includes('font-display: swap'), 'FontAwesome includes font-display: swap to eliminate FOIT');
+
+const iconicCss = fs.readFileSync(path.join(rootDir, 'fonts/iconic/css/material-design-iconic-font.min.css'), 'utf-8');
+assert(iconicCss.includes('font-display:swap') || iconicCss.includes('font-display: swap'), 'Material Iconic font includes font-display: swap to eliminate FOIT');
+
+const pIndex = fs.readFileSync(path.join(rootDir, 'index.html'), 'utf-8');
+assert(pIndex.includes('media="print" onload="this.media=\'all\'"'), 'Non-critical stylesheets use async media swap to prevent render blocking');
 
 // 3b. HTML Landmarks & Skip Links
 console.log('\n--- Suite 3b: HTML5 Semantic Landmarks & Skip-to-Content Navigation ---');
