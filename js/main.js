@@ -5631,6 +5631,107 @@ function initStockUrgencyEngine() {
     }
 }
 
+// =================================================================
+// PRODUCT CATALOG VIRTUAL PAGINATION & LAZY CONTROLLER
+// =================================================================
+function initProductCatalogPagination() {
+    var $grid = $('.isotope-grid');
+    if ($grid.length === 0) return;
+
+    var pageSize = 16;
+    var currentPage = 1;
+
+    if ($('#catalogPagination').length === 0) {
+        $grid.after('<div id="catalogPagination" class="catalog-pagination-container"></div>');
+    }
+
+    var $paginationContainer = $('#catalogPagination');
+
+    function getMatchingItems() {
+        var activeFilter = $('.filter-tope-group button.how-active1').attr('data-filter') || '*';
+        if (activeFilter === '*') {
+            return $grid.find('.isotope-item');
+        }
+        return $grid.find('.isotope-item' + activeFilter);
+    }
+
+    function renderPagination() {
+        var $matching = getMatchingItems();
+        var totalItems = $matching.length;
+        var totalPages = Math.ceil(totalItems / pageSize) || 1;
+
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+
+        // Apply slice visibility
+        var startIndex = (currentPage - 1) * pageSize;
+        var endIndex = startIndex + pageSize;
+
+        // Hide all items first, then show only the active slice of matching items
+        $grid.find('.isotope-item').hide();
+        $matching.slice(startIndex, endIndex).fadeIn(200);
+
+        // If Isotope is initialized, update layout safely
+        if ($.fn.isotope && $grid.data('isotope')) {
+            try { $grid.isotope('layout'); } catch (e) {}
+        }
+
+        if (totalItems <= pageSize) {
+            $paginationContainer.empty();
+            return;
+        }
+
+        var startDisplay = totalItems === 0 ? 0 : startIndex + 1;
+        var endDisplay = Math.min(endIndex, totalItems);
+
+        var html = 
+            '<div class="catalog-pagination-summary">' +
+            '  Showing ' + startDisplay + '–' + endDisplay + ' of ' + totalItems + ' products' +
+            '</div>' +
+            '<div class="catalog-pagination-nav" role="navigation" aria-label="Product Catalog Pagination">';
+
+        // Prev Button
+        html += '<button type="button" class="pagination-btn pagination-prev" data-page="' + (currentPage - 1) + '" ' + (currentPage === 1 ? 'disabled aria-disabled="true"' : '') + ' aria-label="Previous page"><i class="zmdi zmdi-chevron-left"></i></button>';
+
+        for (var p = 1; p <= totalPages; p++) {
+            var isActive = p === currentPage;
+            html += '<button type="button" class="pagination-btn pagination-num ' + (isActive ? 'active' : '') + '" data-page="' + p + '" aria-label="Go to page ' + p + '" ' + (isActive ? 'aria-current="page"' : '') + '>' + p + '</button>';
+        }
+
+        // Next Button
+        html += '<button type="button" class="pagination-btn pagination-next" data-page="' + (currentPage + 1) + '" ' + (currentPage === totalPages ? 'disabled aria-disabled="true"' : '') + ' aria-label="Next page"><i class="zmdi zmdi-chevron-right"></i></button>';
+
+        html += '</div>';
+
+        $paginationContainer.html(html);
+    }
+
+    // Pagination button clicks
+    $(document).on('click', '.pagination-btn', function(e) {
+        e.preventDefault();
+        var targetPage = parseInt($(this).attr('data-page'), 10);
+        if (!targetPage || $(this).prop('disabled')) return;
+
+        currentPage = targetPage;
+        renderPagination();
+
+        if ($grid.offset()) {
+            $('html, body').animate({
+                scrollTop: $grid.offset().top - 100
+            }, 300);
+        }
+    });
+
+    // Reset pagination on category filter changes
+    $('.filter-tope-group button').on('click', function() {
+        currentPage = 1;
+        setTimeout(renderPagination, 50);
+    });
+
+    // Initialize pagination on catalog
+    renderPagination();
+}
+
 // Initialize Batch 2 & Enhanced Luxury Features on Document Ready
 $(document).ready(function() {
     initSmartLiveSearch();
@@ -5644,6 +5745,7 @@ $(document).ready(function() {
     initMiniCartDrawerEngine();
     initStickyMobileAddToCart();
     initStockUrgencyEngine();
+    initProductCatalogPagination();
 
     // Add dashboard-load section after Our Blogs on home page after 4 seconds
     if ($('.section-slide').length > 0) {

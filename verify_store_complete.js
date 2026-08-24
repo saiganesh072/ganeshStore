@@ -191,6 +191,11 @@ try {
     assert(mainCssContent.includes('.skeleton-shimmer') && mainCssContent.includes('@keyframes skeletonShimmer'), 'main.css defines animated skeleton shimmer effect.');
     assert(mainCssContent.includes('.stock-urgency-badge') && mainCssContent.includes('.low-stock'), 'main.css styles real stock urgency pulse badges.');
 
+    console.log('\n--- TEST GROUP 8: Virtual Product Catalog Pagination & Filter Integrity ---');
+    assert(mainJsContent.includes('initProductCatalogPagination'), 'main.js defines initProductCatalogPagination controller.');
+    assert(mainCssContent.includes('.catalog-pagination-container') && mainCssContent.includes('.pagination-btn'), 'main.css styles catalog pagination container and pill buttons.');
+    assert(mainJsContent.includes('catalog-pagination-summary') && mainJsContent.includes('aria-label="Product Catalog Pagination"'), 'Pagination contains accessible summary and ARIA navigation labels.');
+
     console.log();
 } catch (e) {
     console.error('[ERROR] Failed to verify DataLayer or Build Pipeline:', e.message);

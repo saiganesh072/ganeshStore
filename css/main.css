@@ -669,6 +669,67 @@ Input, textarea : 14px/1.6 '', Arial, sans-serif;
   }
 }
 
+/* =================================================================
+   LUXURY CATALOG PAGINATION & LAZY CONTROLLER
+   ================================================================= */
+.catalog-pagination-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+  padding: 40px 0 20px;
+}
+.catalog-pagination-summary {
+  font-family: Poppins-Regular, sans-serif;
+  font-size: 13px;
+  color: #888;
+}
+.catalog-pagination-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.pagination-btn {
+  min-width: 40px;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 20px;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  color: #333;
+  font-family: Poppins-Medium, sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+.pagination-btn:hover {
+  background: #717fe0;
+  color: #fff;
+  border-color: #717fe0;
+  transform: translateY(-1px);
+}
+.pagination-btn.active {
+  background: #222;
+  color: #fff;
+  border-color: #222;
+  font-weight: 700;
+}
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  background: #f8f9fa;
+  border-color: #e9ecef;
+  color: #aaa;
+}
+
 .main-menu > li:hover > .sub-menu {
   visibility: visible;
   opacity: 1;
