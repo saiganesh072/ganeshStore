@@ -3518,32 +3518,84 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             showPremiumToast('Selected Bank: ' + selectedBank, 'info');
         });
 
-        // 11. Live input validation handlers
-        $('#checkoutForm input').on('input change blur', function() {
-            var $input = $(this);
+        // 11. Luxury Real-Time Accessible Field Validation Engine
+        function validateCheckoutField($input) {
             var val = $input.val().trim();
+            var name = $input.attr('name');
+            var isRequired = $input.attr('required');
             var isValid = true;
+            var errorMsg = '';
 
-            if ($input.attr('required') && !val) {
+            // Clean previous error message
+            $input.closest('.input-validate-container, .col-sm-6, .col-sm-4, .col-md-6, .m-b-20, .m-b-15').find('.checkout-field-error').remove();
+
+            if (isRequired && !val) {
                 isValid = false;
-            } else if ($input.attr('type') === 'email' && val) {
-                var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                isValid = re.test(val);
-            } else if ($input.attr('name') === 'card_number' && $('.payment-tab-btn.active-tab').attr('data-tab') === 'card') {
-                isValid = val.replace(/\s/g, '').length === 16;
-            } else if ($input.attr('name') === 'card_expiry' && $('.payment-tab-btn.active-tab').attr('data-tab') === 'card') {
-                isValid = val.length === 5 && val.indexOf('/') === 2;
-            } else if ($input.attr('name') === 'card_cvv' && $('.payment-tab-btn.active-tab').attr('data-tab') === 'card') {
-                isValid = val.length >= 3;
+                errorMsg = 'This field is required.';
+            } else if (val) {
+                if (name === 'checkout-email' || name === 'email' || $input.attr('type') === 'email') {
+                    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(val)) {
+                        isValid = false;
+                        errorMsg = 'Please enter a valid email address (e.g. name@domain.com).';
+                    }
+                } else if (name === 'phone' || $input.attr('type') === 'tel') {
+                    var digits = val.replace(/\D/g, '');
+                    if (digits.length < 10) {
+                        isValid = false;
+                        errorMsg = 'Please enter a valid 10-digit phone number.';
+                    }
+                } else if (name === 'postcode' || name === 'zip') {
+                    if (val.length < 4) {
+                        isValid = false;
+                        errorMsg = 'Please enter a valid ZIP / Postcode.';
+                    }
+                } else if (name === 'card_number') {
+                    var rawCard = val.replace(/\s/g, '');
+                    if (rawCard.length < 15 || rawCard.length > 19) {
+                        isValid = false;
+                        errorMsg = 'Card number must be 15 to 19 digits.';
+                    }
+                } else if (name === 'card_expiry') {
+                    if (!/^\d{2}\/\d{2}$/.test(val)) {
+                        isValid = false;
+                        errorMsg = 'Expiry must be in MM/YY format.';
+                    } else {
+                        var parts = val.split('/');
+                        var month = parseInt(parts[0], 10);
+                        if (month < 1 || month > 12) {
+                            isValid = false;
+                            errorMsg = 'Invalid expiry month.';
+                        }
+                    }
+                } else if (name === 'card_cvv') {
+                    if (val.length < 3 || val.length > 4) {
+                        isValid = false;
+                        errorMsg = 'CVV must be 3 or 4 digits.';
+                    }
+                }
             }
 
             if (isValid && val) {
                 $input.removeClass('field-error').addClass('field-valid');
+                $input.attr('aria-invalid', 'false');
             } else if (!isValid) {
                 $input.removeClass('field-valid').addClass('field-error');
+                $input.attr('aria-invalid', 'true');
+                if (errorMsg) {
+                    var $errEl = $('<div class="checkout-field-error" role="alert" aria-live="polite" style="color:#dc3545; font-size:12px; margin-top:4px; font-weight:500; display:flex; align-items:center; gap:4px;"><i class="zmdi zmdi-alert-circle"></i> ' + errorMsg + '</div>');
+                    $input.parent().after($errEl);
+                }
             } else {
                 $input.removeClass('field-valid field-error');
+                $input.removeAttr('aria-invalid');
             }
+
+            return isValid;
+        }
+
+        $('#checkoutForm input').on('input change blur keyup', function() {
+            validateCheckoutField($(this));
         });
 
         // 12. Coupon validation trigger
