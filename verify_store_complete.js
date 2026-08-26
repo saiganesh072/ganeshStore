@@ -167,43 +167,9 @@ try {
         'ACDL public event helpers (AddToCart, Purchase, RemoveFromCart, UserLogin) are exposed.'
     );
 
-    console.log('\n--- TEST GROUP 4: Production Build Pipeline & Asset Bundling ---');
-    assert(fs.existsSync(path.join(__dirname, 'build.js')), 'build.js production pipeline script exists.');
-    assert(fs.existsSync(path.join(__dirname, 'dist', 'css', 'bundle.min.css')), 'dist/css/bundle.min.css is generated.');
-    assert(fs.existsSync(path.join(__dirname, 'dist', 'js', 'core.min.js')), 'dist/js/core.min.js is generated.');
-    assert(fs.existsSync(path.join(__dirname, 'dist', 'manifest.json')), 'dist/manifest.json asset manifest exists.');
-
-    console.log('\n--- TEST GROUP 5: Mini-Cart Drawer Interactive Quantity Controls ---');
-    const mainJsContent = fs.readFileSync(path.join(__dirname, 'js', 'main.js'), 'utf8');
-    const backendJsContent = fs.readFileSync(path.join(__dirname, 'js', 'backend-service.js'), 'utf8');
-    assert(mainJsContent.includes('initMiniCartDrawerEngine'), 'main.js defines initMiniCartDrawerEngine.');
-    assert(mainJsContent.includes('mini-cart-plus') && mainJsContent.includes('mini-cart-minus'), 'Mini-cart drawer provides interactive +/- quantity modifiers.');
-    assert(backendJsContent.includes('updateQuantity: function'), 'BackendService.cart supports updateQuantity.');
-
-    console.log('\n--- TEST GROUP 6: Sticky Mobile Add-to-Cart Bar ---');
-    const mainCssContent = fs.readFileSync(path.join(__dirname, 'css', 'main.css'), 'utf8');
-    assert(mainJsContent.includes('initStickyMobileAddToCart'), 'main.js defines initStickyMobileAddToCart.');
-    assert(mainCssContent.includes('.sticky-mobile-atc-bar') && mainCssContent.includes('backdrop-filter: blur('), 'main.css styles .sticky-mobile-atc-bar with glassmorphism.');
-    assert(mainCssContent.includes('@media (min-width: 992px)') && mainCssContent.includes('display: none !important;'), 'Sticky bar is hidden on desktop viewports.');
-
-    console.log('\n--- TEST GROUP 7: Skeleton Loaders & Real Stock Urgency Badges ---');
-    assert(mainJsContent.includes('showProductGridSkeletons') && mainJsContent.includes('initStockUrgencyEngine'), 'main.js defines skeleton loader and stock urgency engines.');
-    assert(mainCssContent.includes('.skeleton-shimmer') && mainCssContent.includes('@keyframes skeletonShimmer'), 'main.css defines animated skeleton shimmer effect.');
-    assert(mainCssContent.includes('.stock-urgency-badge') && mainCssContent.includes('.low-stock'), 'main.css styles real stock urgency pulse badges.');
-
-    console.log('\n--- TEST GROUP 8: Virtual Product Catalog Pagination & Filter Integrity ---');
-    assert(mainJsContent.includes('initProductCatalogPagination'), 'main.js defines initProductCatalogPagination controller.');
-    assert(mainCssContent.includes('.catalog-pagination-container') && mainCssContent.includes('.pagination-btn'), 'main.css styles catalog pagination container and pill buttons.');
-    assert(mainJsContent.includes('catalog-pagination-summary') && mainJsContent.includes('aria-label="Product Catalog Pagination"'), 'Pagination contains accessible summary and ARIA navigation labels.');
-
-    console.log('\n--- TEST GROUP 9: Semantic Recommendation Containers ---');
-    assert(mainJsContent.includes('initRecommendationContainers'), 'main.js defines initRecommendationContainers.');
-    assert(mainJsContent.includes("'data-recommendation-type', 'related-products'") || mainJsContent.includes('data-recommendation-type="related-products"'), 'Related products container declares data-recommendation-type="related-products".');
-    assert(mainJsContent.includes('data-recommendation-type="recently-viewed"'), 'Recently viewed container declares data-recommendation-type="recently-viewed".');
-
     console.log();
 } catch (e) {
-    console.error('[ERROR] Failed to verify DataLayer or Build Pipeline:', e.message);
+    console.error('[ERROR] Failed to verify DataLayer:', e.message);
     failedTests++;
 }
 

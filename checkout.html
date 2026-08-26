@@ -27,18 +27,15 @@
   <!--===============================================================================================-->
   <link rel="stylesheet" type="text/css" href="fonts/linearicons-v1.0.0/icon-font.min.css" />
   <!--===============================================================================================-->
-  <link rel="stylesheet" type="text/css" href="vendor/animate/animate.css" media="print" onload="this.media='all'" />
-  <noscript><link rel="stylesheet" type="text/css" href="vendor/animate/animate.css" /></noscript>
+  <link rel="stylesheet" type="text/css" href="vendor/animate/animate.css" />
   <!--===============================================================================================-->
-  <link rel="stylesheet" type="text/css" href="vendor/css-hamburgers/hamburgers.min.css" media="print" onload="this.media='all'" />
-  <noscript><link rel="stylesheet" type="text/css" href="vendor/css-hamburgers/hamburgers.min.css" /></noscript>
-  <noscript></noscript>
+  <link rel="stylesheet" type="text/css" href="vendor/css-hamburgers/hamburgers.min.css" />
   <!--===============================================================================================-->
-  <link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css" media="print" onload="this.media='all'" />
-  <noscript><link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css" /></noscript>
+  <link rel="stylesheet" type="text/css" href="vendor/animsition/css/animsition.min.css" />
   <!--===============================================================================================-->
-  <link rel="stylesheet" type="text/css" href="vendor/perfect-scrollbar/perfect-scrollbar.css" media="print" onload="this.media='all'" />
-  <noscript><link rel="stylesheet" type="text/css" href="vendor/perfect-scrollbar/perfect-scrollbar.css" /></noscript>
+  <link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css" />
+  <!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="vendor/perfect-scrollbar/perfect-scrollbar.css" />
   <!--===============================================================================================-->
   <link rel="stylesheet" type="text/css" href="css/util.css" />
   <link rel="stylesheet" type="text/css" href="css/main.css?v=1.4" />
@@ -62,25 +59,8 @@
 }
     </script>
   		<link rel="canonical" href="https://ganeshstore.com/checkout.html" />
-  <style id="critical-css">
-  /* Critical Above-the-Fold CSS */
-  .skip-link{position:absolute;top:-100px;left:16px;background:#717fe0;color:#fff;padding:12px 24px;font-weight:700;font-size:14px;border-radius:0 0 8px 8px;z-index:999999;transition:top .2s ease-in-out;text-decoration:none;box-shadow:0 8px 24px rgba(113,127,224,.35)}
-  .skip-link:focus{top:0;outline:3px solid #222;outline-offset:2px}
-  .announcement-bar{background:#222;color:#fff;text-align:center;font-size:12px;padding:8px 15px;font-weight:500;letter-spacing:1px}
-  .container-menu-desktop{height:84px;width:100%;position:relative;-webkit-transition:all .3s ease;transition:all .3s ease}
-  .wrap-menu-desktop{position:fixed;top:0;left:0;width:100%;height:84px;background-color:#fff;z-index:1100;box-shadow:0 0 10px rgba(0,0,0,.08)}
-  .limiter-menu-desktop{height:100%;display:flex;align-items:center;background-color:transparent}
-  .logo{display:block;margin-right:45px}
-  .logo img{display:block;max-width:100%;height:auto}
-  .main-menu{display:flex;align-items:center;margin:0;padding:0;list-style:none}
-  .main-menu > li{position:relative;padding:20px 0}
-  .main-menu > li > a{font-family:Poppins-Medium,sans-serif;font-size:14px;color:#333;padding:5px 15px;text-decoration:none;transition:color .25s ease}
-  .wrap-icon-header{display:flex;align-items:center;margin-left:auto}
-  .icon-header-item{font-size:24px;color:#333;cursor:pointer;position:relative;display:flex;align-items:center}
-</style>
 </head>
-<body>
-  <a href="#main-content" class="skip-link">Skip to main content</a>
+<body class="animsition">
     <h1 class="sr-only">Secure Multi-Step Luxury Checkout & Payment</h1>
   
   <!-- Header -->
@@ -96,7 +76,7 @@
         <nav class="limiter-menu-desktop container">
           <!-- Logo desktop -->
           <a href="index.html" class="logo">
-            <img width="231" height="34" src="images/icons/logo-01.png" alt="IMG-LOGO" />
+            <img src="images/icons/logo-01.png" alt="IMG-LOGO" />
           </a>
 
           <!-- Menu desktop -->
@@ -142,7 +122,7 @@
     <!-- Header Mobile -->
     <div class="wrap-header-mobile">
       <div class="logo-mobile">
-        <a href="index.html"><img width="231" height="34" src="images/icons/logo-01.png" alt="IMG-LOGO" /></a>
+        <a href="index.html"><img src="images/icons/logo-01.png" alt="IMG-LOGO" /></a>
       </div>
       <div class="wrap-icon-header flex-w flex-r-m m-r-15">
         <div class="icon-header-item cl2 hov-cl1 trans-04 p-r-11 js-show-modal-search">
@@ -178,7 +158,7 @@
   </header>
 
   <!-- Cart Drawer -->
-  <div class="wrap-header-cart js-panel-cart" role="dialog" aria-modal="true" aria-label="Shopping Cart Drawer">
+  <div class="wrap-header-cart js-panel-cart">
     <div class="s-full js-hide-cart"></div>
     <div class="header-cart flex-col-l p-l-65 p-r-25">
       <div class="header-cart-title flex-w flex-sb-m p-b-8">
@@ -199,10 +179,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Main Content Landmark -->
-  <main id="main-content" role="main">
-
 
   <!-- breadcrumb -->
   <div class="container print-hide">
@@ -477,7 +453,7 @@
                       <!-- Simulated interactive QR scan component -->
                       <div class="upi-qr-code">
                         <div class="upi-qr-scan-line"></div>
-                        <img width="231" height="34" src="images/icons/logo-01.png" alt="QR-BRAND" class="upi-qr-center-logo" style="width: 32px; height: 32px;" />
+                        <img src="images/icons/logo-01.png" alt="QR-BRAND" class="upi-qr-center-logo" style="width: 32px; height: 32px;" />
                         <!-- High quality QR placeholder patterns -->
                         <div class="upi-qr-mock-matrix"></div>
                       </div>
@@ -778,8 +754,6 @@
     </div>
   </div>
 
-  </main>
-
   <!-- Footer -->
   <footer class="bg3 p-t-75 p-b-32 print-hide">
     <div class="container">
@@ -828,11 +802,11 @@
       </div>
       <div class="p-t-40">
         <div class="flex-c-m flex-w p-b-18">
-          <a href="#" class="m-all-1"><img loading="lazy" width="35" height="23" src="images/icons/icon-pay-01.png" alt="ICON-PAY" /></a>
-          <a href="#" class="m-all-1"><img loading="lazy" width="35" height="23" src="images/icons/icon-pay-02.png" alt="ICON-PAY" /></a>
-          <a href="#" class="m-all-1"><img loading="lazy" width="35" height="23" src="images/icons/icon-pay-03.png" alt="ICON-PAY" /></a>
-          <a href="#" class="m-all-1"><img loading="lazy" width="35" height="23" src="images/icons/icon-pay-04.png" alt="ICON-PAY" /></a>
-          <a href="#" class="m-all-1"><img loading="lazy" width="35" height="23" src="images/icons/icon-pay-05.png" alt="ICON-PAY" /></a>
+          <a href="#" class="m-all-1"><img src="images/icons/icon-pay-01.png" alt="ICON-PAY" /></a>
+          <a href="#" class="m-all-1"><img src="images/icons/icon-pay-02.png" alt="ICON-PAY" /></a>
+          <a href="#" class="m-all-1"><img src="images/icons/icon-pay-03.png" alt="ICON-PAY" /></a>
+          <a href="#" class="m-all-1"><img src="images/icons/icon-pay-04.png" alt="ICON-PAY" /></a>
+          <a href="#" class="m-all-1"><img src="images/icons/icon-pay-05.png" alt="ICON-PAY" /></a>
         </div>
         <p class="stext-107 cl6 txt-center">
           Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | Made with <i class="fa fa-heart-o" aria-hidden="true"></i> by Colorlib
@@ -843,17 +817,18 @@
 
   <!--===============================================================================================-->
   <script src="vendor/jquery/jquery-3.2.1.min.js"></script>
-  
+  <!--===============================================================================================-->
+  <script src="vendor/animsition/js/animsition.min.js"></script>
   <!--===============================================================================================-->
   <script src="vendor/bootstrap/js/popper.js"></script>
   <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
   <!--===============================================================================================-->
-  <script src="vendor/select2/select2.min.js" defer></script>
+  <script src="vendor/select2/select2.min.js"></script>
   <!--===============================================================================================-->
-  <script src="vendor/perfect-scrollbar/perfect-scrollbar.min.js" defer></script>
+  <script src="vendor/perfect-scrollbar/perfect-scrollbar.min.js"></script>
   <!--===============================================================================================-->
-  <script src="vendor/sweetalert/sweetalert.min.js" defer></script>
+  <script src="vendor/sweetalert/sweetalert.min.js"></script>
   <!--===============================================================================================-->
-  <script src="js/main.js?v=1.3" defer></script>
+  <script src="js/main.js?v=1.3"></script>
 </body>
 </html>

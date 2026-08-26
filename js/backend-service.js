@@ -77,31 +77,6 @@
     };
 
     // =================================================================
-    // DOM SANITIZATION & ANTI-XSS ESCAPING ENGINE
-    // =================================================================
-    var DOMSanitizer = {
-        escapeHTML: function (str) {
-            if (str === null || str === undefined) return '';
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#x27;')
-                .replace(/\//g, '&#x2F;');
-        },
-        sanitizeUrl: function (url) {
-            if (!url) return '#';
-            var clean = String(url).trim();
-            if (/^(javascript|vbscript|data:text\/html)/i.test(clean)) {
-                return '#';
-            }
-            return clean;
-        }
-    };
-    window.DOMSanitizer = DOMSanitizer;
-
-    // =================================================================
     // RFC 6238 TOTP / GOOGLE AUTHENTICATOR HELPER ENGINE
     // =================================================================
     var TOTP = {
@@ -313,19 +288,6 @@
 
                 user.two_factor_enabled = true;
                 user.two_factor_secret = secret;
-
-                // Encrypt secret at rest via Supabase pgcrypto RPC if cloud is connected
-                if (BackendService._isCloudAvailable && BackendService._client) {
-                    try {
-                        await BackendService._client.rpc('enable_user_2fa', {
-                            p_user_id: user.id,
-                            p_secret_text: secret
-                        });
-                    } catch (e) {
-                        console.warn('Supabase encrypted 2FA RPC fallback:', e);
-                    }
-                }
-
                 await this.updateProfile({
                     two_factor_enabled: true,
                     two_factor_secret: secret
@@ -695,22 +657,6 @@
                 return filtered;
             },
 
-            updateQuantity: function (name, size, color, newQty) {
-                var cart = this.getCart();
-                var qty = parseInt(newQty, 10);
-                var item = cart.find(function (i) {
-                    return i.name === name && (i.size || '') === (size || '') && (i.color || '') === (color || '');
-                });
-                if (item) {
-                    if (qty <= 0) {
-                        return this.removeFromCart(name, size, color);
-                    }
-                    item.quantity = qty;
-                    this.saveCart(cart);
-                }
-                return cart;
-            },
-
             clearCart: function () {
                 this.saveCart([]);
                 return [];
@@ -904,16 +850,16 @@
             },
 
             addReview: async function (productName, reviewData) {
-                var cleanName = DOMSanitizer.escapeHTML((productName || '').trim());
+                var cleanName = (productName || '').trim();
                 var cacheKey = 'reviews_' + cleanName.replace(/\s+/g, '_');
                 var currentReviews = await this.getProductReviews(cleanName);
 
                 var newRev = {
                     product_name: cleanName,
-                    reviewer_name: DOMSanitizer.escapeHTML(reviewData.name || reviewData.reviewer_name || 'Verified Buyer'),
-                    email: DOMSanitizer.escapeHTML(reviewData.email || 'customer@ganeshstore.com'),
+                    reviewer_name: reviewData.name || reviewData.reviewer_name || 'Verified Buyer',
+                    email: reviewData.email || 'customer@ganeshstore.com',
                     rating: parseInt(reviewData.rating, 10) || 5,
-                    comment: DOMSanitizer.escapeHTML(reviewData.comment || reviewData.review || ''),
+                    comment: reviewData.comment || reviewData.review || '',
                     verified_purchase: true,
                     created_at: new Date().toISOString()
                 };
@@ -958,18 +904,6 @@
         orders: {
             createOrder: async function (orderPayload) {
                 var user = BackendService.auth.getCurrentUser();
-                var rawItems = orderPayload.items || BackendService.cart.getCart();
-                var formattedItems = rawItems.map(function(item) {
-                    return {
-                        id: item.id || item.productId || 'GS001',
-                        name: item.name || 'Product',
-                        quantity: parseInt(item.quantity || item.qty || 1, 10),
-                        size: item.size || 'M',
-                        color: item.color || 'Default',
-                        image: item.image || item.img || 'images/product-01.jpg'
-                    };
-                });
-
                 var orderId = orderPayload.order_id || ('ORD-' + Math.floor(100000 + Math.random() * 900000));
                 var trackingNo = 'GS-TRK-' + Math.floor(10000000 + Math.random() * 90000000);
 
@@ -989,7 +923,7 @@
                     order_status: 'processing',
                     tracking_number: trackingNo,
                     estimated_delivery: estDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }),
-                    items: formattedItems,
+                    items: orderPayload.items || BackendService.cart.getCart(),
                     subtotal: parseFloat(orderPayload.subtotal) || 0,
                     discount: parseFloat(orderPayload.discount) || 0,
                     shipping_fee: parseFloat(orderPayload.shipping_fee) || 0,
@@ -997,43 +931,6 @@
                     total: parseFloat(orderPayload.total) || 0,
                     created_at: new Date().toISOString()
                 };
-
-                // Server-Side Pricing & Atomic RPC Order Placement
-                if (BackendService._isCloudAvailable && BackendService._client) {
-                    try {
-                        var rpcRes = await BackendService._client.rpc('create_authenticated_order', {
-                            order_payload: {
-                                user_id: orderRecord.user_id,
-                                customer_name: orderRecord.customer_name,
-                                email: orderRecord.email,
-                                phone: orderRecord.phone,
-                                shipping_address: orderRecord.shipping_address,
-                                shipping_method: orderRecord.shipping_method,
-                                payment_method: orderRecord.payment_method,
-                                coupon_code: orderPayload.coupon_code || orderPayload.coupon || '',
-                                items: formattedItems,
-                                notes: orderPayload.notes || ''
-                            }
-                        });
-
-                        if (rpcRes && rpcRes.data && rpcRes.data.success) {
-                            var srv = rpcRes.data;
-                            orderRecord.order_id = srv.order_id || orderRecord.order_id;
-                            orderRecord.tracking_number = srv.tracking_number || orderRecord.tracking_number;
-                            orderRecord.subtotal = parseFloat(srv.subtotal) || orderRecord.subtotal;
-                            orderRecord.discount = parseFloat(srv.discount) || orderRecord.discount;
-                            orderRecord.shipping_fee = parseFloat(srv.shipping_fee) || orderRecord.shipping_fee;
-                            orderRecord.tax = parseFloat(srv.tax) || orderRecord.tax;
-                            orderRecord.total = parseFloat(srv.total) || orderRecord.total;
-                            orderRecord.estimated_delivery = srv.estimated_delivery || orderRecord.estimated_delivery;
-                        }
-                    } catch (e) {
-                        console.warn('Server-side RPC order placement fallback:', e);
-                        try {
-                            await BackendService._client.from('orders').insert(orderRecord);
-                        } catch (err) {}
-                    }
-                }
 
                 // Save locally
                 var history = Storage.get('order_history', []);
@@ -1050,6 +947,15 @@
                         loyaltyPoints: user.loyaltyPoints,
                         loyaltyTier: user.loyaltyTier
                     });
+                }
+
+                // Cloud Supabase Sync
+                if (BackendService._isCloudAvailable && BackendService._client) {
+                    try {
+                        await BackendService._client.from('orders').insert(orderRecord);
+                    } catch (e) {
+                        console.warn('Supabase cloud order insert error:', e);
+                    }
                 }
 
                 // Telemetry
@@ -1217,29 +1123,6 @@
         // COUPONS & DISCOUNTS VALIDATOR SUBSYSTEM
         // =================================================================
         coupons: {
-            validateCouponAsync: async function (code, subtotal) {
-                var cleanCode = (code || '').trim().toUpperCase();
-                var numSubtotal = parseFloat(subtotal) || 0;
-
-                if (BackendService._isCloudAvailable && BackendService._client) {
-                    try {
-                        var res = await BackendService._client.rpc('validate_coupon_code', {
-                            coupon_code: cleanCode,
-                            subtotal_amount: numSubtotal
-                        });
-                        if (res && res.data) {
-                            if (window.trackACDLPromoCode) {
-                                window.trackACDLPromoCode(cleanCode, res.data.discount_amount || 0, res.data.valid, res.data.message || '');
-                            }
-                            return res.data;
-                        }
-                    } catch (e) {
-                        console.warn('Server coupon validation RPC fallback:', e);
-                    }
-                }
-                return this.validateCoupon(cleanCode, numSubtotal);
-            },
-
             validateCoupon: function (code, subtotal) {
                 var cleanCode = (code || '').trim().toUpperCase();
                 var numSubtotal = parseFloat(subtotal) || 0;
@@ -1303,10 +1186,7 @@
                 var clean = (name || '').trim().toLowerCase();
                 return MASTER_CATALOG.find(function (p) { return p.name.toLowerCase() === clean; }) || null;
             }
-        },
-
-        // DOM Sanitization
-        DOMSanitizer: DOMSanitizer
+        }
     };
 
     // Auto initialize BackendService on window load

@@ -527,68 +527,11 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         // 4. Open modal
         $modal.find('.js-addcart-detail').off('click');
         $modal.addClass('show-modal1');
-        if (typeof trapModalFocus === 'function') {
-            trapModalFocus($modal, $btn);
-        }
     });
 
     $('.js-hide-modal1').on('click', function() {
-        if (typeof closeAccessibleModal === 'function') {
-            closeAccessibleModal($('.js-modal1'));
-        } else {
-            $('.js-modal1').removeClass('show-modal1');
-        }
+        $('.js-modal1').removeClass('show-modal1');
     });
-
-    /*==================================================================
-    [ Modal Accessibility Focus Trapping & Restoration (WCAG 2.2 AA) ]*/
-    var lastModalTrigger = null;
-
-    window.trapModalFocus = function($modal, $trigger) {
-        if ($trigger) lastModalTrigger = $trigger;
-        var focusableSel = 'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
-        
-        setTimeout(function() {
-            var $focusables = $modal.find(focusableSel).filter(':visible');
-            if ($focusables.length) {
-                $focusables.first().focus();
-            }
-        }, 120);
-
-        $modal.off('keydown.trapFocus').on('keydown.trapFocus', function(e) {
-            if (e.key === 'Tab' || e.keyCode === 9) {
-                var $focusables = $modal.find(focusableSel).filter(':visible');
-                if (!$focusables.length) return;
-                var first = $focusables[0];
-                var last = $focusables[$focusables.length - 1];
-
-                if (e.shiftKey) {
-                    if (document.activeElement === first) {
-                        e.preventDefault();
-                        last.focus();
-                    }
-                } else {
-                    if (document.activeElement === last) {
-                        e.preventDefault();
-                        first.focus();
-                    }
-                }
-            } else if (e.key === 'Escape' || e.keyCode === 27) {
-                closeAccessibleModal($modal);
-            }
-        });
-    };
-
-    window.closeAccessibleModal = function($modal) {
-        $modal.removeClass('show-modal1 show-modal-search show-header-cart show-sidebar');
-        $modal.off('keydown.trapFocus');
-        if (lastModalTrigger && $(lastModalTrigger).length) {
-            try {
-                $(lastModalTrigger).focus();
-            } catch (err) {}
-            lastModalTrigger = null;
-        }
-    };
 
     /*==================================================================
     [ Click block2 image to go to PDP ]*/
@@ -3518,84 +3461,32 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             showPremiumToast('Selected Bank: ' + selectedBank, 'info');
         });
 
-        // 11. Luxury Real-Time Accessible Field Validation Engine
-        function validateCheckoutField($input) {
+        // 11. Live input validation handlers
+        $('#checkoutForm input').on('input change blur', function() {
+            var $input = $(this);
             var val = $input.val().trim();
-            var name = $input.attr('name');
-            var isRequired = $input.attr('required');
             var isValid = true;
-            var errorMsg = '';
 
-            // Clean previous error message
-            $input.closest('.input-validate-container, .col-sm-6, .col-sm-4, .col-md-6, .m-b-20, .m-b-15').find('.checkout-field-error').remove();
-
-            if (isRequired && !val) {
+            if ($input.attr('required') && !val) {
                 isValid = false;
-                errorMsg = 'This field is required.';
-            } else if (val) {
-                if (name === 'checkout-email' || name === 'email' || $input.attr('type') === 'email') {
-                    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    if (!emailRegex.test(val)) {
-                        isValid = false;
-                        errorMsg = 'Please enter a valid email address (e.g. name@domain.com).';
-                    }
-                } else if (name === 'phone' || $input.attr('type') === 'tel') {
-                    var digits = val.replace(/\D/g, '');
-                    if (digits.length < 10) {
-                        isValid = false;
-                        errorMsg = 'Please enter a valid 10-digit phone number.';
-                    }
-                } else if (name === 'postcode' || name === 'zip') {
-                    if (val.length < 4) {
-                        isValid = false;
-                        errorMsg = 'Please enter a valid ZIP / Postcode.';
-                    }
-                } else if (name === 'card_number') {
-                    var rawCard = val.replace(/\s/g, '');
-                    if (rawCard.length < 15 || rawCard.length > 19) {
-                        isValid = false;
-                        errorMsg = 'Card number must be 15 to 19 digits.';
-                    }
-                } else if (name === 'card_expiry') {
-                    if (!/^\d{2}\/\d{2}$/.test(val)) {
-                        isValid = false;
-                        errorMsg = 'Expiry must be in MM/YY format.';
-                    } else {
-                        var parts = val.split('/');
-                        var month = parseInt(parts[0], 10);
-                        if (month < 1 || month > 12) {
-                            isValid = false;
-                            errorMsg = 'Invalid expiry month.';
-                        }
-                    }
-                } else if (name === 'card_cvv') {
-                    if (val.length < 3 || val.length > 4) {
-                        isValid = false;
-                        errorMsg = 'CVV must be 3 or 4 digits.';
-                    }
-                }
+            } else if ($input.attr('type') === 'email' && val) {
+                var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                isValid = re.test(val);
+            } else if ($input.attr('name') === 'card_number' && $('.payment-tab-btn.active-tab').attr('data-tab') === 'card') {
+                isValid = val.replace(/\s/g, '').length === 16;
+            } else if ($input.attr('name') === 'card_expiry' && $('.payment-tab-btn.active-tab').attr('data-tab') === 'card') {
+                isValid = val.length === 5 && val.indexOf('/') === 2;
+            } else if ($input.attr('name') === 'card_cvv' && $('.payment-tab-btn.active-tab').attr('data-tab') === 'card') {
+                isValid = val.length >= 3;
             }
 
             if (isValid && val) {
                 $input.removeClass('field-error').addClass('field-valid');
-                $input.attr('aria-invalid', 'false');
             } else if (!isValid) {
                 $input.removeClass('field-valid').addClass('field-error');
-                $input.attr('aria-invalid', 'true');
-                if (errorMsg) {
-                    var $errEl = $('<div class="checkout-field-error" role="alert" aria-live="polite" style="color:#dc3545; font-size:12px; margin-top:4px; font-weight:500; display:flex; align-items:center; gap:4px;"><i class="zmdi zmdi-alert-circle"></i> ' + errorMsg + '</div>');
-                    $input.parent().after($errEl);
-                }
             } else {
                 $input.removeClass('field-valid field-error');
-                $input.removeAttr('aria-invalid');
             }
-
-            return isValid;
-        }
-
-        $('#checkoutForm input').on('input change blur keyup', function() {
-            validateCheckoutField($(this));
         });
 
         // 12. Coupon validation trigger
@@ -5309,21 +5200,17 @@ function initUniversalReviewSystem() {
                     starsHtml += s <= newRev.rating ? '<i class="zmdi zmdi-star"></i> ' : '<i class="zmdi zmdi-star-outline"></i> ';
                 }
 
-                var safeName = (window.DOMSanitizer ? window.DOMSanitizer.escapeHTML(name) : name.replace(/[&<>"']/g, ''));
-                var safeComment = (window.DOMSanitizer ? window.DOMSanitizer.escapeHTML(comment) : comment.replace(/[&<>"']/g, ''));
-                var initials = (name.substring(0, 2).toUpperCase()).replace(/[^A-Z0-9]/g, '');
-
                 var reviewCardHtml = 
                     '<div class="flex-w flex-t p-b-35" style="animation: fadeIn 0.4s ease; border-bottom: 1px solid #f0f0f0; margin-bottom: 25px;">' +
                     '  <div class="wrap-pic-s size-109 bor0 of-hidden m-r-18 m-t-6" style="background:#717fe0; color:#fff; border-radius:50%; width:44px; height:44px; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:16px;">' +
-                    '    ' + (initials || 'GS') +
+                    '    ' + (name.substring(0, 2).toUpperCase()) +
                     '  </div>' +
                     '  <div class="size-207">' +
                     '    <div class="flex-w flex-sb-m p-b-10">' +
-                    '      <span class="mtext-107 cl2 p-r-20">' + safeName + ' <span style="font-size:11px; background:#e8f5e9; color:#2e7d32; padding:2px 8px; border-radius:12px; font-weight:700; margin-left:6px;"><i class="zmdi zmdi-check-circle"></i> Verified Buyer</span></span>' +
+                    '      <span class="mtext-107 cl2 p-r-20">' + name + ' <span style="font-size:11px; background:#e8f5e9; color:#2e7d32; padding:2px 8px; border-radius:12px; font-weight:700; margin-left:6px;"><i class="zmdi zmdi-check-circle"></i> Verified Buyer</span></span>' +
                     '      <span class="fs-18 cl11" style="color: #f5a623;">' + starsHtml + '</span>' +
                     '    </div>' +
-                    '    <p class="stext-102 cl6">' + safeComment + '</p>' +
+                    '    <p class="stext-102 cl6">' + comment + '</p>' +
                     '  </div>' +
                     '</div>';
 
@@ -5428,397 +5315,6 @@ function initUniversalContactSystem() {
     });
 }
 
-// =================================================================
-// LUXURY MINI-CART DRAWER INTERACTIVE ENGINE
-// =================================================================
-function initMiniCartDrawerEngine() {
-    function renderMiniCart() {
-        if (!window.BackendService) return;
-        var cart = window.BackendService.cart.getCart();
-        var $cartWrap = $('.header-cart-wrapitem');
-        if ($cartWrap.length === 0) return;
-
-        if (!cart || cart.length === 0) {
-            $cartWrap.html(
-                '<li class="p-t-30 p-b-30 text-center w-full" style="list-style:none;">' +
-                '  <div style="font-size:36px; color:#c5c5c5; margin-bottom:12px;"><i class="zmdi zmdi-shopping-cart"></i></div>' +
-                '  <p class="stext-115 cl6 m-b-15">Your shopping bag is currently empty.</p>' +
-                '  <a href="product.html" class="flex-c-m stext-101 cl0 size-107 bg3 bor2 hov-btn3 p-lr-15 trans-04 m-auto" style="width:160px; height:40px; border-radius:20px;">Shop Catalog</a>' +
-                '</li>'
-            );
-            $('.header-cart-total').text('Total: $0.00');
-            return;
-        }
-
-        var html = '';
-        var total = 0;
-
-        cart.forEach(function(item) {
-            var priceNum = parseFloat(String(item.price).replace(/[^0-9.]/g, '')) || 0;
-            var qty = parseInt(item.quantity, 10) || 1;
-            total += priceNum * qty;
-
-            var safeName = window.DOMSanitizer ? window.DOMSanitizer.escapeHTML(item.name) : item.name;
-            var safeSize = window.DOMSanitizer ? window.DOMSanitizer.escapeHTML(item.size || 'M') : (item.size || 'M');
-            var safeColor = window.DOMSanitizer ? window.DOMSanitizer.escapeHTML(item.color || 'Default') : (item.color || 'Default');
-            var imgSrc = item.image || 'images/item-cart-01.jpg';
-
-            html += 
-                '<li class="header-cart-item flex-w flex-t m-b-16 p-b-12" style="border-bottom:1px solid #f4f4f4; width:100%; position:relative;">' +
-                '  <div class="header-cart-item-img" style="width:60px; height:80px; flex-shrink:0; overflow:hidden; border-radius:6px; margin-right:16px;">' +
-                '    <img src="' + imgSrc + '" alt="' + safeName + '" style="width:100%; height:100%; object-fit:cover;">' +
-                '  </div>' +
-                '  <div class="header-cart-item-txt" style="flex:1; min-width:0;">' +
-                '    <a href="' + (item.link || 'product.html') + '" class="header-cart-item-name stext-104 cl4 hov-cl1 trans-04 dis-block" style="font-weight:600; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + safeName + '</a>' +
-                '    <span class="stext-105 cl3 dis-block m-t-2" style="font-weight:700;">$' + priceNum.toFixed(2) + '</span>' +
-                '    <div class="mini-cart-qty-row flex-w flex-m m-t-8" style="gap:6px;">' +
-                '      <button type="button" class="mini-cart-qty-btn mini-cart-minus" data-name="' + safeName + '" data-size="' + safeSize + '" data-color="' + safeColor + '" aria-label="Decrease ' + safeName + ' quantity" style="width:24px; height:24px; border-radius:50%; border:1px solid #e0e0e0; background:#f8f9fa; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; font-size:14px; transition:all 0.2s;">-</button>' +
-                '      <span class="mini-cart-qty-val" style="min-width:24px; text-align:center; font-weight:600; font-size:13px;">' + qty + '</span>' +
-                '      <button type="button" class="mini-cart-qty-btn mini-cart-plus" data-name="' + safeName + '" data-size="' + safeSize + '" data-color="' + safeColor + '" aria-label="Increase ' + safeName + ' quantity" style="width:24px; height:24px; border-radius:50%; border:1px solid #e0e0e0; background:#f8f9fa; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; font-size:14px; transition:all 0.2s;">+</button>' +
-                '      <button type="button" class="mini-cart-remove-btn" data-name="' + safeName + '" data-size="' + safeSize + '" data-color="' + safeColor + '" aria-label="Remove ' + safeName + '" style="margin-left:auto; background:none; border:none; color:#999; cursor:pointer; font-size:16px; padding:2px 6px; transition:color 0.2s;"><i class="zmdi zmdi-delete"></i></button>' +
-                '    </div>' +
-                '  </div>' +
-                '</li>';
-        });
-
-        $cartWrap.html(html);
-        $('.header-cart-total').text('Total: $' + total.toFixed(2));
-
-        if (typeof window.updateFreeShippingProgressBar === 'function') {
-            window.updateFreeShippingProgressBar();
-        }
-    }
-
-    // Bind Quantity Stepper and Delete Handlers
-    $(document).on('click', '.mini-cart-plus', function(e) {
-        e.preventDefault();
-        var name = $(this).data('name');
-        var size = $(this).data('size');
-        var color = $(this).data('color');
-        var cart = window.BackendService.cart.getCart();
-        var item = cart.find(function(i) { return i.name === name && (i.size || 'M') === (size || 'M') && (i.color || 'Default') === (color || 'Default'); });
-        var currentQty = item ? (parseInt(item.quantity, 10) || 1) : 1;
-        window.BackendService.cart.updateQuantity(name, size, color, currentQty + 1);
-        renderMiniCart();
-    });
-
-    $(document).on('click', '.mini-cart-minus', function(e) {
-        e.preventDefault();
-        var name = $(this).data('name');
-        var size = $(this).data('size');
-        var color = $(this).data('color');
-        var cart = window.BackendService.cart.getCart();
-        var item = cart.find(function(i) { return i.name === name && (i.size || 'M') === (size || 'M') && (i.color || 'Default') === (color || 'Default'); });
-        var currentQty = item ? (parseInt(item.quantity, 10) || 1) : 1;
-        window.BackendService.cart.updateQuantity(name, size, color, currentQty - 1);
-        renderMiniCart();
-    });
-
-    $(document).on('click', '.mini-cart-remove-btn', function(e) {
-        e.preventDefault();
-        var name = $(this).data('name');
-        var size = $(this).data('size');
-        var color = $(this).data('color');
-        window.BackendService.cart.removeFromCart(name, size, color);
-        renderMiniCart();
-    });
-
-    // Re-render on drawer trigger and cart updates
-    $(document).on('click', '.js-show-cart', renderMiniCart);
-    $(document).on('cartUpdated', renderMiniCart);
-    renderMiniCart();
-}
-
-// =================================================================
-// STICKY MOBILE ADD-TO-CART ENGINE
-// =================================================================
-function initStickyMobileAddToCart() {
-    var $detailSec = $('.sec-product-detail');
-    var $mainAtcBtn = $('.js-addcart-detail').first();
-    if ($detailSec.length === 0 || $mainAtcBtn.length === 0) return;
-
-    var prodTitle = $('.js-name-detail').first().text().trim() || 'Luxury Product';
-    var prodPrice = $detailSec.find('.mtext-106').first().text().trim() || '$0.00';
-    var prodImg = $('.item-slick3 img').first().attr('src') || 'images/product-01.jpg';
-
-    if ($('#stickyMobileAtc').length === 0) {
-        var stickyHtml = 
-            '<div id="stickyMobileAtc" class="sticky-mobile-atc-bar" role="region" aria-label="Quick Add to Cart">' +
-            '  <div class="sticky-atc-container">' +
-            '    <div class="sticky-atc-thumb"><img src="' + prodImg + '" alt="' + prodTitle + '"></div>' +
-            '    <div class="sticky-atc-info">' +
-            '      <span class="sticky-atc-title">' + prodTitle + '</span>' +
-            '      <span class="sticky-atc-price">' + prodPrice + '</span>' +
-            '    </div>' +
-            '    <button type="button" class="sticky-atc-btn" id="btnStickyMobileAtc" aria-label="Add ' + prodTitle + ' to Cart">' +
-            '      <i class="zmdi zmdi-shopping-cart"></i> Add to Cart' +
-            '    </button>' +
-            '  </div>' +
-            '</div>';
-        $('body').append(stickyHtml);
-    }
-
-    var $stickyBar = $('#stickyMobileAtc');
-
-    $(document).on('click', '#btnStickyMobileAtc', function(e) {
-        e.preventDefault();
-        $mainAtcBtn.trigger('click');
-    });
-
-    $(window).on('scroll resize', function() {
-        if ($(window).width() >= 992) {
-            $stickyBar.removeClass('active');
-            return;
-        }
-
-        var atcOffsetTop = $mainAtcBtn.offset().top + $mainAtcBtn.outerHeight();
-        var scrollTop = $(window).scrollTop();
-        var footerTop = $('footer').length ? $('footer').offset().top : $(document).height();
-        var windowBottom = scrollTop + $(window).height();
-
-        if (scrollTop > atcOffsetTop && windowBottom < footerTop + 60) {
-            $stickyBar.addClass('active');
-        } else {
-            $stickyBar.removeClass('active');
-        }
-    });
-}
-
-// =================================================================
-// SKELETON LOADERS & REAL STOCK URGENCY ENGINE
-// =================================================================
-function showProductGridSkeletons($container, count) {
-    if (!$container || $container.length === 0) return;
-    count = count || 8;
-    var html = '';
-    for (var i = 0; i < count; i++) {
-        html += 
-            '<div class="col-sm-6 col-md-4 col-lg-3 p-b-35 skeleton-card-item">' +
-            '  <div class="skeleton-card">' +
-            '    <div class="skeleton-img skeleton-shimmer"></div>' +
-            '    <div class="skeleton-title skeleton-shimmer"></div>' +
-            '    <div class="skeleton-price skeleton-shimmer"></div>' +
-            '  </div>' +
-            '</div>';
-    }
-    $container.html(html);
-}
-window.showProductGridSkeletons = showProductGridSkeletons;
-
-function initStockUrgencyEngine() {
-    var $detailSec = $('.sec-product-detail');
-    if ($detailSec.length === 0) return;
-
-    var prodName = $('.js-name-detail').first().text().trim();
-    if (!prodName || !window.BackendService) return;
-
-    var prod = window.BackendService.products.getProductByName(prodName);
-    var stock = (prod && typeof prod.stock_quantity === 'number') ? prod.stock_quantity : ((prod && typeof prod.stock === 'number') ? prod.stock : 4);
-
-    if ($('.stock-urgency-badge').length === 0) {
-        var badgeHtml = '';
-        if (stock > 0 && stock <= 5) {
-            badgeHtml = '<div class="stock-urgency-badge low-stock" role="status"><i class="zmdi zmdi-fire"></i> Only ' + stock + ' items left in stock - order soon!</div>';
-        } else if (stock > 5) {
-            badgeHtml = '<div class="stock-urgency-badge in-stock" role="status"><i class="zmdi zmdi-check-circle"></i> In Stock & Ready for Express Dispatch</div>';
-        } else if (stock === 0) {
-            badgeHtml = '<div class="stock-urgency-badge out-of-stock" role="status"><i class="zmdi zmdi-time-restore"></i> Backorder - Reserve Now for Priority Allocation</div>';
-        }
-
-        if (badgeHtml) {
-            $detailSec.find('.mtext-106').first().after(badgeHtml);
-        }
-    }
-}
-
-// =================================================================
-// PRODUCT CATALOG VIRTUAL PAGINATION & LAZY CONTROLLER
-// =================================================================
-function initProductCatalogPagination() {
-    var $grid = $('.isotope-grid');
-    if ($grid.length === 0) return;
-
-    var pageSize = 16;
-    var currentPage = 1;
-
-    if ($('#catalogPagination').length === 0) {
-        $grid.after('<div id="catalogPagination" class="catalog-pagination-container"></div>');
-    }
-
-    var $paginationContainer = $('#catalogPagination');
-
-    function getMatchingItems() {
-        var activeFilter = $('.filter-tope-group button.how-active1').attr('data-filter') || '*';
-        if (activeFilter === '*') {
-            return $grid.find('.isotope-item');
-        }
-        return $grid.find('.isotope-item' + activeFilter);
-    }
-
-    function renderPagination() {
-        var $matching = getMatchingItems();
-        var totalItems = $matching.length;
-        var totalPages = Math.ceil(totalItems / pageSize) || 1;
-
-        if (currentPage > totalPages) currentPage = totalPages;
-        if (currentPage < 1) currentPage = 1;
-
-        // Apply slice visibility
-        var startIndex = (currentPage - 1) * pageSize;
-        var endIndex = startIndex + pageSize;
-
-        // Hide all items first, then show only the active slice of matching items
-        $grid.find('.isotope-item').hide();
-        $matching.slice(startIndex, endIndex).fadeIn(200);
-
-        // If Isotope is initialized, update layout safely
-        if ($.fn.isotope && $grid.data('isotope')) {
-            try { $grid.isotope('layout'); } catch (e) {}
-        }
-
-        if (totalItems <= pageSize) {
-            $paginationContainer.empty();
-            return;
-        }
-
-        var startDisplay = totalItems === 0 ? 0 : startIndex + 1;
-        var endDisplay = Math.min(endIndex, totalItems);
-
-        var html = 
-            '<div class="catalog-pagination-summary">' +
-            '  Showing ' + startDisplay + '–' + endDisplay + ' of ' + totalItems + ' products' +
-            '</div>' +
-            '<div class="catalog-pagination-nav" role="navigation" aria-label="Product Catalog Pagination">';
-
-        // Prev Button
-        html += '<button type="button" class="pagination-btn pagination-prev" data-page="' + (currentPage - 1) + '" ' + (currentPage === 1 ? 'disabled aria-disabled="true"' : '') + ' aria-label="Previous page"><i class="zmdi zmdi-chevron-left"></i></button>';
-
-        for (var p = 1; p <= totalPages; p++) {
-            var isActive = p === currentPage;
-            html += '<button type="button" class="pagination-btn pagination-num ' + (isActive ? 'active' : '') + '" data-page="' + p + '" aria-label="Go to page ' + p + '" ' + (isActive ? 'aria-current="page"' : '') + '>' + p + '</button>';
-        }
-
-        // Next Button
-        html += '<button type="button" class="pagination-btn pagination-next" data-page="' + (currentPage + 1) + '" ' + (currentPage === totalPages ? 'disabled aria-disabled="true"' : '') + ' aria-label="Next page"><i class="zmdi zmdi-chevron-right"></i></button>';
-
-        html += '</div>';
-
-        $paginationContainer.html(html);
-    }
-
-    // Pagination button clicks
-    $(document).on('click', '.pagination-btn', function(e) {
-        e.preventDefault();
-        var targetPage = parseInt($(this).attr('data-page'), 10);
-        if (!targetPage || $(this).prop('disabled')) return;
-
-        currentPage = targetPage;
-        renderPagination();
-
-        if ($grid.offset()) {
-            $('html, body').animate({
-                scrollTop: $grid.offset().top - 100
-            }, 300);
-        }
-    });
-
-    // Reset pagination on category filter changes
-    $('.filter-tope-group button').on('click', function() {
-        currentPage = 1;
-        setTimeout(renderPagination, 50);
-    });
-
-    // Initialize pagination on catalog
-    renderPagination();
-}
-
-// =================================================================
-// RECOMMENDATION CONTAINERS (RECENTLY VIEWED & RELATED PRODUCTS)
-// =================================================================
-function initRecommendationContainers() {
-    // 1. Tag or establish #relatedProducts container
-    var $relatedSec = $('.sec-relate-product');
-    if ($relatedSec.length) {
-        $relatedSec.attr('id', 'relatedProducts');
-        $relatedSec.attr('data-recommendation-type', 'related-products');
-    }
-
-    // 2. Manage Recently Viewed Items on PDP
-    var $detailSec = $('.sec-product-detail');
-    if ($detailSec.length) {
-        var prodTitle = $('.js-name-detail').first().text().trim();
-        var prodPrice = $detailSec.find('.mtext-106').first().text().trim();
-        var prodImg = $('.item-slick3 img').first().attr('src') || 'images/product-01.jpg';
-        var currentUrl = window.location.pathname.split('/').pop() || 'product-detail.html';
-
-        if (prodTitle) {
-            var recentlyViewed = [];
-            try {
-                recentlyViewed = JSON.parse(localStorage.getItem('ganeshStore_recently_viewed') || '[]');
-            } catch (e) {}
-
-            // Remove current if exists, then unshift
-            recentlyViewed = recentlyViewed.filter(function(p) { return p.name !== prodTitle; });
-            recentlyViewed.unshift({
-                name: prodTitle,
-                price: prodPrice,
-                image: prodImg,
-                url: currentUrl
-            });
-            if (recentlyViewed.length > 6) recentlyViewed = recentlyViewed.slice(0, 6);
-
-            try {
-                localStorage.setItem('ganeshStore_recently_viewed', JSON.stringify(recentlyViewed));
-            } catch (e) {}
-
-            // 3. Render #recentlyViewedProducts section if items exist
-            var otherItems = recentlyViewed.filter(function(p) { return p.name !== prodTitle; });
-            if (otherItems.length > 0) {
-                if ($('#recentlyViewedProducts').length === 0) {
-                    var rvHtml = 
-                        '<section class="sec-recently-viewed bg0 p-t-30 p-b-80" id="recentlyViewedProducts" data-recommendation-type="recently-viewed">' +
-                        '  <div class="container">' +
-                        '    <div class="p-b-35">' +
-                        '      <h3 class="ltext-106 cl5 txt-center" style="font-family:Poppins-Bold;">Recently Viewed</h3>' +
-                        '    </div>' +
-                        '    <div class="row recently-viewed-grid" id="recentlyViewedGrid"></div>' +
-                        '  </div>' +
-                        '</section>';
-                    if ($relatedSec.length) {
-                        $relatedSec.after(rvHtml);
-                    } else {
-                        $detailSec.after(rvHtml);
-                    }
-                }
-
-                var cardsHtml = '';
-                otherItems.slice(0, 4).forEach(function(item) {
-                    var safeName = window.DOMSanitizer ? window.DOMSanitizer.escapeHTML(item.name) : item.name;
-                    var safePrice = window.DOMSanitizer ? window.DOMSanitizer.escapeHTML(item.price) : item.price;
-                    var safeUrl = window.DOMSanitizer ? window.DOMSanitizer.sanitizeUrl(item.url) : item.url;
-                    var safeImg = item.image || 'images/product-01.jpg';
-
-                    cardsHtml += 
-                        '<div class="col-sm-6 col-md-4 col-lg-3 p-b-35">' +
-                        '  <div class="block2">' +
-                        '    <div class="block2-pic hov-img0">' +
-                        '      <a href="' + safeUrl + '"><img src="' + safeImg + '" alt="' + safeName + '" loading="lazy" style="width:100%; height:auto; aspect-ratio:1200/1486; object-fit:cover;"></a>' +
-                        '    </div>' +
-                        '    <div class="block2-txt flex-w flex-t p-t-14">' +
-                        '      <div class="block2-txt-child1 flex-col-l">' +
-                        '        <a href="' + safeUrl + '" class="stext-104 cl4 hov-cl1 trans-04 js-name-b2 p-b-6" style="font-weight:600;">' + safeName + '</a>' +
-                        '        <span class="stext-105 cl3">' + safePrice + '</span>' +
-                        '      </div>' +
-                        '    </div>' +
-                        '  </div>' +
-                        '</div>';
-                });
-                $('#recentlyViewedGrid').html(cardsHtml);
-            }
-        }
-    }
-}
-
 // Initialize Batch 2 & Enhanced Luxury Features on Document Ready
 $(document).ready(function() {
     initSmartLiveSearch();
@@ -5829,11 +5325,6 @@ $(document).ready(function() {
     initUniversalReviewSystem();
     initUniversalNewsletterSystem();
     initUniversalContactSystem();
-    initMiniCartDrawerEngine();
-    initStickyMobileAddToCart();
-    initStockUrgencyEngine();
-    initProductCatalogPagination();
-    initRecommendationContainers();
 
     // Add dashboard-load section after Our Blogs on home page after 4 seconds
     if ($('.section-slide').length > 0) {

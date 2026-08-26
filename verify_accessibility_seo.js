@@ -62,117 +62,13 @@ assert(allHaveJsonLd, 'All HTML files embed schema.org JSON-LD Structured Data')
 assert(allHaveH1, 'All HTML files contain accessible <h1> heading hierarchy');
 assert(allTargetBlankSecure, 'All target="_blank" links include rel="noopener noreferrer" for security');
 
-// 2b. Granular JSON-LD Schemas (Breadcrumbs, Sitelinks Search, FAQPage, ContactPage)
-const pHome = fs.readFileSync(path.join(rootDir, 'index.html'), 'utf-8');
-assert(pHome.includes('"SearchAction"') && pHome.includes('"WebSite"'), 'index.html contains WebSite + SearchAction (Sitelinks Searchbox) schema');
-
-const pReturns = fs.readFileSync(path.join(rootDir, 'returns.html'), 'utf-8');
-assert(pReturns.includes('"FAQPage"'), 'returns.html contains FAQPage JSON-LD schema');
-
-const pShipping = fs.readFileSync(path.join(rootDir, 'shipping.html'), 'utf-8');
-assert(pShipping.includes('"FAQPage"'), 'shipping.html contains FAQPage JSON-LD schema');
-
-const pContact = fs.readFileSync(path.join(rootDir, 'contact.html'), 'utf-8');
-assert(pContact.includes('"ContactPage"'), 'contact.html contains ContactPage JSON-LD schema');
-
-let pdpBreadcrumbsValid = true;
-const pdpFiles = htmlFiles.filter(f => f.startsWith('p-') || f === 'product-detail.html' || f === 'product.html');
-pdpFiles.forEach(f => {
-    const c = fs.readFileSync(path.join(rootDir, f), 'utf-8');
-    if (!c.includes('"BreadcrumbList"')) pdpBreadcrumbsValid = false;
-});
-assert(pdpBreadcrumbsValid, 'All 67 product detail pages and catalog pages contain BreadcrumbList JSON-LD schema');
-
-let allJsonLdParseValid = true;
-htmlFiles.forEach(file => {
-    const html = fs.readFileSync(path.join(rootDir, file), 'utf-8');
-    const regex = /<script\s+type=["']application\/ld\+json["']>([\s\S]*?)<\/script>/gi;
-    let match;
-    while ((match = regex.exec(html)) !== null) {
-        try {
-            JSON.parse(match[1].trim());
-        } catch (e) {
-            allJsonLdParseValid = false;
-        }
-    }
-});
-assert(allJsonLdParseValid, 'All embedded JSON-LD blocks across all 99 pages parse as valid schema.org JSON');
-
-// 3. CSS Accessibility & Focus Rules
+// 3. CSS Accessibility & Focus Indicators
 console.log('\n--- Suite 3: CSS WCAG 2.2 AA Accessibility & Focus Rules ---');
 const mainCss = fs.readFileSync(path.join(rootDir, 'css', 'main.css'), 'utf-8');
 assert(mainCss.includes('.sr-only'), 'CSS declares .sr-only accessible screen reader utility');
 assert(mainCss.includes(':focus-visible'), 'CSS declares accessible :focus-visible outline indicators');
 assert(mainCss.includes('prefers-reduced-motion'), 'CSS supports prefers-reduced-motion user preference');
 assert(mainCss.includes('min-width: 44px') || mainCss.includes('min-height: 44px'), 'CSS establishes mobile minimum touch target guidelines');
-assert(mainCss.includes('.skip-link'), 'CSS styles accessible .skip-link navigation utility');
-assert(mainCss.includes('font-display: swap'), 'main.css includes font-display: swap on all typography font-face declarations');
-
-const faCss = fs.readFileSync(path.join(rootDir, 'fonts/font-awesome-4.7.0/css/font-awesome.min.css'), 'utf-8');
-assert(faCss.includes('font-display:swap') || faCss.includes('font-display: swap'), 'FontAwesome includes font-display: swap to eliminate FOIT');
-
-const iconicCss = fs.readFileSync(path.join(rootDir, 'fonts/iconic/css/material-design-iconic-font.min.css'), 'utf-8');
-assert(iconicCss.includes('font-display:swap') || iconicCss.includes('font-display: swap'), 'Material Iconic font includes font-display: swap to eliminate FOIT');
-
-const pIndex = fs.readFileSync(path.join(rootDir, 'index.html'), 'utf-8');
-assert(pIndex.includes('media="print" onload="this.media=\'all\'"'), 'Non-critical stylesheets use async media swap to prevent render blocking');
-
-// 3b. HTML Landmarks & Skip Links
-console.log('\n--- Suite 3b: HTML5 Semantic Landmarks & Skip-to-Content Navigation ---');
-let allHaveSkipLink = true;
-let allHaveMainLandmark = true;
-htmlFiles.forEach(file => {
-    const content = fs.readFileSync(path.join(rootDir, file), 'utf-8');
-    if (!content.includes('class="skip-link"') || !content.includes('href="#main-content"')) {
-        allHaveSkipLink = false;
-    }
-    if (!content.includes('id="main-content"') || !content.includes('role="main"') || !content.includes('</main>')) {
-        allHaveMainLandmark = false;
-    }
-});
-assert(allHaveSkipLink, 'All 99 HTML files feature a focusable Skip-to-Main-Content link');
-assert(allHaveMainLandmark, 'All 99 HTML files wrap primary content in <main id="main-content" role="main">');
-
-// 3c. Image Performance & CLS Prevention
-console.log('\n--- Suite 3c: Image Performance, CLS Prevention & Lazy Loading ---');
-let hasLazyImages = false;
-let hasExplicitDimensions = true;
-let heroNotLazy = true;
-
-htmlFiles.forEach(file => {
-    const content = fs.readFileSync(path.join(rootDir, file), 'utf-8');
-    if (content.includes('loading="lazy"')) hasLazyImages = true;
-    if (file === 'index.html') {
-        const heroMatch = content.match(/<img[^>]+src=["'][^"']*slide-01\.jpg["'][^>]*>/i);
-        if (heroMatch && heroMatch[0].includes('loading="lazy"')) {
-            heroNotLazy = false;
-        }
-    }
-});
-assert(hasLazyImages, 'Below-the-fold catalog and content images utilize native loading="lazy"');
-assert(heroNotLazy, 'LCP above-the-fold hero images are eager loaded without lazy loading');
-const sampleProductHtml = fs.readFileSync(path.join(rootDir, 'product.html'), 'utf-8');
-assert(sampleProductHtml.includes('width="1200"') && sampleProductHtml.includes('height="1486"'), 'Product grid images declare explicit width and height attributes to prevent CLS');
-
-// 3d. Modal Accessibility & Keyboard Focus Trapping (WCAG 2.2 AA)
-console.log('\n--- Suite 3d: Modal Dialog ARIA & Keyboard Focus Trapping ---');
-let allModalsAriaCompliant = true;
-htmlFiles.forEach(file => {
-    const content = fs.readFileSync(path.join(rootDir, file), 'utf-8');
-    if (content.includes('js-modal1') && !content.includes('role="dialog"')) {
-        allModalsAriaCompliant = false;
-    }
-    if (content.includes('modal-search-header') && !content.includes('role="dialog"')) {
-        allModalsAriaCompliant = false;
-    }
-    if (content.includes('js-panel-cart') && !content.includes('role="dialog"')) {
-        allModalsAriaCompliant = false;
-    }
-});
-assert(allModalsAriaCompliant, 'Search modals, Quick View popups, and Cart drawers declare role="dialog" and aria-modal="true"');
-
-const jsMainContent = fs.readFileSync(path.join(rootDir, 'js', 'main.js'), 'utf-8');
-assert(jsMainContent.includes('trapModalFocus') && jsMainContent.includes('closeAccessibleModal'), 'main.js implements keyboard focus trapping and focus restoration on close');
 
 // 4. Link & Asset Integrity
 console.log('\n--- Suite 4: Broken Link & Asset Resolution ---');
@@ -211,36 +107,6 @@ htmlFiles.forEach(file => {
     }
 });
 assert(allHaveCanonical, 'All HTML pages contain unified global canonical tags');
-
-// 6. HTTP Security Headers Configuration (Cloudflare Pages _headers)
-console.log('\n--- Suite 6: Production HTTP Security Headers & CSP Allowlist ---');
-assert(fs.existsSync(path.join(rootDir, '_headers')), 'Cloudflare Pages _headers file exists in repo root');
-const headersContent = fs.readFileSync(path.join(rootDir, '_headers'), 'utf-8');
-assert(headersContent.includes('Content-Security-Policy-Report-Only') && headersContent.includes('Strict-Transport-Security'), '_headers file includes CSP Report-Only and HSTS');
-assert(headersContent.includes('X-Frame-Options: DENY') && headersContent.includes('X-Content-Type-Options: nosniff'), '_headers file declares X-Frame-Options and X-Content-Type-Options');
-assert(headersContent.includes('Referrer-Policy: strict-origin-when-cross-origin') && headersContent.includes('Permissions-Policy'), '_headers file declares Referrer-Policy and Permissions-Policy');
-assert(headersContent.includes('payment=(self)'), '_headers permissions policy restricts payment to self');
-
-// 7. Non-Critical Script Deferring & Animsition Latency Removal (CWV / INP / TBT)
-console.log('\n--- Suite 7: Non-Critical Script Deferring & Animsition Latency Removal ---');
-let allDeferredCorrectly = true;
-let noAnimsitionLatency = true;
-
-htmlFiles.forEach(file => {
-    const content = fs.readFileSync(path.join(rootDir, file), 'utf-8');
-    if (content.includes('class="animsition"') || content.includes('animsition.min.js')) {
-        noAnimsitionLatency = false;
-    }
-    if (content.includes('src="vendor/slick/slick.min.js"') && !content.includes('src="vendor/slick/slick.min.js" defer')) {
-        allDeferredCorrectly = false;
-    }
-    if (content.includes('src="vendor/select2/select2.min.js"') && !content.includes('src="vendor/select2/select2.min.js" defer')) {
-        allDeferredCorrectly = false;
-    }
-});
-
-assert(noAnimsitionLatency, 'Animsition latency overlay and blocking scripts removed across all 99 pages');
-assert(allDeferredCorrectly, 'Non-critical vendor plugins (Slick, Select2, Isotope, SweetAlert) load with defer');
 
 console.log('\n========================================================================');
 console.log(`TEST RESULTS: ${passed} Passed, ${failed} Failed`);

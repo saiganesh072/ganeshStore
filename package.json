@@ -1,12 +1,4 @@
 {
-  "name": "ganeshstore",
-  "version": "3.0.0",
-  "description": "GaneshStore Luxury E-Commerce Storefront",
-  "scripts": {
-    "build": "node build.js",
-    "dev": "node -e \"console.log('GaneshStore dev server ready.')\"",
-    "test": "node run_all_tests.js"
-  },
   "dependencies": {
     "puppeteer-core": "^25.0.4"
   }

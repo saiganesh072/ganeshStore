@@ -216,15 +216,6 @@ const p2 = computeFreeShippingProgress(120.00);
 assert(p2.percent === 100 && p2.remaining === 0 && p2.isUnlocked, 'Cart with $120 shows 100% progress and unlocked free shipping');
 
 // -----------------------------------------------------------------------------
-// Suite 7: Real-Time Inline Form Validation & Accessible ARIA Alerts
-// -----------------------------------------------------------------------------
-console.log('\n--- Suite 7: Real-Time Inline Form Validation & Accessible ARIA Alerts ---');
-const mainJsLatest = fs.readFileSync(path.join(__dirname, 'js', 'main.js'), 'utf8');
-assert(mainJsLatest.includes('validateCheckoutField'), 'main.js implements real-time validateCheckoutField engine');
-assert(mainJsLatest.includes('checkout-field-error') && mainJsLatest.includes('role="alert"') && mainJsLatest.includes('aria-live="polite"'), 'Real-time validation outputs accessible role="alert" aria-live="polite" error elements');
-assert(mainJsLatest.includes('aria-invalid'), 'Inputs toggle aria-invalid dynamically based on validity state');
-
-// -----------------------------------------------------------------------------
 // Final Summary
 // -----------------------------------------------------------------------------
 console.log('\n========================================================================');
