@@ -88,14 +88,396 @@
         --text-muted: #888888;
       }
 
+      /* 3A. Page Background */
+      .auth-page-bg {
+        min-height: calc(100vh - 84px);
+        background: linear-gradient(160deg, #f8f9fd 0%, #eef0f7 50%, #f5f0fa 100%);
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 60px 20px 80px;
+      }
+
+      /* 3B. Auth Card Container */
+      .auth-card {
+        width: 100%;
+        max-width: 480px;
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 44px 40px;
+        box-shadow:
+          0 4px 6px rgba(0, 0, 0, 0.02),
+          0 14px 32px rgba(113, 127, 224, 0.09),
+          0 0 0 1px rgba(0, 0, 0, 0.03);
+        border: none;
+        animation: cardFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      @keyframes cardFadeIn {
+        from { opacity: 0; transform: translateY(16px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+      }
+
+      @media (max-width: 576px) {
+        .auth-card {
+          padding: 32px 24px;
+          border-radius: 16px;
+          max-width: 100%;
+        }
+      }
+
       .Loginmain, .Logoutmain {
         font-family: 'Inter', sans-serif;
-        background: #ffffff;
-        border-radius: 16px;
-        padding: 10px 5px;
+        background: transparent;
+        border-radius: 0;
+        padding: 0;
         transition: all 0.3s ease;
       }
 
+      /* 3C. Logo + Title at Top of Card */
+      .auth-card-header {
+        text-align: center;
+        margin-bottom: 28px;
+      }
+
+      .auth-card-logo {
+        height: 32px;
+        width: auto;
+        margin-bottom: 12px;
+        opacity: 0.85;
+      }
+
+      .auth-card-subtitle {
+        font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        color: #999;
+        font-weight: 400;
+        letter-spacing: 0.3px;
+        margin: 0;
+      }
+
+      /* 3E. Pill-Style Tab Toggles */
+      .auth-tabs {
+        display: flex;
+        background: #f3f4f8;
+        border-radius: 12px;
+        padding: 4px;
+        margin-bottom: 28px;
+        position: relative;
+        border-bottom: none;
+      }
+
+      .auth-tab-btn {
+        flex: 1;
+        text-align: center;
+        padding: 11px 16px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #777;
+        cursor: pointer;
+        border: none;
+        background: none;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 2;
+        outline: none;
+      }
+
+      .auth-tab-btn:hover {
+        color: #222;
+      }
+
+      .auth-tab-btn.active {
+        color: #222;
+        background: #ffffff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      }
+
+      /* 3D. Floating Label Inputs */
+      .auth-float-group {
+        position: relative;
+        margin-bottom: 22px;
+      }
+
+      .auth-float-group .auth-input-field {
+        width: 100%;
+        padding: 18px 16px 8px;
+        border: 1.5px solid #e2e4ea;
+        border-radius: 12px;
+        font-size: 15px;
+        font-family: 'Inter', sans-serif;
+        color: #222;
+        background: #fafbfc;
+        outline: none;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      }
+
+      .auth-float-label {
+        position: absolute;
+        top: 50%;
+        left: 16px;
+        transform: translateY(-50%);
+        font-size: 14px;
+        color: #aaa;
+        pointer-events: none;
+        transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+        background: transparent;
+        padding: 0 4px;
+        margin: 0;
+      }
+
+      /* When focused or has content, float label up */
+      .auth-float-group .auth-input-field:focus,
+      .auth-float-group .auth-input-field:not(:placeholder-shown) {
+        border-color: #717fe0;
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(113, 127, 224, 0.1);
+      }
+
+      .auth-float-group .auth-input-field:focus + .auth-float-label,
+      .auth-float-group .auth-input-field:not(:placeholder-shown) + .auth-float-label {
+        top: 2px;
+        transform: translateY(0);
+        font-size: 10.5px;
+        font-weight: 700;
+        color: #717fe0;
+        background: #fff;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+      }
+
+      .auth-password-toggle {
+        position: absolute;
+        right: 16px;
+        top: 18px;
+        cursor: pointer;
+        color: var(--text-muted);
+        transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+        z-index: 3;
+      }
+
+      .auth-password-toggle:hover {
+        color: var(--accent-color);
+        transform: scale(1.2);
+      }
+
+      .auth-options {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+        margin-bottom: 25px;
+      }
+
+      .auth-remember {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+      }
+
+      .auth-remember input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--accent-color);
+        cursor: pointer;
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        margin: 0;
+      }
+
+      .auth-remember:hover input[type="checkbox"] {
+        transform: scale(1.2);
+      }
+
+      .auth-remember input[type="checkbox"]:active {
+        transform: scale(0.9);
+      }
+
+      .auth-forgot-link {
+        color: var(--accent-color);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s ease;
+      }
+
+      .auth-forgot-link:hover {
+        text-decoration: underline;
+        color: var(--accent-hover);
+      }
+
+      #contact-signin-section, #contact-signup-section {
+        transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      }
+
+      /* 3F. Primary CTA Button */
+      .btn-auth-submit {
+        width: 100%;
+        padding: 15px;
+        border: none;
+        border-radius: 12px;
+        background: #222;
+        color: #fff;
+        font-size: 15px;
+        font-weight: 600;
+        font-family: 'Inter', sans-serif;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* Shimmer sweep effect on hover */
+      .btn-auth-submit::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -150%;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(
+          to right,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.25) 50%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        transform: skewX(-25deg);
+        transition: left 0.6s ease;
+      }
+
+      .btn-auth-submit:hover::after {
+        left: 150%;
+      }
+
+      .btn-auth-submit:hover {
+        background: #333;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
+      }
+
+      .btn-auth-submit:active {
+        transform: scale(0.97) translateY(0);
+        transition: transform 0.1s ease;
+      }
+
+      .btn-auth-submit:hover i.zmdi-arrow-right {
+        transform: translateX(5px);
+      }
+
+      .btn-auth-submit:hover i.zmdi-assignment-account {
+        transform: scale(1.2);
+      }
+
+      .btn-auth-submit i {
+        transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        display: inline-block;
+      }
+
+      .auth-divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 12px;
+        margin-top: 25px;
+        margin-bottom: 20px;
+      }
+
+      .auth-divider::before,
+      .auth-divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid #eeeeee;
+      }
+
+      .auth-divider:not(:empty)::before {
+        margin-right: .5em;
+      }
+
+      .auth-divider:not(:empty)::after {
+        margin-left: .5em;
+      }
+
+      /* 3H. Google Button */
+      .btn-google-login {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        width: 100%;
+        padding: 13px;
+        border: 1.5px solid #e2e4ea;
+        border-radius: 12px;
+        background: #fff;
+        color: #333;
+        font-size: 14px;
+        font-weight: 600;
+        font-family: 'Inter', sans-serif;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn-google-login:hover {
+        border-color: #ccc;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        transform: translateY(-1px);
+      }
+
+      .btn-google-login:active {
+        transform: scale(0.98);
+      }
+
+      /* 3G. Demo Accounts Box */
+      .demo-accounts-box {
+        background: #f9fafe;
+        border: 1px dashed #d8dce8;
+        border-radius: 12px;
+        padding: 14px 16px;
+        margin-top: 24px;
+        margin-bottom: 0;
+      }
+
+      .demo-accounts-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: #555;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .demo-account-pill {
+        display: inline-block;
+        padding: 4px 10px;
+        background: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        color: #444;
+        cursor: pointer;
+        margin: 2px 4px 2px 0;
+        transition: all 0.2s ease;
+      }
+
+      .demo-account-pill:hover {
+        background: var(--accent-color);
+        color: #ffffff;
+        border-color: var(--accent-color);
+        transform: translateY(-1px);
+      }
+
+      /* Dashboard / Account Styles */
       .account-header-card {
         background: linear-gradient(135deg, #1f2438 0%, #0f121d 100%);
         border-radius: 14px;
@@ -158,12 +540,12 @@
         border: 1px solid rgba(255, 215, 0, 0.3);
       }
 
-      /* Account Center Tabs */
       .account-nav-tabs {
         display: flex;
         border-bottom: 2px solid #f0f0f0;
         margin-bottom: 25px;
         gap: 6px;
+        overflow-x: auto;
       }
 
       .account-nav-btn {
@@ -180,6 +562,7 @@
         display: flex;
         align-items: center;
         gap: 6px;
+        white-space: nowrap;
       }
 
       .account-nav-btn:hover {
@@ -191,7 +574,6 @@
         border-bottom-color: #717fe0;
       }
 
-      /* Order Cards */
       .account-order-card {
         border: 1px solid #eef0f5;
         border-radius: 12px;
@@ -248,25 +630,25 @@
         line-height: 1.4;
       }
 
-      .order-card-footer {
+      .order-footer-meta {
         display: flex;
         justify-content: space-between;
         align-items: center;
       }
 
       .order-total-price {
-        font-size: 16px;
         font-weight: 700;
-        color: #111;
+        font-size: 16px;
+        color: #222;
       }
 
       .btn-track-order {
-        padding: 6px 16px;
-        background: #717fe0;
-        color: #ffffff;
-        border-radius: 20px;
+        padding: 6px 14px;
         font-size: 12px;
         font-weight: 600;
+        border-radius: 6px;
+        background: #717fe0;
+        color: #fff;
         border: none;
         cursor: pointer;
         transition: all 0.2s ease;
@@ -277,126 +659,82 @@
         transform: translateY(-1px);
       }
 
-      /* Quick Demo Account Switcher */
-      .demo-accounts-box {
-        background: #f8f9fc;
-        border: 1px dashed #d5daf0;
-        border-radius: 12px;
-        padding: 14px 16px;
-        margin-bottom: 22px;
-      }
-
-      .demo-accounts-title {
-        font-size: 12px;
-        font-weight: 700;
-        color: #555;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 8px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-
-      .demo-account-pill {
-        display: inline-block;
-        padding: 6px 12px;
-        border-radius: 20px;
-        background: #ffffff;
-        border: 1px solid #dcdfe6;
-        font-size: 12px;
-        font-weight: 600;
-        color: #333;
-        margin-right: 6px;
-        margin-bottom: 6px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-      }
-
-      .demo-account-pill:hover {
-        background: #717fe0;
-        color: #fff;
-        border-color: #717fe0;
-        transform: translateY(-1px);
-      }
-
       /* Tracking Modal */
       .tracking-modal-overlay {
         position: fixed;
         top: 0;
         left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: rgba(0, 0, 0, 0.6);
-        backdrop-filter: blur(8px);
-        z-index: 99999;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
         display: none;
         align-items: center;
         justify-content: center;
-        padding: 20px;
+        z-index: 10000;
+        backdrop-filter: blur(4px);
       }
 
       .tracking-modal-content {
-        background: #ffffff;
+        background: #fff;
         border-radius: 16px;
-        max-width: 540px;
-        width: 100%;
-        padding: 30px 25px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-        position: relative;
-        animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      }
-
-      @keyframes modalSlideUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+        width: 90%;
+        max-width: 520px;
+        padding: 30px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        animation: cardFadeIn 0.3s ease;
       }
 
       .tracking-timeline {
         position: relative;
-        margin: 25px 0 10px;
-        padding-left: 24px;
+        padding-left: 30px;
+        margin: 20px 0;
       }
 
       .tracking-timeline::before {
         content: '';
         position: absolute;
-        left: 7px;
-        top: 8px;
-        bottom: 8px;
+        left: 9px;
+        top: 6px;
+        bottom: 6px;
         width: 2px;
         background: #e0e0e0;
       }
 
       .timeline-step {
         position: relative;
-        padding-bottom: 22px;
+        padding-bottom: 20px;
       }
 
-      .timeline-dot {
+      .timeline-step:last-child {
+        padding-bottom: 0;
+      }
+
+      .timeline-step-dot {
         position: absolute;
-        left: -24px;
+        left: -30px;
         top: 2px;
-        width: 16px;
-        height: 16px;
+        width: 20px;
+        height: 20px;
         border-radius: 50%;
-        background: #ccc;
-        border: 2px solid #fff;
-        box-shadow: 0 0 0 2px #ccc;
+        background: #e0e0e0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        color: #fff;
       }
 
-      .timeline-step.completed .timeline-dot {
+      .timeline-step.completed .timeline-step-dot {
         background: #2e7d32;
-        box-shadow: 0 0 0 2px #2e7d32;
       }
 
-      .timeline-step.active .timeline-dot {
+      .timeline-step.active .timeline-step-dot {
         background: #717fe0;
-        box-shadow: 0 0 0 2px #717fe0;
-        animation: pulseRing 1.5s infinite;
+        box-shadow: 0 0 0 4px rgba(113, 127, 224, 0.2);
+        animation: pulseTimeline 2s infinite;
       }
 
-      @keyframes pulseRing {
+      @keyframes pulseTimeline {
         0% { box-shadow: 0 0 0 2px #717fe0; }
         50% { box-shadow: 0 0 0 6px rgba(113, 127, 224, 0.3); }
         100% { box-shadow: 0 0 0 2px #717fe0; }
@@ -435,296 +773,6 @@
       button.CLogout:hover {
         background-color: #d32f2f;
         transform: translateY(-1px);
-      }
-
-      /* Premium Login Redesign styling */
-      .auth-tabs {
-        display: flex;
-        border-bottom: 2px solid #f0f0f0;
-        margin-bottom: 20px;
-        position: relative;
-      }
-
-        margin-bottom: 20px;
-        position: relative;
-      }
-
-      .auth-tab-btn {
-        flex: 1;
-        text-align: center;
-        padding: 12px;
-        font-size: 15px;
-        font-weight: 600;
-        color: var(--text-muted);
-        cursor: pointer;
-        border: none;
-        background: none;
-        outline: none;
-        transition: all 0.3s ease;
-        position: relative;
-        z-index: 2;
-      }
-
-      .auth-tab-btn:hover {
-        color: var(--primary-color);
-      }
-
-      .auth-tab-btn.active {
-        color: var(--accent-color);
-      }
-
-      .auth-tabs-slider {
-        position: absolute;
-        bottom: -2px;
-        left: 0;
-        width: 50%;
-        height: 2px;
-        background-color: var(--accent-color);
-        transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
-        z-index: 1;
-      }
-
-      .btn-google-login {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        width: 100%;
-        padding: 12px;
-        border: 1px solid #e0e0e0;
-        border-radius: 10px;
-        background-color: #ffffff;
-        color: #333333;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        margin-bottom: 0px;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .btn-google-login::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -150%;
-        width: 50%;
-        height: 100%;
-        background: linear-gradient(
-          to right,
-          rgba(0, 0, 0, 0) 0%,
-          rgba(0, 0, 0, 0.04) 50%,
-          rgba(0, 0, 0, 0) 100%
-        );
-        transform: skewX(-25deg);
-        transition: left 0.6s ease;
-      }
-
-      .btn-google-login:hover::after {
-        left: 150%;
-      }
-
-      .btn-google-login:hover {
-        background-color: #fcfcfc;
-        border-color: #cccccc;
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
-        transform: translateY(-2px);
-      }
-
-      .btn-google-login img,
-      .btn-google-login svg {
-        width: 20px;
-        height: 20px;
-        transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-      }
-
-      .btn-google-login:hover svg {
-        transform: scale(1.15);
-      }
-
-      .auth-divider {
-        display: flex;
-        align-items: center;
-        text-align: center;
-        color: var(--text-muted);
-        font-size: 12px;
-        margin-top: 25px;
-        margin-bottom: 20px;
-      }
-
-      .auth-divider::before,
-      .auth-divider::after {
-        content: '';
-        flex: 1;
-        border-bottom: 1px solid #eeeeee;
-      }
-
-      .auth-divider:not(:empty)::before {
-        margin-right: .5em;
-      }
-
-      .auth-divider:not(:empty)::after {
-        margin-left: .5em;
-      }
-
-      .auth-input-group {
-        position: relative;
-        margin-bottom: 20px;
-      }
-
-      .auth-input-label {
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--primary-color);
-        margin-bottom: 6px;
-        display: block;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      .auth-input-field {
-        width: 100%;
-        padding: 12px 16px;
-        border: 1.5px solid #e0e0e0;
-        border-radius: 10px;
-        font-size: 14px;
-        color: var(--primary-color);
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        outline: none;
-      }
-
-      .auth-input-field:focus {
-        border-color: var(--accent-color);
-        box-shadow: 0 0 0 4px rgba(113, 127, 224, 0.18);
-        transform: translateY(-1px);
-      }
-
-      .auth-password-toggle {
-        position: absolute;
-        right: 16px;
-        top: 38px;
-        cursor: pointer;
-        color: var(--text-muted);
-        transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
-      }
-
-      .auth-password-toggle:hover {
-        color: var(--accent-color);
-        transform: scale(1.2);
-      }
-
-      .auth-options {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 13px;
-        margin-bottom: 25px;
-      }
-
-      .auth-remember {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
-      }
-
-      .auth-remember input[type="checkbox"] {
-        width: 15px;
-        height: 15px;
-        accent-color: var(--accent-color);
-        cursor: pointer;
-        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-        margin: 0;
-      }
-
-      .auth-remember:hover input[type="checkbox"] {
-        transform: scale(1.2);
-      }
-
-      .auth-remember input[type="checkbox"]:active {
-        transform: scale(0.9);
-      }
-
-      .auth-forgot-link {
-        color: var(--accent-color);
-        text-decoration: none;
-        font-weight: 500;
-        transition: color 0.2s ease;
-      }
-
-      .auth-forgot-link:hover {
-        text-decoration: underline;
-        color: var(--accent-hover);
-      }
-
-      #contact-signin-section, #contact-signup-section {
-        transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-      }
-
-      .btn-auth-submit {
-        width: 100%;
-        padding: 14px;
-        border: none;
-        border-radius: 10px;
-        background-color: var(--primary-color);
-        color: #ffffff;
-        font-size: 15px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        position: relative;
-        overflow: hidden;
-      }
-
-      .btn-auth-submit::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -150%;
-        width: 50%;
-        height: 100%;
-        background: linear-gradient(
-          to right,
-          rgba(255, 255, 255, 0) 0%,
-          rgba(255, 255, 255, 0.25) 50%,
-          rgba(255, 255, 255, 0) 100%
-        );
-        transform: skewX(-25deg);
-        transition: left 0.6s ease;
-      }
-
-      .btn-auth-submit:hover::after {
-        left: 150%;
-      }
-
-      .btn-auth-submit i {
-        transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        display: inline-block;
-      }
-
-      .btn-auth-submit:hover {
-        background-color: #333333;
-        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
-        transform: translateY(-2px);
-      }
-
-      .btn-auth-submit:active, .btn-google-login:active {
-        transform: scale(0.97) translateY(0);
-        transition: transform 0.1s ease;
-      }
-
-      .btn-auth-submit:hover i.zmdi-arrow-right {
-        transform: translateX(5px);
-      }
-
-      .btn-auth-submit:hover i.zmdi-assignment-account {
-        transform: scale(1.2);
       }
 
       .auth-alert-banner {
@@ -766,6 +814,14 @@
       .auth-alert-banner.shake {
         animation: bannerShake 0.4s ease-in-out;
       }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
     </style>
     <style>
       input::-webkit-outer-spin-button,
@@ -782,34 +838,32 @@
 
     <script type="application/ld+json">
     {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "GaneshStore",
-  "url": "https://ganeshstore.com",
-  "logo": "images/icons/logo-01.png",
-  "description": "Curated luxury fashion atelier, accessories, footwear, and bespoke craftsmanship.",
-  "sameAs": [
-    "https://www.facebook.com/ganeshstore",
-    "https://www.instagram.com/ganeshstore",
-    "https://www.pinterest.com/ganeshstore"
-  ]
-}
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "GaneshStore",
+      "url": "https://ganeshstore.com",
+      "logo": "images/icons/logo-01.png",
+      "description": "Curated luxury fashion atelier, accessories, footwear, and bespoke craftsmanship.",
+      "sameAs": [
+        "https://www.facebook.com/ganeshstore",
+        "https://www.instagram.com/ganeshstore",
+        "https://www.pinterest.com/ganeshstore"
+      ]
+    }
     </script>
-  		<link rel="canonical" href="https://ganeshstore.com/signin.html" />
-</head>
+    <link rel="canonical" href="https://ganeshstore.com/signin.html" />
+  </head>
   <body class="animsition">
     <h1 class="sr-only">Client Sign In, 2-Step Verification & VIP Rewards</h1>
     <!-- Header -->
     <header class="header-v4">
-    <!-- Announcement Bar -->
-    <div class="announcement-bar">
-      Free shipping for standard orders over $100
-    </div>
+      <!-- Announcement Bar -->
+      <div class="announcement-bar">
+        Free shipping for standard orders over $100
+      </div>
 
       <!-- Header desktop -->
       <div class="container-menu-desktop">
-        
-
         <div class="wrap-menu-desktop how-shadow1">
           <nav class="limiter-menu-desktop container">
             <!-- Logo desktop -->
@@ -862,8 +916,8 @@
               </div>
 
               <a
-                href="#"
-                class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti"
+                href="wishlist.html"
+                class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti heart-icon-header"
                 data-notify="0"
               >
                 <i class="zmdi zmdi-favorite-outline"></i>
@@ -898,16 +952,12 @@
           </div>
 
           <a
-            href="#"
-            class="dis-block icon-header-item cl2 hov-cl1 trans-04 p-r-11 p-l-10 icon-header-noti"
+            href="wishlist.html"
+            class="dis-block icon-header-item cl2 hov-cl1 trans-04 p-r-11 p-l-10 icon-header-noti heart-icon-header"
             data-notify="0"
           >
             <i class="zmdi zmdi-favorite-outline"></i>
           </a>
-
-        <a href="signin.html" class="dis-block icon-header-item cl2 hov-cl1 trans-04 p-r-11 p-l-10 js-auth-link-container">
-          <i class="zmdi zmdi-account js-auth-icon"></i>
-        </a>
         </div>
 
         <!-- Button show menu -->
@@ -920,8 +970,6 @@
 
       <!-- Menu Mobile -->
       <div class="menu-mobile">
-        
-
         <ul class="main-menu-m">
           <li>
             <a href="index.html">Home</a>
@@ -945,7 +993,9 @@
             <a href="about.html">About</a>
           </li>
 
-          
+          <li>
+            <a href="signin.html">Login</a>
+          </li>
         </ul>
       </div>
 
@@ -997,7 +1047,7 @@
 
               <div class="header-cart-item-txt p-t-8">
                 <a
-                  href="#"
+                  href="product-detail.html"
                   class="header-cart-item-name m-b-18 hov-cl1 trans-04"
                 >
                   White Shirt Pleat
@@ -1014,7 +1064,7 @@
 
               <div class="header-cart-item-txt p-t-8">
                 <a
-                  href="#"
+                  href="product-detail.html"
                   class="header-cart-item-name m-b-18 hov-cl1 trans-04"
                 >
                   Converse All Star
@@ -1031,7 +1081,7 @@
 
               <div class="header-cart-item-txt p-t-8">
                 <a
-                  href="#"
+                  href="product-detail.html"
                   class="header-cart-item-name m-b-18 hov-cl1 trans-04"
                 >
                   Nixon Porter Leather
@@ -1066,10 +1116,11 @@
     </div>
 
     <!-- Content page -->
-    <section class="p-t-30 p-b-80" style="background: linear-gradient(180deg, #fdfcf9 0%, #f6f0e4 100%);">
-      <div class="container">
-        <div class="size-210 bor10 p-lr-50 p-t-55 p-b-70 p-lr-15-lg w-full-md mx-auto" style="background-color: #ffffff; border-radius: 16px; box-shadow: 0 12px 35px rgba(0,0,0,0.045); border: 1px solid #eaeaea;">          <!-- Account Profile Panel (Shown when logged in) -->
-          <div class="Logoutmain" style="display: none;">
+    <section class="auth-page-bg">
+      <div class="auth-card">
+        <!-- Logged-in dashboard: hidden by default -->
+        <div id="auth-loggedin-view" style="display: none;">
+          <div class="Logoutmain">
             <!-- Header Summary Card -->
             <div class="account-header-card">
               <div class="account-avatar js-logout-avatar">SG</div>
@@ -1111,17 +1162,17 @@
             <!-- TAB 2: Profile & Shipping Address -->
             <div id="acc-tab-profile" class="account-tab-content" style="display: none;">
               <form onsubmit="handleProfileUpdate(event)">
-                <div class="auth-input-group">
-                  <label class="auth-input-label">Full Name</label>
-                  <input class="auth-input-field" type="text" id="acc-edit-name" required />
+                <div class="auth-float-group">
+                  <input class="auth-input-field" type="text" id="acc-edit-name" required placeholder=" " />
+                  <label class="auth-float-label" for="acc-edit-name">Full Name</label>
                 </div>
-                <div class="auth-input-group">
-                  <label class="auth-input-label">Phone Number</label>
-                  <input class="auth-input-field" type="tel" id="acc-edit-phone" required />
+                <div class="auth-float-group">
+                  <input class="auth-input-field" type="tel" id="acc-edit-phone" required placeholder=" " />
+                  <label class="auth-float-label" for="acc-edit-phone">Phone Number</label>
                 </div>
-                <div class="auth-input-group">
-                  <label class="auth-input-label">Default Shipping Address</label>
-                  <input class="auth-input-field" type="text" id="acc-edit-address" placeholder="123 Luxury Way, New York, NY 10001" />
+                <div class="auth-float-group">
+                  <input class="auth-input-field" type="text" id="acc-edit-address" placeholder=" " />
+                  <label class="auth-float-label" for="acc-edit-address">Default Shipping Address</label>
                 </div>
                 <button type="submit" class="btn-auth-submit" style="margin-top: 10px;">
                   <i class="zmdi zmdi-check"></i> Save Changes
@@ -1138,7 +1189,7 @@
 
             <!-- TAB 4: VIP Rewards -->
             <div id="acc-tab-rewards" class="account-tab-content" style="display: none;">
-              <div class="demo-accounts-box" style="background: #fff8e1; border-color: #ffe082;">
+              <div class="demo-accounts-box" style="background: #fff8e1; border-color: #ffe082; margin-top: 0;">
                 <div class="demo-accounts-title" style="color: #f57f17;">
                   <i class="zmdi zmdi-crown"></i> VIP Loyalty Benefits
                 </div>
@@ -1204,29 +1255,21 @@
               <i class="zmdi zmdi-power"></i> Sign Out
             </button>
           </div>
+        </div>
 
-          <!-- Auth Forms Panel (Shown when logged out) -->
+        <!-- Logged-out login form: shown by default -->
+        <div id="auth-loggedout-view" style="display: block;">
           <div class="Loginmain">
-            <!-- Quick Demo Accounts Switcher -->
-            <div class="demo-accounts-box">
-              <div class="demo-accounts-title">
-                <i class="zmdi zmdi-flash"></i> Quick Test Demo Accounts (1-Click Login)
-              </div>
-              <span class="demo-account-pill" onclick="quickLoginDemo('sai@ganeshstore.com', 'password123')">
-                👑 Sai Ganesh (Platinum)
-              </span>
-              <span class="demo-account-pill" onclick="quickLoginDemo('olivia@vance.net', 'password123')">
-                ⭐ Olivia Vance (Gold)
-              </span>
-              <span class="demo-account-pill" onclick="quickLoginDemo('demo@ganeshstore.com', 'password123')">
-                ✨ Demo Customer (Silver)
-              </span>
+            <!-- Header with Logo and Welcome -->
+            <div class="auth-card-header">
+              <img src="images/icons/logo-01.png" alt="GaneshStore" class="auth-card-logo" />
+              <p class="auth-card-subtitle">Welcome to GaneshStore</p>
             </div>
 
+            <!-- Tab Toggles (Pill style) -->
             <div class="auth-tabs">
               <button type="button" class="auth-tab-btn active" id="btn-tab-signin" onclick="switchContactTab('signin')">Sign In</button>
               <button type="button" class="auth-tab-btn" id="btn-tab-signup" onclick="switchContactTab('signup')">Create Account</button>
-              <div class="auth-tabs-slider"></div>
             </div>
 
             <!-- Inline Alert Feedback Banner -->
@@ -1238,14 +1281,14 @@
             <!-- ================= Sign In Mode ================= -->
             <div id="contact-signin-section">
               <form id="contact-login-form" onsubmit="handleEmailLogin(event)">
-                <div class="auth-input-group">
-                  <label class="auth-input-label" for="c-login-email">Email Address</label>
-                  <input class="auth-input-field auth-email-input" type="email" id="c-login-email" required placeholder="name@example.com" />
+                <div class="auth-float-group">
+                  <input class="auth-input-field auth-email-input" type="email" id="c-login-email" required placeholder=" " />
+                  <label class="auth-float-label" for="c-login-email">Email Address</label>
                 </div>
 
-                <div class="auth-input-group">
-                  <label class="auth-input-label" for="c-login-password">Password</label>
-                  <input class="auth-input-field auth-password-input" type="password" id="c-login-password" required placeholder="••••••••" />
+                <div class="auth-float-group">
+                  <input class="auth-input-field auth-password-input" type="password" id="c-login-password" required placeholder=" " />
+                  <label class="auth-float-label" for="c-login-password">Password</label>
                   <i class="zmdi zmdi-eye auth-password-toggle" onclick="toggleContactPassword('c-login-password', this)"></i>
                 </div>
 
@@ -1267,214 +1310,19 @@
             <!-- ================= Sign Up Mode ================= -->
             <div id="contact-signup-section" style="display: none;">
               <form id="contact-register-form" onsubmit="handleEmailSignUp(event)">
-                <div class="auth-input-group">
-                  <label class="auth-input-label" for="c-signup-name">Full Name</label>
-                  <input class="auth-input-field" type="text" id="c-signup-name" required placeholder="Sai Ganesh" />
+                <div class="auth-float-group">
+                  <input class="auth-input-field" type="text" id="c-signup-name" required placeholder=" " />
+                  <label class="auth-float-label" for="c-signup-name">Full Name</label>
                 </div>
 
-                <div class="auth-input-group">
-                  <label class="auth-input-label" for="c-signup-email">Email Address</label>
-                  <input class="auth-input-field" type="email" id="c-signup-email" required placeholder="name@example.com" />
+                <div class="auth-float-group">
+                  <input class="auth-input-field" type="email" id="c-signup-email" required placeholder=" " />
+                  <label class="auth-float-label" for="c-signup-email">Email Address</label>
                 </div>
 
-                <div class="auth-input-group">
-                  <label class="auth-input-label" for="c-signup-password">Password</label>
-                  <input class="auth-input-field" type="password" id="c-signup-password" required placeholder="Min 6 characters" minlength="6" />
-                  <i class="zmdi zmdi-eye auth-password-toggle" onclick="toggleContactPassword('c-signup-password', this)"></i>
-                </div>
-
-                <div class="auth-options">
-                  <label class="auth-remember" style="font-size: 12px; line-height: 1.4;">
-                    <input type="checkbox" id="c-signup-agree" required />
-                    <span>I agree to the Terms of Service & Privacy Policy</span>
-                  </label>
-                </div>
-
-                <button type="submit" class="btn-auth-submit">
-                  <span>Create Account</span>
-                  <i class="zmdi zmdi-assignment-account"></i>
-                </button>
-              </form>
-            </div>
-
-            <div class="auth-divider">or continue with</div>
-
-            <!-- Google Authentication Trigger -->
-            <button type="button" class="btn-google-login" onclick="handleGoogleSignIn()">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20px" height="20px">
-                <path fill="#EA4335" d="M24 9.5c3.3 0 6.3 1.2 8.7 3.2l6.5-6.5C34.5 2.5 29.8 0 24 0 14.7 0 6.8 5.6 3.1 13.8l7.5 5.8C12.5 12.8 17.7 9.5 24 9.5z"/>
-                <path fill="#4285F4" d="M46.9 24.5c0-1.6-.1-3.2-.4-4.7H24v9.4h12.9c-.6 3.1-2.3 5.7-4.9 7.4l7.7 6c4.5-4.2 7.2-10.4 7.2-18.1z"/>
-                <path fill="#FBBC05" d="M10.6 28.5c-1-3-1-6.3 0-9.4l-7.5-5.8c-2.7 5.4-2.7 11.8 0 17.2l7.5-5.8z"/>
-                <path fill="#34A853" d="M24 48c6.5 0 11.9-2.2 15.9-5.9l-7.7-6c-2.2 1.5-5 2.3-8.2 2.3-6.3 0-11.5-4.2-13.4-10.1l-7.5 5.8C6.8 42.4 14.7 48 24 48z"/>
-                <div class="auth-input-group">
-                  <label class="auth-input-label">Full Name</label>
-                  <input class="auth-input-field" type="text" id="acc-edit-name" required />
-                </div>
-                <div class="auth-input-group">
-                  <label class="auth-input-label">Phone Number</label>
-                  <input class="auth-input-field" type="tel" id="acc-edit-phone" required />
-                </div>
-                <div class="auth-input-group">
-                  <label class="auth-input-label">Default Shipping Address</label>
-                  <input class="auth-input-field" type="text" id="acc-edit-address" placeholder="123 Luxury Way, New York, NY 10001" />
-                </div>
-                <button type="submit" class="btn-auth-submit" style="margin-top: 10px;">
-                  <i class="zmdi zmdi-check"></i> Save Changes
-                </button>
-              </form>
-            </div>
-
-            <!-- TAB 3: Wishlist Summary -->
-            <div id="acc-tab-wishlist" class="account-tab-content" style="display: none;">
-              <div id="account-wishlist-list">
-                <!-- Dynamically populated via JS -->
-              </div>
-            </div>
-
-            <!-- TAB 4: VIP Rewards -->
-            <div id="acc-tab-rewards" class="account-tab-content" style="display: none;">
-              <div class="demo-accounts-box" style="background: #fff8e1; border-color: #ffe082;">
-                <div class="demo-accounts-title" style="color: #f57f17;">
-                  <i class="zmdi zmdi-crown"></i> VIP Loyalty Benefits
-                </div>
-                <p style="font-size: 13px; color: #666; margin-bottom: 12px;" id="acc-rewards-desc">
-                  Enjoy 2x points on all purchases, automatic Free Express Shipping, and access to VIP exclusive drops.
-                </p>
-                <div style="font-size: 12px; font-weight: 700; color: #444; margin-bottom: 6px;">Available Promo Codes:</div>
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                  <span class="demo-account-pill" style="background: #fff; border-color: #ffd54f; font-weight: 700; color: #e65100;">GANESH20 ($20 OFF)</span>
-                  <span class="demo-account-pill" style="background: #fff; border-color: #ffd54f; font-weight: 700; color: #e65100;">SAVE10 (10% OFF)</span>
-                  <span class="demo-account-pill" style="background: #fff; border-color: #ffd54f; font-weight: 700; color: #e65100;">FREESHIP (FREE SHIPPING)</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- TAB 5: Security & Google Authenticator 2FA -->
-            <div id="acc-tab-security" class="account-tab-content" style="display: none;">
-              <div style="background: #fdfdfd; border: 1px solid #eef0f5; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                  <div>
-                    <h5 style="font-weight: 700; color: #222; margin: 0 0 4px 0;"><i class="zmdi zmdi-shield-check" style="color: #717fe0;"></i> Google Authenticator (2FA)</h5>
-                    <p style="font-size: 13px; color: #777; margin: 0;">Protect your account with Time-based One-Time Passwords (TOTP).</p>
-                  </div>
-                  <span id="twofa-status-pill" style="padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; background: #eee; color: #666;">
-                    Disabled
-                  </span>
-                </div>
-
-                <!-- 2FA Setup Flow (Shown when Disabled) -->
-                <div id="twofa-setup-section" style="display: none; border-top: 1px solid #f0f0f0; padding-top: 15px; margin-top: 15px;">
-                  <p style="font-size: 13px; color: #444; margin-bottom: 15px;"><strong>Step 1:</strong> Scan this QR code with <strong>Google Authenticator</strong> (or Authy / 1Password):</p>
-                  <div style="text-align: center; margin-bottom: 15px;">
-                    <img id="twofa-qr-image" src="" alt="2FA QR Code" style="width: 180px; height: 180px; border-radius: 10px; border: 1px solid #ddd; padding: 5px; background: #fff;" />
-                  </div>
-                  <div style="background: #f5f7fa; padding: 10px 14px; border-radius: 8px; font-size: 12px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
-                    <span>Secret Key: <strong id="twofa-secret-text" style="letter-spacing: 1px; color: #222;">...</strong></span>
-                    <button type="button" onclick="copySecretKey()" style="background: none; border: 1px solid #ccc; padding: 2px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">Copy</button>
-                  </div>
-
-                  <p style="font-size: 13px; color: #444; margin-bottom: 8px;"><strong>Step 2:</strong> Enter the 6-digit verification code generated by your app:</p>
-                  <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <input type="text" id="twofa-verify-input" class="auth-input-field" placeholder="000000" maxlength="6" style="text-align: center; font-size: 18px; letter-spacing: 4px; font-weight: 700; width: 160px;" />
-                    <button type="button" class="btn-auth-submit" style="width: auto; padding: 0 20px;" onclick="handleEnable2FA()">
-                      Activate 2FA
-                    </button>
-                  </div>
-                </div>
-
-                <!-- 2FA Active Management (Shown when Enabled) -->
-                <div id="twofa-active-section" style="display: none; border-top: 1px solid #f0f0f0; padding-top: 15px; margin-top: 15px;">
-                  <p style="font-size: 13px; color: #2e7d32; margin-bottom: 15px;">
-                    <i class="zmdi zmdi-check-circle"></i> Two-Factor Authentication is currently protecting your account.
-                  </p>
-                  <button type="button" style="background: #fff; border: 1px solid #d32f2f; color: #d32f2f; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;" onclick="handleDisable2FA()">
-                    Disable 2FA
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Logout Action -->
-            <button class="CLogout flex-c-m" onclick="logoutUser(event)">
-              <i class="zmdi zmdi-power"></i> Sign Out
-            </button>
-          </div>
-
-          <!-- Auth Forms Panel (Shown when logged out) -->
-          <div class="Loginmain">
-            <!-- Quick Demo Accounts Switcher -->
-            <div class="demo-accounts-box">
-              <div class="demo-accounts-title">
-                <i class="zmdi zmdi-flash"></i> Quick Test Demo Accounts (1-Click Login)
-              </div>
-              <span class="demo-account-pill" onclick="quickLoginDemo('sai@ganeshstore.com', 'password123')">
-                👑 Sai Ganesh (Platinum)
-              </span>
-              <span class="demo-account-pill" onclick="quickLoginDemo('olivia@vance.net', 'password123')">
-                ⭐ Olivia Vance (Gold)
-              </span>
-              <span class="demo-account-pill" onclick="quickLoginDemo('demo@ganeshstore.com', 'password123')">
-                ✨ Demo Customer (Silver)
-              </span>
-            </div>
-
-            <div class="auth-tabs">
-              <button type="button" class="auth-tab-btn active" id="btn-tab-signin" onclick="switchContactTab('signin')">Sign In</button>
-              <button type="button" class="auth-tab-btn" id="btn-tab-signup" onclick="switchContactTab('signup')">Create Account</button>
-              <div class="auth-tabs-slider"></div>
-            </div>
-
-            <!-- Inline Alert Feedback Banner -->
-            <div class="auth-alert-banner" id="contact-auth-banner">
-              <i class="zmdi zmdi-info-outline" id="c-banner-icon"></i>
-              <span id="c-banner-text">Welcome back!</span>
-            </div>
-
-            <!-- ================= Sign In Mode ================= -->
-            <div id="contact-signin-section">
-              <form id="contact-login-form" onsubmit="handleEmailLogin(event)">
-                <div class="auth-input-group">
-                  <label class="auth-input-label" for="c-login-email">Email Address</label>
-                  <input class="auth-input-field auth-email-input" type="email" id="c-login-email" required placeholder="name@example.com" />
-                </div>
-
-                <div class="auth-input-group">
-                  <label class="auth-input-label" for="c-login-password">Password</label>
-                  <input class="auth-input-field auth-password-input" type="password" id="c-login-password" required placeholder="••••••••" />
-                  <i class="zmdi zmdi-eye auth-password-toggle" onclick="toggleContactPassword('c-login-password', this)"></i>
-                </div>
-
-                <div class="auth-options">
-                  <label class="auth-remember">
-                    <input type="checkbox" id="c-login-remember" checked />
-                    <span>Remember me</span>
-                  </label>
-                  <a href="#" class="auth-forgot-link" onclick="handleForgotPassword(event)">Forgot Password?</a>
-                </div>
-
-                <button type="submit" class="btn-auth-submit btn-auth-submit-action">
-                  <span>Sign In</span>
-                  <i class="zmdi zmdi-arrow-right"></i>
-                </button>
-              </form>
-            </div>
-
-            <!-- ================= Sign Up Mode ================= -->
-            <div id="contact-signup-section" style="display: none;">
-              <form id="contact-register-form" onsubmit="handleEmailSignUp(event)">
-                <div class="auth-input-group">
-                  <label class="auth-input-label" for="c-signup-name">Full Name</label>
-                  <input class="auth-input-field" type="text" id="c-signup-name" required placeholder="Sai Ganesh" />
-                </div>
-
-                <div class="auth-input-group">
-                  <label class="auth-input-label" for="c-signup-email">Email Address</label>
-                  <input class="auth-input-field" type="email" id="c-signup-email" required placeholder="name@example.com" />
-                </div>
-
-                <div class="auth-input-group">
-                  <label class="auth-input-label" for="c-signup-password">Password</label>
-                  <input class="auth-input-field" type="password" id="c-signup-password" required placeholder="Min 6 characters" minlength="6" />
+                <div class="auth-float-group">
+                  <input class="auth-input-field" type="password" id="c-signup-password" required placeholder=" " minlength="6" />
+                  <label class="auth-float-label" for="c-signup-password">Password</label>
                   <i class="zmdi zmdi-eye auth-password-toggle" onclick="toggleContactPassword('c-signup-password', this)"></i>
                 </div>
 
@@ -1504,6 +1352,22 @@
               </svg>
               <span>Continue with Google</span>
             </button>
+
+            <!-- Quick Demo Accounts Switcher (Moved below forms) -->
+            <div class="demo-accounts-box">
+              <div class="demo-accounts-title">
+                <i class="zmdi zmdi-flash"></i> Quick Test Demo Accounts (1-Click Login)
+              </div>
+              <span class="demo-account-pill" onclick="quickLoginDemo('sai@ganeshstore.com', 'password123')">
+                👑 Sai Ganesh (Platinum)
+              </span>
+              <span class="demo-account-pill" onclick="quickLoginDemo('olivia@vance.net', 'password123')">
+                ⭐ Olivia Vance (Gold)
+              </span>
+              <span class="demo-account-pill" onclick="quickLoginDemo('demo@ganeshstore.com', 'password123')">
+                ✨ Demo Customer (Silver)
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -1653,29 +1517,85 @@
       var currentGeneratedSecret = null;
       var pendingLoginUserId = null;
 
+      function syncAuthView() {
+        var user = null;
+        if (window.BackendService && typeof window.BackendService.auth.getCurrentUser === 'function') {
+          user = window.BackendService.auth.getCurrentUser();
+        }
+        if (!user) {
+          try {
+            user = JSON.parse(localStorage.getItem('ganeshStore_user_mock'));
+          } catch(e){}
+        }
+        var loggedIn = !!user;
+        var loggedInView = document.getElementById('auth-loggedin-view');
+        var loggedOutView = document.getElementById('auth-loggedout-view');
+        if (loggedInView) loggedInView.style.display = loggedIn ? 'block' : 'none';
+        if (loggedOutView) loggedOutView.style.display = loggedIn ? 'none' : 'block';
+
+        if (loggedIn && user) {
+          var name = user.displayName || user.name || (user.email ? user.email.split('@')[0] : 'Member');
+          var email = user.email || '';
+          $('.AccountName').text(name);
+          $('.AccountEmail').text(email);
+          var initials = name.split(' ').map(function(n) { return n[0]; }).join('').toUpperCase().substring(0, 2) || 'GS';
+          $('.js-logout-avatar').text(initials);
+          $('#acc-edit-name').val(name);
+        }
+      }
+
+      // Password visibility toggle
+      function toggleContactPassword(id, el) {
+        var input = document.getElementById(id);
+        if (!input) return;
+        if (input.type === 'password') {
+          input.type = 'text';
+          if (el) { el.classList.remove('zmdi-eye'); el.classList.add('zmdi-eye-off'); }
+        } else {
+          input.type = 'password';
+          if (el) { el.classList.remove('zmdi-eye-off'); el.classList.add('zmdi-eye'); }
+        }
+      }
+
+      // Display alert message banner
+      function showContactMessage(type, msg) {
+        var banner = document.getElementById('contact-auth-banner');
+        var icon = document.getElementById('c-banner-icon');
+        var text = document.getElementById('c-banner-text');
+        if (!banner || !text) return;
+        banner.className = 'auth-alert-banner ' + type;
+        text.textContent = msg;
+        if (icon) {
+          icon.className = type === 'success' ? 'zmdi zmdi-check-circle' : 'zmdi zmdi-alert-circle-o';
+        }
+        banner.style.display = 'flex';
+        banner.classList.remove('shake');
+        if (type === 'error') {
+          void banner.offsetWidth;
+          banner.classList.add('shake');
+        }
+      }
+
       // Switch Sign In / Sign Up tabs
       function switchContactTab(tab) {
         const loginTab = document.getElementById('btn-tab-signin');
         const signupTab = document.getElementById('btn-tab-signup');
         const loginSec = document.getElementById('contact-signin-section');
         const signupSec = document.getElementById('contact-signup-section');
-        const slider = document.querySelector('.auth-tabs-slider');
         const banner = document.getElementById('contact-auth-banner');
 
-        banner.style.display = 'none';
+        if (banner) banner.style.display = 'none';
 
         if (tab === 'signin') {
-          loginTab.classList.add('active');
-          signupTab.classList.remove('active');
-          if (slider) slider.style.transform = 'translateX(0%)';
-          signupSec.style.display = 'none';
-          loginSec.style.display = 'block';
+          if (loginTab) loginTab.classList.add('active');
+          if (signupTab) signupTab.classList.remove('active');
+          if (signupSec) signupSec.style.display = 'none';
+          if (loginSec) loginSec.style.display = 'block';
         } else {
-          loginTab.classList.remove('active');
-          signupTab.classList.add('active');
-          if (slider) slider.style.transform = 'translateX(100%)';
-          loginSec.style.display = 'none';
-          signupSec.style.display = 'block';
+          if (loginTab) loginTab.classList.remove('active');
+          if (signupTab) signupTab.classList.add('active');
+          if (loginSec) loginSec.style.display = 'none';
+          if (signupSec) signupSec.style.display = 'block';
         }
       }
 
@@ -1683,6 +1603,7 @@
       function quickLoginDemo(email, pass) {
         document.getElementById('c-login-email').value = email;
         document.getElementById('c-login-password').value = pass;
+        $('#c-login-email, #c-login-password').trigger('input').trigger('change');
         if (typeof window.handleEmailLogin === 'function') {
           window.handleEmailLogin();
         }
@@ -1699,6 +1620,37 @@
           var user = window.BackendService ? window.BackendService.auth.getCurrentUser() : null;
           if (user) init2FAPanel(user);
         }
+      }
+
+      function handleProfileUpdate(event) {
+        if (event) event.preventDefault();
+        var name = document.getElementById('acc-edit-name').value.trim();
+        var phone = document.getElementById('acc-edit-phone').value.trim();
+        var addr = document.getElementById('acc-edit-address').value.trim();
+        
+        var user = null;
+        try {
+          user = JSON.parse(localStorage.getItem('ganeshStore_user_mock')) || {};
+        } catch(e) { user = {}; }
+        
+        user.displayName = name;
+        user.name = name;
+        user.phone = phone;
+        user.address = addr;
+        localStorage.setItem('ganeshStore_user_mock', JSON.stringify(user));
+        
+        $('.AccountName').text(name);
+        alert('Profile updated successfully!');
+      }
+
+      function logoutUser(event) {
+        if (event) event.preventDefault();
+        localStorage.removeItem('ganeshStore_user_mock');
+        if (window.BackendService && window.BackendService.auth && typeof window.BackendService.auth.logout === 'function') {
+          window.BackendService.auth.logout();
+        }
+        syncAuthView();
+        window.location.reload();
       }
 
       // Initialize 2FA Security Panel
@@ -1777,7 +1729,8 @@
         if (window.BackendService && pendingLoginUserId) {
           window.BackendService.auth.verifyLogin2FA(pendingLoginUserId, code).then(function(user) {
             $('#twoFactorModal').hide();
-            loginfun();
+            syncAuthView();
+            window.location.reload();
           }).catch(function(err) {
             $('#twofa-modal-alert-text').text(err.message);
             $('#twofa-modal-alert').show();
@@ -1789,6 +1742,14 @@
         $('#twoFactorModal').hide();
         pendingLoginUserId = null;
       }
+
+      function closeTrackingModal() {
+        $('#orderTrackingModal').hide();
+      }
+
+      $(document).ready(function() {
+        syncAuthView();
+      });
     </script>
   
   <!-- Firebase & GaneshStore Auth Engine -->
