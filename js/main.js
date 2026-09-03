@@ -5326,11 +5326,15 @@ $(document).ready(function() {
     initUniversalNewsletterSystem();
     initUniversalContactSystem();
 
-    // Add dashboard-load section after Our Blogs on home page after 4 seconds
+    // Add dashboard-load, policy-card-load, and change-retirement-age-link section after Our Blogs on home page after 4 seconds
     if ($('.section-slide').length > 0) {
         setTimeout(function() {
             if ($('.dashboard-load').length === 0) {
-                $('.sec-blog').after('<section class="dashboard-load"></section>');
+                $('.sec-blog').after(
+                    '<section class="dashboard-load policy-card-load change-retirement-age-link">' +
+                    '<a href="javascript:void(0)" class="change-retirement-age-link" style="display:none;">Change retirement age</a>' +
+                    '</section>'
+                );
             }
         }, 4000);
     }
