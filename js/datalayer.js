@@ -123,9 +123,6 @@
       
       document.querySelectorAll('span').forEach(function (el) {
         var text = el.innerText || '';
-        if (!sku && text.indexOf('SKU:') !== -1) {
-          sku = text.replace('SKU:', '').trim();
-        }
         if (text.indexOf('Categories:') !== -1) {
           categories = text.replace('Categories:', '').split(',').map(function (c) {
             return c.trim();
@@ -133,14 +130,18 @@
         }
       });
 
-      if (!pId) {
-        pId = sku || (pName ? pName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') : 'GS001');
+      // User standard: All SKUs must start with 'GS' and be derived from product ID
+      var finalSku = '';
+      if (urlSku && /^GS/i.test(urlSku)) {
+        finalSku = urlSku.toUpperCase();
+      } else if (pId && /^GS/i.test(pId)) {
+        finalSku = pId.toUpperCase();
+      } else if (pId) {
+        finalSku = 'GS' + pId.replace(/^GS-?/i, '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+      } else {
+        finalSku = pName ? ('GS-' + pName.replace(/[^a-zA-Z0-9]/g, '').slice(0, 6).toUpperCase()) : 'GS001';
       }
-      if (!sku) {
-        sku = pId || 'GS001';
-      }
-
-      var finalSku = urlSku || sku || pId || 'GS001';
+      pId = finalSku;
 
       if (!urlSku) {
         urlParams.set('SKUID', finalSku);
@@ -404,7 +405,24 @@
       var itemTotal = typeof item.priceTotal === 'number'
         ? item.priceTotal
         : parseFloat((priceNum * qty).toFixed(2));
-      var skuVal = item.SKU || item.sku || item.id || item.productId || 'GS001';
+      // User requirement: All SKUs must start with 'GS' and be taken from ID
+      var skuVal = '';
+      if (item.id && /^GS/i.test(item.id)) {
+        skuVal = item.id.toUpperCase();
+      } else if (item.productId && /^GS/i.test(item.productId)) {
+        skuVal = item.productId.toUpperCase();
+      } else if (item.SKU && /^GS/i.test(item.SKU)) {
+        skuVal = item.SKU.toUpperCase();
+      } else if (item.sku && /^GS/i.test(item.sku)) {
+        skuVal = item.sku.toUpperCase();
+      } else {
+        var rawId = item.id || item.productId || item.SKU || item.sku || '001';
+        skuVal = 'GS' + String(rawId).replace(/^GS-?/i, '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+      }
+
+      // Synchronize onto item so both transaction.items and productListItems have the GS SKU
+      item.SKU = skuVal;
+      item.sku = skuVal;
 
       return {
         SKU: skuVal,

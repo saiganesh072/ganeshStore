@@ -119,9 +119,9 @@ assert(xdm.commerce.purchases.value === 1, 'XDM commerce.purchases.value equals 
 
 // Verify productListItems
 assert(Array.isArray(xdm.productListItems) && xdm.productListItems.length === 2, 'productListItems has 2 items');
-assert(xdm.productListItems[0].SKU === 'PROD-01', 'First product SKU is PROD-01');
+assert(xdm.productListItems[0].SKU === 'GS001', 'First product SKU starts with GS and takes from ID (GS001)');
 assert(xdm.productListItems[0].priceTotal === 58.79, 'First product priceTotal is 58.79');
-assert(xdm.productListItems[1].SKU === 'PROD-02', 'Second product SKU fallback to sku property (PROD-02)');
+assert(xdm.productListItems[1].SKU === 'GS002', 'Second product SKU starts with GS and takes from ID (GS002)');
 assert(xdm.productListItems[1].priceTotal === 200.00, 'Second product priceTotal calculates unit price * qty (200.00)');
 
 // Verify Decisioning / Propositions

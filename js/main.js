@@ -2048,22 +2048,23 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             if (!sizeVal || sizeVal.indexOf('Choose') !== -1) sizeVal = 'Size M';
             if (!colorVal || colorVal.indexOf('Choose') !== -1) colorVal = 'Default';
 
-            // 2. Extract SKU if present on PDP, button or URL
-            var productSku = $btn.attr('data-sku') || $btn.attr('data-product-sku') || '';
-            if (!productSku) {
-                var skuSpan = $pdpContainer.find('span').filter(function() {
-                    return ($(this).text() || '').indexOf('SKU:') !== -1;
-                }).first();
-                if (skuSpan.length > 0) {
-                    productSku = skuSpan.text().replace(/.*SKU:\s*/i, '').trim().split(/\s+/)[0];
-                }
-            }
-            if (!productSku) {
+            // 2. Extract SKU: All SKUs must start with 'GS', taking primarily from data-product-id
+            var pId = $btn.attr('data-product-id') || '';
+            var productSku = '';
+            if (pId && /^GS/i.test(pId)) {
+                productSku = pId.toUpperCase();
+            } else {
                 var urlParams = new URLSearchParams(window.location.search);
-                productSku = urlParams.get('SKUID') || urlParams.get('sku') || urlParams.get('SKU') || '';
-            }
-            if (!productSku) {
-                productSku = $btn.attr('data-product-id') || ('GS-' + nameProduct.replace(/[^a-zA-Z0-9]/g, '').slice(0, 8).toUpperCase());
+                var urlSku = urlParams.get('SKUID') || urlParams.get('sku') || urlParams.get('SKU') || '';
+                if (urlSku && /^GS/i.test(urlSku)) {
+                    productSku = urlSku.toUpperCase();
+                } else if ($btn.attr('data-sku') && /^GS/i.test($btn.attr('data-sku'))) {
+                    productSku = $btn.attr('data-sku').toUpperCase();
+                } else if (pId) {
+                    productSku = 'GS' + pId.replace(/^GS-?/i, '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+                } else {
+                    productSku = 'GS' + nameProduct.replace(/[^a-zA-Z0-9]/g, '').slice(0, 6).toUpperCase();
+                }
             }
 
             var unitPriceNum = parseFloat(priceText.replace(/[^\d.]/g, '')) || 0;
@@ -2076,13 +2077,15 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
 
             if (existingIndex > -1) {
                 cart[existingIndex].quantity += qtyVal;
-                if (!cart[existingIndex].SKU) {
+                // Normalize existing SKU to start with GS
+                if (!cart[existingIndex].SKU || !/^GS/i.test(cart[existingIndex].SKU)) {
                     cart[existingIndex].SKU = productSku;
                     cart[existingIndex].sku = productSku;
+                    cart[existingIndex].id = productSku;
                 }
             } else {
                 cart.push({
-                    id: $btn.attr('data-product-id') || productSku || 'GS001',
+                    id: productSku,
                     sku: productSku,
                     SKU: productSku,
                     name: nameProduct,
@@ -3910,9 +3913,24 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                                     ? parseFloat(item.priceValue) || 0 
                                     : parseFloat((item.price || '0').toString().replace(/[^\d.]/g, '')) || 0);
                             var qty = parseInt(item.quantity || 1, 10);
-                            var skuVal = item.SKU || item.sku || item.id || ('GS-' + (item.name || 'PROD').replace(/[^a-zA-Z0-9]/g, '').slice(0, 8).toUpperCase());
+
+                            // User standard: All SKUs must start with 'GS' and take primarily from id
+                            var skuVal = '';
+                            if (item.id && /^GS/i.test(item.id)) {
+                                skuVal = item.id.toUpperCase();
+                            } else if (item.productId && /^GS/i.test(item.productId)) {
+                                skuVal = item.productId.toUpperCase();
+                            } else if (item.SKU && /^GS/i.test(item.SKU)) {
+                                skuVal = item.SKU.toUpperCase();
+                            } else if (item.sku && /^GS/i.test(item.sku)) {
+                                skuVal = item.sku.toUpperCase();
+                            } else {
+                                var raw = item.id || item.productId || item.SKU || item.sku || '001';
+                                skuVal = 'GS' + String(raw).replace(/^GS-?/i, '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+                            }
+
                             return Object.assign({}, item, {
-                                id: item.id || skuVal,
+                                id: skuVal,
                                 sku: skuVal,
                                 SKU: skuVal,
                                 price: item.price || ('$' + priceNum.toFixed(2)),
