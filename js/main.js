@@ -2048,7 +2048,27 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             if (!sizeVal || sizeVal.indexOf('Choose') !== -1) sizeVal = 'Size M';
             if (!colorVal || colorVal.indexOf('Choose') !== -1) colorVal = 'Default';
 
-            // 2. Save item to cartItems in localStorage
+            // 2. Extract SKU if present on PDP, button or URL
+            var productSku = $btn.attr('data-sku') || $btn.attr('data-product-sku') || '';
+            if (!productSku) {
+                var skuSpan = $pdpContainer.find('span').filter(function() {
+                    return ($(this).text() || '').indexOf('SKU:') !== -1;
+                }).first();
+                if (skuSpan.length > 0) {
+                    productSku = skuSpan.text().replace(/.*SKU:\s*/i, '').trim().split(/\s+/)[0];
+                }
+            }
+            if (!productSku) {
+                var urlParams = new URLSearchParams(window.location.search);
+                productSku = urlParams.get('SKUID') || urlParams.get('sku') || urlParams.get('SKU') || '';
+            }
+            if (!productSku) {
+                productSku = $btn.attr('data-product-id') || ('GS-' + nameProduct.replace(/[^a-zA-Z0-9]/g, '').slice(0, 8).toUpperCase());
+            }
+
+            var unitPriceNum = parseFloat(priceText.replace(/[^\d.]/g, '')) || 0;
+
+            // 3. Save item to cartItems in localStorage
             var cart = getCart();
             var existingIndex = cart.findIndex(function(i) {
                 return i.name === nameProduct && i.size === sizeVal && i.color === colorVal;
@@ -2056,11 +2076,18 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
 
             if (existingIndex > -1) {
                 cart[existingIndex].quantity += qtyVal;
+                if (!cart[existingIndex].SKU) {
+                    cart[existingIndex].SKU = productSku;
+                    cart[existingIndex].sku = productSku;
+                }
             } else {
                 cart.push({
-                    id: $btn.attr('data-product-id') || 'GS001',
+                    id: $btn.attr('data-product-id') || productSku || 'GS001',
+                    sku: productSku,
+                    SKU: productSku,
                     name: nameProduct,
                     price: priceText,
+                    priceValue: unitPriceNum,
                     quantity: qtyVal,
                     image: imgUrl,
                     size: sizeVal,
@@ -3785,6 +3812,26 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                             activeProfile = JSON.parse(localStorage.getItem('userProfile'));
                         } catch(e) {}
 
+                        // Enrich currentCart items with SKU and numeric priceTotal for XDM / Alloy / ACDL
+                        var enrichedItems = currentCart.map(function(item) {
+                            var priceNum = typeof item.price === 'number'
+                                ? item.price
+                                : (item.priceValue !== undefined 
+                                    ? parseFloat(item.priceValue) || 0 
+                                    : parseFloat((item.price || '0').toString().replace(/[^\d.]/g, '')) || 0);
+                            var qty = parseInt(item.quantity || 1, 10);
+                            var skuVal = item.SKU || item.sku || item.id || ('GS-' + (item.name || 'PROD').replace(/[^a-zA-Z0-9]/g, '').slice(0, 8).toUpperCase());
+                            return Object.assign({}, item, {
+                                id: item.id || skuVal,
+                                sku: skuVal,
+                                SKU: skuVal,
+                                price: item.price || ('$' + priceNum.toFixed(2)),
+                                priceValue: priceNum,
+                                quantity: qty,
+                                priceTotal: parseFloat((priceNum * qty).toFixed(2))
+                            });
+                        });
+
                         var orderData = {
                             order_id: orderId,
                             tracking_number: trackingNumber,
@@ -3794,7 +3841,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                             shipping_address: addrVal,
                             shipping_method: shipMethodVal,
                             payment_method: effectivePayment,
-                            items: currentCart,
+                            items: enrichedItems,
                             subtotal: subtotalNum,
                             discount: discountNum,
                             shipping_fee: shippingFee,
@@ -3821,10 +3868,11 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                             // Populate items table
                             var $receiptTable = $('#receiptTableBody');
                             $receiptTable.empty();
-                            currentCart.forEach(function(item) {
+                            enrichedItems.forEach(function(item) {
+                                var skuBadge = (item.SKU || item.sku) ? '<span style="font-size:11px;color:#0f766e;margin-left:6px;font-family:monospace;font-weight:600;">[' + (item.SKU || item.sku) + ']</span>' : '';
                                 var row = 
                                     '<tr>' +
-                                    '  <td>' + item.name + ' <span style="font-size:11px;color:#888;">(' + item.size + ' / ' + item.color + ')</span></td>' +
+                                    '  <td>' + item.name + ' <span style="font-size:11px;color:#888;">(' + item.size + ' / ' + item.color + ')</span>' + skuBadge + '</td>' +
                                     '  <td style="text-align:center;">' + item.quantity + '</td>' +
                                     '  <td style="text-align:right;">' + item.price + '</td>' +
                                     '</tr>';
@@ -3839,6 +3887,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                                 $('#receiptDiscountRow').hide();
                             }
                             $('#receiptShipping').text(shippingFee > 0 ? '$ 15.00' : 'Free');
+                            $('#receiptTax').text('$ ' + taxNum.toFixed(2));
                             $('#receiptTotal').text('$ ' + totalNum.toFixed(2));
 
                             $('#receiptContainer').show();

@@ -374,19 +374,120 @@
     );
   };
 
-  // Helper to push Purchase Completed event to ACDL
-  window.trackACDLPurchase = function (transactionInfo) {
+  // Helper to push Purchase Completed event to ACDL & Adobe Experience Platform (Alloy) Web SDK
+  var _lastPurchaseTrackedId = null;
+  var _lastPurchaseTrackedTime = 0;
+
+  window.trackACDLPurchase = function (transactionInfo, customMboxScope) {
+    if (!transactionInfo) return;
+
+    // Deduplication check: prevent duplicate purchase tracking within 2.5 seconds for the same order
+    var currentOrderId = transactionInfo.order_id || transactionInfo.purchaseID || '';
+    var now = Date.now();
+    if (currentOrderId && currentOrderId === _lastPurchaseTrackedId && (now - _lastPurchaseTrackedTime < 2500)) {
+      return;
+    }
+    _lastPurchaseTrackedId = currentOrderId;
+    _lastPurchaseTrackedTime = now;
+
     window.adobeDataLayer = window.adobeDataLayer || [];
-    window.adobeDataLayer.push({
+
+    // Format productListItems conforming to XDM commerce schema
+    var rawItems = transactionInfo.items || [];
+    var productListItems = rawItems.map(function (item) {
+      var priceNum = typeof item.price === 'number'
+        ? item.price
+        : (item.priceValue !== undefined 
+            ? parseFloat(item.priceValue) || 0 
+            : parseFloat((item.price || '0').toString().replace(/[^\d.]/g, '')) || 0);
+      var qty = parseInt(item.quantity || 1, 10);
+      var itemTotal = typeof item.priceTotal === 'number'
+        ? item.priceTotal
+        : parseFloat((priceNum * qty).toFixed(2));
+      var skuVal = item.SKU || item.sku || item.id || item.productId || 'GS001';
+
+      return {
+        SKU: skuVal,
+        name: item.name || '',
+        quantity: qty,
+        priceTotal: itemTotal
+      };
+    });
+
+    var totalVal = typeof transactionInfo.total === 'number'
+      ? transactionInfo.total
+      : parseFloat((transactionInfo.total || '0').toString().replace(/[^\d.]/g, '')) || 0;
+
+    var purchaseIdVal = transactionInfo.order_id || transactionInfo.purchaseID || ('ORD-' + now);
+    var scopeName = customMboxScope || window.targetMboxScope || window.adobeTargetScope || '<your_mbox>';
+
+    // Construct XDM object compliant with Adobe Experience Platform Web SDK specification
+    var xdmPayload = {
+      commerce: {
+        order: {
+          purchaseID: purchaseIdVal,
+          priceTotal: totalVal,
+          currencyCode: 'USD'
+        },
+        purchases: {
+          value: 1
+        }
+      },
+      productListItems: productListItems,
+      _experience: {
+        decisioning: {
+          propositions: [
+            {
+              scope: scopeName
+            }
+          ],
+          propositionEventType: {
+            display: 1
+          }
+        }
+      }
+    };
+
+    // Attach xdm into transaction object
+    transactionInfo.xdm = xdmPayload;
+
+    // Push unified ACDL payload
+    var acdlPayload = {
       event: 'purchaseCompleted',
       transaction: transactionInfo,
-      timestamp: Date.now()
-    });
+      xdm: xdmPayload,
+      timestamp: now
+    };
+    window.adobeDataLayer.push(acdlPayload);
+
     console.log(
       '%c🎉 ACDL - Event "purchaseCompleted" Pushed',
       'background: #2e7d32; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;',
-      transactionInfo
+      acdlPayload
     );
+
+    // If Adobe Experience Platform Web SDK (alloy) is loaded, dispatch sendEvent directly
+    if (typeof window.alloy === 'function') {
+      window.alloy("sendEvent", {
+        xdm: xdmPayload
+      }).then(function (result) {
+        console.log(
+          '%c🚀 Alloy Web SDK - Purchase sendEvent Dispatched Successfully',
+          'background: #0052cc; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;',
+          result
+        );
+      }).catch(function (error) {
+        console.warn('Alloy sendEvent warning:', error);
+      });
+    }
+
+    return acdlPayload;
+  };
+
+  // Dedicated helper for explicit Alloy Web SDK purchase call
+  window.trackAlloyPurchase = function (transactionInfo, customMboxScope) {
+    if (!transactionInfo) return;
+    return window.trackACDLPurchase(transactionInfo, customMboxScope);
   };
 
   // Helper to push User Login event to ACDL
