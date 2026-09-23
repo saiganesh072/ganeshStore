@@ -3609,6 +3609,96 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             }, 600);
         });
 
+        // 13.5 Instant Demo Details Auto-Fill & Test Mode
+        function fillDemoCheckoutDetails(autoSubmit) {
+            // Ensure at least 1 item in cart so checkout can proceed
+            if (getCart().length === 0) {
+                var demoProduct = {
+                    id: 'GS001',
+                    sku: 'GS-PESPRITR',
+                    SKU: 'GS-PESPRITR',
+                    name: 'Esprit Ruffle Shirt',
+                    price: '$58.79',
+                    priceValue: 58.79,
+                    quantity: 1,
+                    image: 'images/product-01.jpg',
+                    size: 'Size M',
+                    color: 'Default'
+                };
+                saveCart([demoProduct]);
+                renderCheckoutSummary();
+            }
+
+            var demo = {
+                firstname: 'Alex',
+                lastname: 'Morgan',
+                email: 'alex.morgan@example.com',
+                phone: '9876543210',
+                address: '742 Evergreen Terrace, Apt 4B',
+                city: 'New York',
+                state: 'NY',
+                postcode: '10001',
+                cardName: 'ALEX MORGAN',
+                cardNumber: '4111 1111 1111 1111',
+                cardExpiry: '12/28',
+                cardCvv: '888'
+            };
+
+            // Populate contact & address
+            $('input[name="firstname"]').val(demo.firstname).trigger('input').trigger('change').removeClass('field-error').addClass('field-valid');
+            $('input[name="lastname"]').val(demo.lastname).trigger('input').trigger('change').removeClass('field-error').addClass('field-valid');
+            $('input[name="checkout-email"]').val(demo.email).trigger('input').trigger('change').removeClass('field-error').addClass('field-valid');
+            $('input[name="phone"]').val(demo.phone).trigger('input').trigger('change').removeClass('field-error').addClass('field-valid');
+            $('input[name="address"]').val(demo.address).trigger('input').trigger('change').removeClass('field-error').addClass('field-valid');
+            $('input[name="city"]').val(demo.city).trigger('input').trigger('change').removeClass('field-error').addClass('field-valid');
+            $('input[name="state"]').val(demo.state).trigger('input').trigger('change').removeClass('field-error').addClass('field-valid');
+            $('input[name="postcode"]').val(demo.postcode).trigger('input').trigger('change').removeClass('field-error').addClass('field-valid');
+
+            // Select Card Tab & Fill Test Card
+            $('.payment-tab-btn[data-tab="card"]').trigger('click');
+            $('#inputCardName').val(demo.cardName).trigger('input').removeClass('field-error').addClass('field-valid');
+            $('#inputCardNumber').val(demo.cardNumber).trigger('input').removeClass('field-error').addClass('field-valid');
+            $('#inputCardExpiry').val(demo.cardExpiry).trigger('input').removeClass('field-error').addClass('field-valid');
+            $('#inputCardCvv').val(demo.cardCvv).trigger('input').removeClass('field-error').addClass('field-valid');
+
+            // Update Card visual mockup
+            $('#cardNameLabel').text(demo.cardName);
+            $('#cardNoLabel').text(demo.cardNumber);
+            $('#cardExpiryLabel').text(demo.cardExpiry);
+            $('#cardCvvLabel').text(demo.cardCvv);
+            $('#cardBrandLogo').text('VISA');
+
+            // Mark input validate containers as valid
+            $('.input-validate-container').addClass('is-valid');
+            updateCheckoutStep(3);
+
+            showPremiumToast('✨ Demo details populated! Ready for checkout.', 'success');
+
+            if (autoSubmit) {
+                setTimeout(function() {
+                    $('.js-btn-place-order').trigger('click');
+                }, 500);
+            }
+        }
+
+        $(document).on('click', '.js-btn-fill-demo, #btnFillDemoDetails', function(e) {
+            e.preventDefault();
+            fillDemoCheckoutDetails(false);
+        });
+
+        $(document).on('click', '.js-btn-demo-order, #btnDemoInstantCheckout', function(e) {
+            e.preventDefault();
+            fillDemoCheckoutDetails(true);
+        });
+
+        // URL trigger for ?demo=1 or ?test=1
+        var urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('demo') === '1' || urlParams.get('test') === '1' || urlParams.get('autofill') === '1') {
+            setTimeout(function() {
+                fillDemoCheckoutDetails(false);
+            }, 300);
+        }
+
         // 14. UPI Scan verification handler
         $('.js-verify-upi-payment').on('click', function() {
             var $btn = $(this);

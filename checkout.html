@@ -248,6 +248,25 @@
             <button type="button" class="btn btn-sm btn-link p-0 text-success font-weight-bold" id="btnEditSavedInfo">Edit</button>
           </div>
 
+          <!-- Fast Demo & Testing Mode Autofill Banner -->
+          <div class="demo-autofill-banner m-b-25 p-all-15 print-hide" id="demoAutofillBanner" style="background: linear-gradient(135deg, rgba(113, 127, 224, 0.08) 0%, rgba(15, 118, 110, 0.08) 100%); border: 1px dashed #717fe0; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+            <div class="d-flex align-items-center">
+              <span class="m-r-12" style="font-size: 24px; line-height: 1;">⚡</span>
+              <div>
+                <strong class="stext-101 cl2" style="font-size: 14px; font-weight: 700;">Fast Demo & Testing Mode</strong>
+                <p class="stext-115 cl6" style="margin: 0; font-size: 12px;">1-Click populate verified test customer address, contact info & test Visa card.</p>
+              </div>
+            </div>
+            <div class="flex-w" style="gap: 8px;">
+              <button type="button" class="flex-c-m stext-101 cl0 size-107 bg1 bor1 hov-btn1 p-lr-15 trans-04 pointer js-btn-fill-demo" id="btnFillDemoDetails" style="background-color: #717fe0 !important; border-color: #717fe0 !important; border-radius: 8px; font-weight: 600; box-shadow: 0 4px 12px rgba(113, 127, 224, 0.25);">
+                <i class="zmdi zmdi-flash m-r-6"></i> Fill Demo Details
+              </button>
+              <button type="button" class="flex-c-m stext-101 cl0 size-107 bg3 bor2 hov-btn3 p-lr-15 trans-04 pointer js-btn-demo-order" id="btnDemoInstantCheckout" style="background-color: #0f766e !important; border-color: #0f766e !important; border-radius: 8px; font-weight: 600;">
+                <i class="zmdi zmdi-check-all m-r-6"></i> Fill & Place Order
+              </button>
+            </div>
+          </div>
+
           <form id="checkoutForm" class="p-r-40 p-r-0-lg">
             
             <!-- Shipping Details -->

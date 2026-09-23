@@ -419,7 +419,7 @@
       : parseFloat((transactionInfo.total || '0').toString().replace(/[^\d.]/g, '')) || 0;
 
     var purchaseIdVal = transactionInfo.order_id || transactionInfo.purchaseID || ('ORD-' + now);
-    var scopeName = customMboxScope || window.targetMboxScope || window.adobeTargetScope || '<your_mbox>';
+    var scopeName = customMboxScope || window.targetMboxScope || window.adobeTargetScope || 'orderConfirmationmbox';
 
     // Construct XDM object compliant with Adobe Experience Platform Web SDK specification
     var xdmPayload = {

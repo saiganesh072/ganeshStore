@@ -138,6 +138,13 @@ assert(lastAlloyCallArgs.payload.xdm.commerce.order.purchaseID === 'ORD-703639',
 window.trackACDLPurchase(mockTransaction);
 assert(alloyCallCount === 1, 'Immediate duplicate purchase call was safely blocked by deduplication');
 
+// Test default scope fallback to orderConfirmationmbox
+delete window.targetMboxScope;
+delete window.adobeTargetScope;
+const defaultScopeTx = { ...mockTransaction, order_id: 'ORD-NEW-SCOPE-TEST' };
+const defaultRes = window.trackACDLPurchase(defaultScopeTx);
+assert(defaultRes.xdm._experience.decisioning.propositions[0].scope === 'orderConfirmationmbox', 'Default proposition scope is correctly "orderConfirmationmbox"');
+
 console.log('\n========================================================================');
 console.log(`TOTAL ALLOY XDM VERIFICATION: ${passed} Passed, ${failed} Failed`);
 console.log('========================================================================\n');
