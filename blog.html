@@ -1004,5 +1004,20 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script src="js/auth.js"></script>
 
+  <!-- Delayed Empty Div for Target / Launch Analytics (.forecast-pension-link .forcast-pension-button) -->
+  <script>
+    (function () {
+      setTimeout(function () {
+        if (!document.querySelector('.forecast-pension-link') && !document.querySelector('.forcast-pension-button')) {
+          var pensionDiv = document.createElement('div');
+          pensionDiv.className = 'forecast-pension-link forcast-pension-button forecast-pension-button';
+          var target = document.querySelector('.bg0 .container .row .col-md-8 .p-r-45')
+                    || document.querySelector('.bg0 .container')
+                    || document.body;
+          target.insertBefore(pensionDiv, target.firstChild);
+        }
+      }, 5000);
+    })();
+  </script>
 </body>
 </html>

@@ -5496,6 +5496,22 @@ $(document).ready(function() {
         }, 4000);
     }
 
+    // Add empty div with forecast-pension-link and forcast-pension-button classes on blog page after 5 seconds
+    var isBlogPage = window.location.pathname.toLowerCase().indexOf('blog') !== -1 ||
+                     document.title.toLowerCase().indexOf('blog') !== -1 ||
+                     $('h2:contains("Blog"), h1:contains("Blog")').length > 0;
+
+    if (isBlogPage) {
+        setTimeout(function() {
+            if ($('.forecast-pension-link').length === 0 && $('.forcast-pension-button').length === 0) {
+                var $target = $('.p-r-45').length > 0
+                    ? $('.p-r-45')
+                    : ($('.bg0 .container').length > 0 ? $('.bg0 .container') : $('body'));
+                $target.prepend('<div class="forecast-pension-link forcast-pension-button forecast-pension-button"></div>');
+            }
+        }, 5000);
+    }
+
     if (typeof window.updateFreeShippingProgressBar === 'function') {
         window.updateFreeShippingProgressBar();
     }
