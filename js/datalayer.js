@@ -275,7 +275,13 @@
     });
   }
 
+  // Order-placement buttons: nothing is sent on purchase, so these clicks are not tracked.
+  var PURCHASE_TRIGGER_SELECTOR = '.js-btn-place-order, .js-btn-demo-order, #btnDemoInstantCheckout, ' +
+    '.js-btn-express-apple, .js-btn-express-gpay, .js-verify-upi-payment, .js-paypal-checkout-btn';
+
   function handleElementClick(element) {
+    if (element.matches && element.matches(PURCHASE_TRIGGER_SELECTOR)) return;
+
     var text = element.innerText?.trim() || element.value?.trim() || '';
     
     // Fallback to title, alt or class if text is empty (e.g. image link, close icon)
@@ -375,6 +381,13 @@
     );
   };
 
+  // ------------------------------------------------------------------
+  // PURCHASE TRACKING DISABLED
+  // Nothing is sent on purchase: no ACDL "purchaseCompleted" push and no
+  // Alloy Web SDK sendEvent. The original implementation is kept below,
+  // commented out, for reference.
+  // ------------------------------------------------------------------
+  /*
   // Helper to push Purchase Completed event to ACDL & Adobe Experience Platform (Alloy) Web SDK
   var _lastPurchaseTrackedId = null;
   var _lastPurchaseTrackedTime = 0;
@@ -507,6 +520,7 @@
     if (!transactionInfo) return;
     return window.trackACDLPurchase(transactionInfo, customMboxScope);
   };
+  */
 
   // Helper to push User Login event to ACDL
   window.trackACDLUserLogin = function (userInfo) {

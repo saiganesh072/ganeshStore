@@ -958,10 +958,10 @@
                     }
                 }
 
-                // Telemetry
-                if (window.trackACDLPurchase) {
-                    window.trackACDLPurchase(orderRecord);
-                }
+                // Purchase tracking disabled - nothing is sent on purchase.
+                // if (window.trackACDLPurchase) {
+                //     window.trackACDLPurchase(orderRecord);
+                // }
 
                 // Clear cart
                 BackendService.cart.saveCart([]);

@@ -2393,11 +2393,14 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
     function updateCartPageTotals() {
         var cart = getCart();
         var subtotal = 0;
+        var itemCount = 0;
         cart.forEach(function(item) {
             var priceNum = parseFloat(item.price.replace(/[^\d.]/g, '')) || 0;
             var qty = parseInt(item.quantity) || 1;
             subtotal += priceNum * qty;
+            itemCount += qty;
         });
+        $('.js-cart-page-count').text('(' + itemCount + (itemCount === 1 ? ' item)' : ' items)'));
         
         var discountAmount = subtotal * (activeDiscountPercentage / 100);
         var storedDiscountAmt = parseFloat(sessionStorage.getItem('activeDiscountAmount'));
@@ -3301,11 +3304,13 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             $mobileSummaryList.empty();
 
             var subtotal = 0;
+            var summaryItemCount = 0;
             currentCart.forEach(function(item) {
                 var priceNum = parseFloat(item.price.replace(/[^\d.]/g, '')) || 0;
                 var itemQty = parseInt(item.quantity) || 1;
                 var totalItemPrice = priceNum * itemQty;
                 subtotal += totalItemPrice;
+                summaryItemCount += itemQty;
 
                 var itemHtml = 
                     '<div class="flex-w flex-t p-b-15 border-bottom-light m-b-15" style="align-items: center;">' +
@@ -3322,6 +3327,8 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 $summaryList.append(itemHtml);
                 $mobileSummaryList.append(itemHtml);
             });
+
+            $('.js-summary-item-count').text(summaryItemCount + (summaryItemCount === 1 ? ' Item' : ' Items'));
 
             // Calculate Shipping
             var isExpress = $('input[name="shipping_method_option"]:checked').val() === 'express';
@@ -3658,7 +3665,8 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             $('input[name="postcode"]').val(demo.postcode).trigger('input').trigger('change').removeClass('field-error').addClass('field-valid');
 
             // Select Card Tab & Fill Test Card
-            $('.payment-tab-btn[data-tab="card"]').trigger('click');
+            // triggerHandler switches the tab without a native click, so no click event is tracked.
+            $('.payment-tab-btn[data-tab="card"]').triggerHandler('click');
             $('#inputCardName').val(demo.cardName).trigger('input').removeClass('field-error').addClass('field-valid');
             $('#inputCardNumber').val(demo.cardNumber).trigger('input').removeClass('field-error').addClass('field-valid');
             $('#inputCardExpiry').val(demo.cardExpiry).trigger('input').removeClass('field-error').addClass('field-valid');
@@ -4018,10 +4026,10 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                             updateCartBadges();
                             renderSideDrawerCart();
 
-                            // Dispatch purchase event to Adobe Client Data Layer
-                            if (typeof window.trackACDLPurchase === 'function') {
-                                window.trackACDLPurchase(orderData);
-                            }
+                            // Purchase tracking disabled - nothing is sent on purchase.
+                            // if (typeof window.trackACDLPurchase === 'function') {
+                            //     window.trackACDLPurchase(orderData);
+                            // }
 
                             // Fireworks / confetti explosion
                             triggerConfettiBurst();
@@ -5257,7 +5265,8 @@ window.updateFreeShippingProgressBar = function() {
 
     var $progressContainers = $('.shipping-progress-container');
 
-    if (!$progressContainers.length) {
+    // The cart page already renders its own bar (#free-shipping-box); don't inject a second one.
+    if (!$progressContainers.length && !$('#free-shipping-box').length) {
         var $targetCartPage = $('.table-shopping-cart').closest('.col-lg-10, .col-lg-8, .wrap-table-shopping-cart').first();
         if ($targetCartPage.length && !$('#cart-page-shipping-progress').length) {
             $targetCartPage.prepend('<div id="cart-page-shipping-progress" class="shipping-progress-container"></div>');

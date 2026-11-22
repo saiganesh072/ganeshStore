@@ -70,13 +70,13 @@
     />
     <!--===============================================================================================-->
     <link rel="stylesheet" type="text/css" href="css/util.css" />
-    <link rel="stylesheet" type="text/css" href="css/main.css?v=2.0.1" />
+    <link rel="stylesheet" type="text/css" href="css/main.css?v=2.0.3" />
     <!--===============================================================================================-->
     <script
       src="https://assets.adobedtm.com/6268dc4b6b26/a79c12535bfd/launch-6b416d57c554-development.min.js"
       async
     ></script>
-    <script src="js/datalayer.js"></script>
+    <script src="js/datalayer.js?v=2.0.2"></script>
 
     <script type="application/ld+json">
     {
@@ -350,7 +350,7 @@
               </a>
 
               <a
-                href="shoping-cart.html"
+                href="checkout.html"
                 class="flex-c-m stext-101 cl0 size-107 bg3 bor2 hov-btn3 p-lr-15 trans-04 m-b-10"
               >
                 Check Out
@@ -366,17 +366,36 @@
       <div class="bread-crumb flex-w p-l-25 p-r-15 p-t-30 p-lr-0-lg">
         <a href="index.html" class="stext-109 cl8 hov-cl1 trans-04">
           Home
-        <a href="index.html" class="stext-109 cl8 hov-cl1 trans-04">
-          Home
           <i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
         </a>
 
-        <span class="stext-109 cl4"> Shoping Cart </span>
+        <span class="stext-109 cl4"> Shopping Cart </span>
       </div>
     </div>
     <!-- Shoping Cart -->
-    <form id="cart-form" class="bg0 p-t-75 p-b-85">
+    <form id="cart-form" class="bg0 p-t-30 p-b-85 cart-page">
       <div class="container">
+        <!-- Cart flow steps -->
+        <div class="checkout-progress-wrapper cart-flow-steps">
+          <div class="checkout-step-item active">
+            <div class="checkout-step-circle">1</div>
+            <span class="checkout-step-title">Cart</span>
+          </div>
+          <div class="checkout-step-item">
+            <div class="checkout-step-circle">2</div>
+            <span class="checkout-step-title">Details &amp; Payment</span>
+          </div>
+          <div class="checkout-step-item">
+            <div class="checkout-step-circle">3</div>
+            <span class="checkout-step-title">Confirmation</span>
+          </div>
+        </div>
+
+        <div class="cart-page-header">
+          <h2 class="cart-page-title">Shopping Cart <span class="cart-page-count js-cart-page-count"></span></h2>
+          <a href="product.html" class="cart-flow-back-link"><i class="zmdi zmdi-arrow-left"></i> Continue shopping</a>
+        </div>
+
         <div class="row">
           <div class="col-lg-7 col-xl-7 m-lr-auto m-b-50">
             <div class="m-l-25 m-r--38 m-lr-0-xl">
@@ -406,7 +425,7 @@
               </div>
 
               <div
-                class="flex-w flex-sb-m bor15 p-t-18 p-b-15 p-lr-40 p-lr-15-sm"
+                class="flex-w flex-sb-m bor15 p-t-18 p-b-15 p-lr-40 p-lr-15-sm cart-actions-bar"
               >
                 <div class="flex-w flex-m m-r-20 m-tb-5">
                   <input
@@ -443,7 +462,7 @@
             <div
               class="bor10 cart-summary-card p-lr-40 p-t-30 p-b-40 m-l-25 m-r-0 m-lr-0-xl p-lr-15-sm"
             >
-              <h4 class="mtext-109 cl2 p-b-30">Cart Totals</h4>
+              <h4 class="mtext-109 cl2 p-b-20">Order Summary</h4>
 
               <div class="flex-w flex-t bor12 p-b-13">
                 <div class="size-208">
@@ -464,7 +483,7 @@
                 </div>
               </div>
 
-              <div class="flex-w flex-t bor12 p-t-15 p-b-20">
+              <div class="flex-w flex-t bor12 p-t-15 p-b-20 cart-shipping-row">
                 <div class="size-208 w-full-ssm">
                   <span class="stext-110 cl2"> Shipping: </span>
                 </div>
@@ -506,6 +525,12 @@
               >
                 Proceed to Checkout
               </a>
+
+              <div class="cart-trust-row">
+                <span><i class="zmdi zmdi-lock"></i> Secure checkout</span>
+                <span><i class="zmdi zmdi-refresh"></i> 30-day returns</span>
+                <span><i class="zmdi zmdi-truck"></i> Free over $100</span>
+              </div>
             </div>
           </div>
         </div>
@@ -693,7 +718,7 @@
     <!--===============================================================================================-->
     <script src="vendor/sweetalert/sweetalert.min.js"></script>
     <!--===============================================================================================-->
-    <script src="js/main.js?v=2.0.1"></script>
+    <script src="js/main.js?v=2.0.3"></script>
     <!--===============================================================================================-->
 
 

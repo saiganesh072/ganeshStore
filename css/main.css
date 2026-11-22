@@ -8831,3 +8831,186 @@ textarea:focus-visible,
     scroll-behavior: auto !important;
   }
 }
+
+/* ==========================================================================
+   CART FLOW REFRESH (shoping-cart.html + checkout.html)
+   ========================================================================== */
+
+/* Shared: step indicator + back links */
+.cart-flow-steps {
+  max-width: 560px;
+  margin: 0 auto 35px;
+}
+.cart-flow-steps .checkout-step-item {
+  cursor: default;
+}
+.checkout-page .checkout-progress-wrapper {
+  max-width: 860px;
+  margin: 0 auto 40px;
+}
+.cart-flow-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: Poppins-Medium, sans-serif;
+  font-size: 13px;
+  color: #717fe0;
+  transition: color 0.2s ease, gap 0.2s ease;
+}
+.cart-flow-back-link:hover {
+  color: #0f766e;
+  gap: 9px;
+}
+
+/* Cart page header */
+.cart-page-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+.cart-page-title {
+  font-size: 26px;
+  font-weight: 600;
+  color: #222;
+  margin: 0;
+}
+.cart-page-count {
+  font-family: Poppins-Regular, sans-serif;
+  font-size: 15px;
+  color: #888;
+  margin-left: 6px;
+}
+
+/* Cart table as a single rounded card */
+.cart-page .wrap-table-shopping-cart {
+  background: #fff;
+  border: 1px solid #ececec;
+  border-bottom: none;
+  border-radius: 16px 16px 0 0;
+}
+.cart-page .table-shopping-cart tr:first-child {
+  border-top: none;
+}
+.cart-page .table-shopping-cart .table_head th {
+  background: #fafafa;
+  font-size: 12px;
+  letter-spacing: 0.6px;
+  color: #777;
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+.cart-page .table-shopping-cart .table_row {
+  height: auto;
+}
+.cart-page .table-shopping-cart .table_row td,
+.cart-page .table-shopping-cart .table_row td.column-1 {
+  padding-top: 22px;
+  padding-bottom: 22px;
+  vertical-align: middle;
+}
+.cart-page .table-shopping-cart .column-1 {
+  width: 110px;
+  padding-left: 24px;
+}
+.cart-page .table-shopping-cart .column-5 {
+  padding-right: 16px;
+  font-family: Poppins-Medium, sans-serif;
+  color: #222;
+}
+.cart-page .table-shopping-cart .column-6 {
+  width: 112px;
+  padding-right: 20px;
+}
+.cart-page .table-shopping-cart .table_row:last-child {
+  border-bottom: none;
+}
+.cart-page .cart-actions-bar {
+  background: #fafafa;
+  border: 1px solid #ececec;
+  border-radius: 0 0 16px 16px;
+  padding-top: 14px !important;
+  padding-bottom: 14px !important;
+}
+
+/* Cart + checkout summary cards */
+.cart-page .cart-summary-card,
+.checkout-page .checkout-summary-card {
+  background: #fff !important;
+  border: 1px solid #ececec !important;
+  border-radius: 16px !important;
+  padding-top: 30px !important;
+  padding-bottom: 30px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
+}
+.cart-page .cart-shipping-row .size-208,
+.cart-page .cart-shipping-row .size-209 {
+  width: 100%;
+  padding-right: 0;
+}
+.cart-page .cart-shipping-row .size-208 {
+  padding-bottom: 8px;
+}
+.cart-trust-row {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+  font-family: Poppins-Regular, sans-serif;
+  font-size: 12px;
+  color: #777;
+}
+.cart-trust-row i {
+  color: #0f766e;
+  margin-right: 4px;
+}
+.checkout-page .checkout-summary-card .cart-flow-back-link {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+/* Checkout coupon: keep input + button on one line */
+.checkout-page .checkout-coupon-row {
+  flex-wrap: nowrap;
+}
+.checkout-page .checkout-coupon-row .input-validate-container {
+  min-width: 0;
+}
+.checkout-page .checkout-coupon-row .input-validate-container input {
+  width: 100%;
+}
+.checkout-page .checkout-coupon-row .js-checkout-apply-coupon {
+  min-width: 0;
+  flex-shrink: 0;
+  padding: 0 22px;
+}
+
+/* Keep the summary in view while scrolling on desktop */
+@media (min-width: 992px) {
+  .cart-page .cart-summary-card,
+  .checkout-page .checkout-summary-card {
+    position: sticky;
+    top: 110px;
+  }
+}
+
+/* Align header with the cart table, which is offset by .m-l-25 on xl screens */
+@media (min-width: 1200px) {
+  .cart-page-header {
+    padding-left: 25px;
+  }
+}
+
+@media (max-width: 575px) {
+  .cart-page-title {
+    font-size: 22px;
+  }
+  .cart-flow-steps,
+  .checkout-page .checkout-progress-wrapper {
+    margin-bottom: 25px;
+  }
+}

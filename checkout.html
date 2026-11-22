@@ -38,10 +38,10 @@
   <link rel="stylesheet" type="text/css" href="vendor/perfect-scrollbar/perfect-scrollbar.css" />
   <!--===============================================================================================-->
   <link rel="stylesheet" type="text/css" href="css/util.css" />
-  <link rel="stylesheet" type="text/css" href="css/main.css?v=1.4" />
+  <link rel="stylesheet" type="text/css" href="css/main.css?v=2.0.3" />
   <!--===============================================================================================-->
   <script src="https://assets.adobedtm.com/6268dc4b6b26/a79c12535bfd/launch-6b416d57c554-development.min.js" async></script>
-  <script src="js/datalayer.js"></script>
+  <script src="js/datalayer.js?v=2.0.2"></script>
 
     <script type="application/ld+json">
     {
@@ -189,6 +189,9 @@
     </div>
   </div>
 
+  <section class="bg0 p-t-30 p-b-85 checkout-page">
+    <div class="container">
+
       <!-- Checkout Step Progress Indicator -->
       <div class="checkout-progress-wrapper print-hide">
         <div class="checkout-step-item active" id="step-node-1">
@@ -267,7 +270,7 @@
             </div>
           </div>
 
-          <form id="checkoutForm" class="p-r-40 p-r-0-lg">
+          <form id="checkoutForm">
             
             <!-- Shipping Details -->
             <div class="checkout-section-box">
@@ -550,7 +553,7 @@
 
         <!-- Right Side: Order Summary & Coupon Code -->
         <div class="col-lg-5 m-b-50 print-hide">
-          <div class="bor10 p-lr-45 p-tb-35 m-l-20 m-l-0-lg p-lr-15-sm">
+          <div class="bor10 p-lr-45 p-tb-35 m-l-20 m-l-0-lg p-lr-15-sm checkout-summary-card">
             <div class="flex-w flex-sb-m p-b-20 border-bottom-light">
               <h4 class="mtext-109 cl2">Order Summary</h4>
               <span class="badge badge-pill badge-primary p-lr-10 p-tb-4 js-summary-item-count" style="background-color: #717fe0;">0 Items</span>
@@ -587,7 +590,7 @@
 
             <!-- Coupon Code Form -->
             <div class="p-t-15 p-b-20">
-              <div class="flex-w flex-m">
+              <div class="flex-w flex-m checkout-coupon-row">
                 <div class="input-validate-container m-r-10 m-b-10" style="flex-grow: 1;">
                   <input class="stext-104 cl2 plh4 size-117 bor13 p-lr-20 w-full" type="text" name="checkout_coupon" placeholder="Promo code (e.g. GANESH20, SAVE10)" style="height: 45px;" />
                   <span class="validation-badge"><i class="zmdi zmdi-check-circle"></i></span>
@@ -614,6 +617,7 @@
                 <i class="zmdi zmdi-lock m-r-4"></i> 256-Bit SSL Encrypted & Bank-Grade Security
               </span>
             </div>
+            <a href="shoping-cart.html" class="cart-flow-back-link"><i class="zmdi zmdi-arrow-left"></i> Back to cart</a>
           </div>
         </div>
 
@@ -852,6 +856,6 @@
   <!--===============================================================================================-->
   <script src="vendor/sweetalert/sweetalert.min.js"></script>
   <!--===============================================================================================-->
-  <script src="js/main.js?v=1.3"></script>
+  <script src="js/main.js?v=2.0.3"></script>
 </body>
 </html>
