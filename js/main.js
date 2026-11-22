@@ -1675,9 +1675,14 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 '</svg>';
             
             if (options && options.image) {
-                imgHtml = '<img src="' + options.image + '" style="width: 42px; height: 42px; object-fit: cover; border-radius: 6px; margin-right: 12px; border: 1px solid rgba(0,0,0,0.06); flex-shrink: 0;">';
+                // Product thumbnail with a check badge replaces the generic cart icon
+                iconHtml = '';
+                imgHtml = '<span class="premium-toast-thumb">' +
+                          '  <img src="' + options.image + '" alt="">' +
+                          '  <span class="premium-toast-thumb-check"><i class="zmdi zmdi-check"></i></span>' +
+                          '</span>';
             }
-            titleHtml = '<span class="premium-toast-title" style="display: block; font-weight: 600; color: #111; font-size: 14px; margin-bottom: 2px; font-family: \'Montserrat\', sans-serif;">Successfully Added</span>';
+            titleHtml = '<span class="premium-toast-title">' + ((options && options.title) || 'Added to Cart') + '</span>';
         } else {
             // Information/Removal circle icon
             iconHtml = 
@@ -1690,25 +1695,38 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         
         var toastId = 'toast-' + Date.now();
         var contentInner = iconHtml + imgHtml;
+        var metaHtml = (options && options.meta) ? '<span class="premium-toast-meta">' + options.meta + '</span>' : '';
         if (titleHtml) {
-            contentInner += '<div class="premium-toast-text" style="display: flex; flex-direction: column; flex-grow: 1;">' +
+            contentInner += '<div class="premium-toast-text">' +
                             titleHtml +
                             '  <span class="premium-toast-message">' + message + '</span>' +
+                            metaHtml +
                             '</div>';
         } else {
             contentInner += '<span class="premium-toast-message" style="flex-grow: 1;">' + message + '</span>';
         }
+
+        var actionHtml = (options && options.action)
+            ? '<a class="premium-toast-action" href="' + options.action.href + '">' + options.action.label + '</a>'
+            : '';
         
         var toastHtml = 
-            '<div id="' + toastId + '" class="premium-toast-item">' +
+            '<div id="' + toastId + '" class="premium-toast-item premium-toast-' + (type || 'info') + '" role="status" aria-live="polite">' +
             '  <div class="premium-toast-content">' +
             contentInner +
             '  </div>' +
-            '  <button class="premium-toast-close">&times;</button>' +
+            actionHtml +
+            '  <button class="premium-toast-close" aria-label="Dismiss">&times;</button>' +
             '</div>';
             
         var $toast = $(toastHtml);
         $container.append($toast);
+
+        // Keep the stack short: drop the oldest nudges beyond three
+        var $all = $container.children('.premium-toast-item');
+        if ($all.length > 3) {
+            $all.slice(0, $all.length - 3).remove();
+        }
         
         // Force browser layout reflow to guarantee starting transition states are registered
         if ($toast.length) {
@@ -1720,10 +1738,15 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             $toast.addClass('toast-show');
         }, 30);
         
-        // Auto dismiss after 3 seconds
-        var autoTimer = setTimeout(function() {
-            closeToast();
-        }, 3000);
+        // Auto dismiss (paused while hovered)
+        var dismissDelay = (options && options.duration) || 3000;
+        var autoTimer = setTimeout(closeToast, dismissDelay);
+
+        $toast.on('mouseenter', function() {
+            clearTimeout(autoTimer);
+        }).on('mouseleave', function() {
+            autoTimer = setTimeout(closeToast, 1500);
+        });
         
         function closeToast() {
             clearTimeout(autoTimer);
@@ -2006,6 +2029,32 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         });
     }
 
+    // "Add to Cart" <-> "Go to Cart" button state
+    function rememberAddToCartLabel($btn) {
+        if ($btn.data('atcLabel') === undefined) {
+            $btn.data('atcLabel', $btn.html());
+        }
+    }
+
+    function setGoToCartState($btns, inCart) {
+        $btns.each(function() {
+            var $b = $(this);
+            rememberAddToCartLabel($b);
+            clearTimeout($b.data('atcTimer'));
+            if (inCart) {
+                $b.removeClass('added-success').addClass('is-in-bag')
+                  .html('<i class="zmdi zmdi-shopping-cart m-r-8"></i>Go to Cart<i class="zmdi zmdi-arrow-right atc-go-arrow"></i>');
+            } else {
+                $b.removeClass('is-in-bag added-success').html($b.data('atcLabel'));
+            }
+        });
+
+        // Keep the sticky "Add to Cart" bars in sync with the main PDP button
+        var $primary = $('.js-addcart-detail').not('.js-modal1 .js-addcart-detail').first();
+        var primaryInCart = $primary.hasClass('is-in-bag');
+        $('.js-sticky-add-cart, .js-sticky-buy-trigger').text(primaryInCart ? 'Go to Cart' : 'Add to Cart');
+    }
+
     // Initialize all cart interactions on load
     function initCart() {
         // 1. Rewrite all header/mobile-header cart icons to point directly to shoping-cart.html but open drawer dynamically
@@ -2028,11 +2077,22 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         updateCartBadges();
         renderSideDrawerCart();
 
-        // 3. Bind Add to Cart click handler for PDP and Modal buttons
+        // 3. Bind Add to Cart click handler for PDP and Modal buttons.
+        // Strip the per-page inline handlers (old SweetAlert modal) so only this one runs.
+        $('.js-addcart-detail').off('click');
         $(document).off('click', '.js-addcart-detail').on('click', '.js-addcart-detail', function(e) {
             e.preventDefault();
             var $btn = $(this);
-            var originalText = $btn.text().trim();
+
+            if ($btn.hasClass('is-in-bag')) {
+                // Programmatic triggers (Buy Now, sticky bars) must not navigate away from their own flow.
+                if (!e.isTrigger) {
+                    window.location.href = 'shoping-cart.html';
+                }
+                return;
+            }
+            if ($btn.hasClass('added-success')) return;
+            rememberAddToCartLabel($btn);
 
             // 1. Get product details from PDP container or modal
             var $pdpContainer = $btn.closest('.sec-product-detail, .js-modal1, .row');
@@ -2068,6 +2128,9 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             }
 
             var unitPriceNum = parseFloat(priceText.replace(/[^\d.]/g, '')) || 0;
+            // The price node can include badge text (e.g. "Free Shipping Eligible"); keep only the amount.
+            var priceMatch = priceText.match(/\$\s?[\d,]+(\.\d+)?/);
+            if (priceMatch) priceText = priceMatch[0].replace(/\s/g, '');
 
             // 3. Save item to cartItems in localStorage
             var cart = getCart();
@@ -2098,22 +2161,53 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 });
             }
             saveCart(cart);
+            renderSideDrawerCart();
 
-            // 3. Visual tactile button response
-            $btn.addClass('added-success').html('<i class="zmdi zmdi-check m-r-6"></i> Added to Cart ✓');
+            // 3. Brief "Added" confirmation, then the button becomes "Go to Cart"
+            $btn.addClass('added-success').html('<i class="zmdi zmdi-check m-r-6"></i> Added');
+            clearTimeout($btn.data('atcTimer'));
+            $btn.data('atcTimer', setTimeout(function() {
+                $btn.removeClass('added-success');
+                setGoToCartState($btn, true);
+            }, 900));
 
-            // 4. Trigger SweetAlert modal if available
-            if (typeof swal === 'function') {
-                swal(nameProduct, "is added to cart !", "success");
-            }
+            // 4. Non-blocking glass nudge (top-right), same system as the wishlist
+            var metaText = priceText + (qtyVal > 1 ? ' &middot; Qty ' + qtyVal : '');
+            showPremiumToast('<strong>' + nameProduct + '</strong>', 'cart-success', {
+                image: imgUrl,
+                title: 'Added to Cart',
+                meta: metaText,
+                action: { label: 'View Cart', href: 'shoping-cart.html' },
+                duration: 3500
+            });
 
             // 5. Trigger badge pulse event
             $(document).trigger('cartUpdated');
-
-            setTimeout(function() {
-                $btn.removeClass('added-success').text(originalText);
-            }, 1800);
         });
+
+        // Selecting another size/colour/quantity means a different item, so offer "Add to Cart" again
+        $(document).off('change.cartstate').on('change.cartstate', 'select, .num-product', function() {
+            var $el = $(this);
+            var $scope = $el.closest('.js-modal1');
+            if (!$scope.length) $scope = $el.closest('.sec-product-detail');
+            if (!$scope.length) $scope = $el.closest('.row');
+            setGoToCartState($scope.find('.js-addcart-detail.is-in-bag'), false);
+        });
+
+        // The quick-view modal is reused for every product; reset its button on open
+        $(document).off('click.cartstate').on('click.cartstate', '.js-show-modal1', function() {
+            setGoToCartState($('.js-modal1 .js-addcart-detail'), false);
+        });
+
+        // PDP: if this product is already in the cart, start in "Go to Cart" state
+        var $primaryAtc = $('.js-addcart-detail').not('.js-modal1 .js-addcart-detail').first();
+        if ($primaryAtc.length && !$primaryAtc.hasClass('added-success')) {
+            var pdpName = $primaryAtc.closest('.sec-product-detail, .row').find('.js-name-detail').first().text().trim();
+            var alreadyInCart = pdpName && getCart().some(function(item) { return item.name === pdpName; });
+            if (alreadyInCart) {
+                setGoToCartState($primaryAtc, true);
+            }
+        }
 
         // 4. Render shopping cart page if on shoping-cart.html
         renderCartPage();
@@ -2300,9 +2394,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 renderSideDrawerCart();
             }, 500);
 
-            if (typeof swal === 'function') {
-                swal(name, "has been removed from your cart.", "info");
-            }
+            showPremiumToast('<strong>' + name + '</strong> has been removed from your cart.', 'info');
         }
     });
 
@@ -2682,10 +2774,6 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 }
             }, 500);
             
-            // Trigger sweetalert and info toast notification
-            if (typeof swal === 'function') {
-                swal(name, "has been removed from your cart.", "info");
-            }
             showPremiumToast('<strong>' + name + '</strong> has been removed from your cart.', 'info');
         }
     });
@@ -2973,7 +3061,12 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         });
         
         $(document).on('click', '.js-sticky-buy-trigger', function() {
-            $('.js-addcart-detail').trigger('click');
+            var $mainBtn = $('.js-addcart-detail').first();
+            if ($mainBtn.hasClass('is-in-bag')) {
+                window.location.href = 'shoping-cart.html';
+                return;
+            }
+            $mainBtn.trigger('click');
         });
     }
 
@@ -4558,7 +4651,12 @@ function initStickyPDPBar() {
     });
 
     $(document).off('click', '.js-sticky-add-cart').on('click', '.js-sticky-add-cart', function() {
-        $('.js-addcart-detail').first().trigger('click');
+        var $mainBtn = $('.js-addcart-detail').first();
+        if ($mainBtn.hasClass('is-in-bag')) {
+            window.location.href = 'shoping-cart.html';
+            return;
+        }
+        $mainBtn.trigger('click');
     });
 
     $(document).off('click', '.js-sticky-buy-now').on('click', '.js-sticky-buy-now', function() {

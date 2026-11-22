@@ -9014,3 +9014,246 @@ textarea:focus-visible,
     margin-bottom: 25px;
   }
 }
+
+/* ==========================================================================
+   GLASS NUDGES (HyperOS-style frosted toasts) + "GO TO CART" BUTTON STATE
+   ========================================================================== */
+
+#premium-toast-container {
+  /* Sit just below the header icons so the cart badge update stays visible */
+  top: 108px;
+  right: 24px;
+  gap: 10px;
+  max-width: 360px;
+  width: calc(100% - 48px);
+}
+
+#premium-toast-container .premium-toast-item {
+  position: relative;
+  gap: 12px;
+  padding: 12px 12px 12px 14px;
+  border-radius: 22px;
+  color: #1f2937;
+  /* Translucent layered glass: strong blur + saturation, soft white sheen */
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.46) 100%) !important;
+  backdrop-filter: blur(28px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    0 0 0 0.5px rgba(15, 23, 42, 0.06),
+    0 18px 48px rgba(15, 23, 42, 0.16) !important;
+  transform: translate3d(calc(100% + 32px), 0, 0) scale(0.96);
+  opacity: 0;
+  transition: transform 0.55s cubic-bezier(0.22, 1.2, 0.36, 1), opacity 0.35s ease !important;
+  overflow: hidden;
+}
+
+/* Subtle specular highlight across the top edge */
+#premium-toast-container .premium-toast-item::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 50% 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0));
+  pointer-events: none;
+}
+
+#premium-toast-container .premium-toast-item.toast-show {
+  transform: translate3d(0, 0, 0) scale(1);
+  opacity: 1;
+}
+
+#premium-toast-container .premium-toast-item:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 0 0 0.5px rgba(15, 23, 42, 0.08),
+    0 22px 56px rgba(15, 23, 42, 0.2) !important;
+}
+
+/* Browsers without backdrop-filter get a solid-enough surface */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  #premium-toast-container .premium-toast-item {
+    background: rgba(255, 255, 255, 0.97) !important;
+  }
+}
+
+#premium-toast-container .premium-toast-content {
+  position: relative;
+  min-width: 0;
+  font-size: 13px;
+}
+
+#premium-toast-container .premium-toast-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+#premium-toast-container .premium-toast-title {
+  display: flex;
+  align-items: center;
+  font-family: Poppins-SemiBold, Poppins-Medium, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #0f766e;
+  margin-bottom: 1px;
+}
+
+#premium-toast-container .premium-toast-message {
+  font-family: Poppins-Regular, sans-serif;
+  font-size: 13px;
+  color: #1f2937;
+  line-height: 1.35;
+}
+
+/* Product line in the cart nudge stays on one line; plain messages wrap */
+#premium-toast-container .premium-toast-text .premium-toast-message {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#premium-toast-container .premium-toast-message strong {
+  font-family: Poppins-Medium, sans-serif;
+  font-weight: 500;
+  color: #111827;
+}
+
+#premium-toast-container .premium-toast-meta {
+  font-family: Poppins-Regular, sans-serif;
+  font-size: 11.5px;
+  color: #6b7280;
+  margin-top: 1px;
+}
+
+/* Product thumbnail with a check badge */
+.premium-toast-thumb {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  margin-right: 12px;
+}
+
+.premium-toast-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+}
+
+.premium-toast-thumb-check {
+  position: absolute;
+  right: -5px;
+  bottom: -5px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #10b981;
+  color: #fff;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  transform: scale(0);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s;
+}
+
+.premium-toast-item.toast-show .premium-toast-thumb-check {
+  transform: scale(1);
+}
+
+/* Inline "View Cart" pill action */
+#premium-toast-container .premium-toast-action {
+  position: relative;
+  flex-shrink: 0;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(17, 24, 39, 0.88);
+  color: #fff;
+  font-family: Poppins-Medium, sans-serif;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+#premium-toast-container .premium-toast-action:hover {
+  background: #0f766e;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+#premium-toast-container .premium-toast-close {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  margin-left: 0;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 18px;
+  color: #6b7280;
+  background: rgba(15, 23, 42, 0.05);
+  flex-shrink: 0;
+}
+
+#premium-toast-container .premium-toast-close:hover {
+  color: #111827 !important;
+  background: rgba(15, 23, 42, 0.1);
+}
+
+@media (max-width: 576px) {
+  #premium-toast-container {
+    top: 12px;
+    right: 12px;
+    width: calc(100% - 24px);
+    max-width: none;
+  }
+  #premium-toast-container .premium-toast-item {
+    transform: translate3d(0, -140%, 0) scale(0.96);
+  }
+  #premium-toast-container .premium-toast-item.toast-show {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* "Added" -> "Go to Cart" button state */
+.js-addcart-detail.added-success,
+.premium-action-row .js-addcart-detail.added-success {
+  background: #10b981 !important;
+  border-color: #10b981 !important;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3) !important;
+}
+
+.js-addcart-detail.is-in-bag,
+.premium-action-row .js-addcart-detail.is-in-bag {
+  background: #111827 !important;
+  border-color: #111827 !important;
+  color: #fff !important;
+  box-shadow: 0 8px 20px rgba(17, 24, 39, 0.22) !important;
+  animation: goToCartIn 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.js-addcart-detail.is-in-bag:hover,
+.premium-action-row .js-addcart-detail.is-in-bag:hover {
+  background: #0f766e !important;
+  border-color: #0f766e !important;
+  box-shadow: 0 12px 25px rgba(15, 118, 110, 0.3) !important;
+}
+
+.js-addcart-detail .atc-go-arrow {
+  margin-left: 8px;
+  transition: transform 0.25s ease;
+}
+
+.js-addcart-detail.is-in-bag:hover .atc-go-arrow {
+  transform: translateX(4px);
+}
+
+@keyframes goToCartIn {
+  from { opacity: 0.6; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
