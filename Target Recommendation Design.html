@@ -1,0 +1,733 @@
+<!--
+  Ganesh Store - "Store Overview" carousel for Adobe Target Recommendations.
+  Fully self-contained (CSS + JS + SVG icons). Colors use rgb() and JS avoids the dollar sign
+  so the Velocity template engine only resolves the entity variables.
+-->
+<style type="text/css">
+  .gsr-section { background-color: rgb(255,255,255); padding: 50px 0; font-family: 'Poppins-Regular', 'Poppins', Arial, sans-serif; }
+  .gsr-section *, .gsr-section *::before, .gsr-section *::after { box-sizing: border-box; }
+  .gsr-container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 15px; }
+
+  .gsr-head { padding-bottom: 50px; }
+  .gsr-title { margin: 0; text-align: center; font-family: 'Outfit', 'Poppins-Bold', 'Poppins', Arial, sans-serif; font-size: 50px; font-weight: 500; line-height: 1.1; color: rgb(34,34,34); }
+
+  .gsr-wrap { position: relative; margin: 0 -15px; }
+  .gsr-list { overflow: hidden; cursor: grab; touch-action: pan-y; -webkit-user-select: none; user-select: none; }
+  .gsr-list.gsr-grabbing { cursor: grabbing; }
+  .gsr-track { display: flex; will-change: transform; }
+  .gsr-item { flex: 0 0 calc(100% / var(--gsr-per-view, 5)); max-width: calc(100% / var(--gsr-per-view, 5)); padding: 15px; }
+
+  .gsr-card { position: relative; padding: 8px; border-radius: 8px; background-color: rgb(255,255,255); transform-style: preserve-3d; backface-visibility: hidden; will-change: transform, box-shadow; transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); }
+  .gsr-card::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 0; pointer-events: none; transition: height 0.4s; }
+
+  .gsr-pic { position: relative; overflow: hidden; aspect-ratio: 3 / 4; border-radius: 8px; background-color: rgb(244,244,244); box-shadow: 0 4px 10px rgba(0,0,0,0.02); transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
+  .gsr-pic-link { display: block; width: 100%; height: 100%; }
+  .gsr-pic img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center top; backface-visibility: hidden; -webkit-user-drag: none; transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1); }
+
+  /* Hover lift only on mouse/trackpad devices so taps on phones don't leave cards stuck */
+  @media (hover: hover) {
+    .gsr-card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.05); }
+    .gsr-card:hover::after { height: 16px; bottom: -16px; pointer-events: auto; }
+    .gsr-card:hover .gsr-pic { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.08); }
+    .gsr-card:hover .gsr-pic img { transform: scale(1.04); }
+  }
+
+  .gsr-quick { position: absolute; bottom: 20px; left: 50%; transform: translate(-50%, 30px); opacity: 0; pointer-events: none; display: flex; align-items: center; justify-content: center; min-width: 139px; height: 40px; padding: 0 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.45); background-color: rgba(255,255,255,0.65); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); font-family: 'Poppins-Regular', 'Poppins', Arial, sans-serif; font-size: 15px; line-height: 1.466667; color: rgb(34,34,34); text-decoration: none; white-space: nowrap; transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease; }
+  .gsr-pic:hover .gsr-quick, .gsr-quick:focus-visible { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
+  .gsr-quick:hover, .gsr-quick:focus { background-color: rgb(34,34,34); border-color: rgb(34,34,34); color: rgb(255,255,255); -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: 0 8px 20px rgba(113,127,224,0.3); text-decoration: none; }
+
+  .gsr-txt { display: flex; flex-wrap: wrap; align-items: flex-start; padding-top: 16px; }
+  .gsr-txt-l { width: calc(100% - 30px); display: flex; flex-direction: column; align-items: flex-start; }
+  .gsr-txt-r { width: 30px; display: flex; justify-content: flex-end; padding-top: 3px; }
+  .gsr-name { display: block; padding-bottom: 6px; font-family: 'Poppins-Regular', 'Poppins', Arial, sans-serif; font-size: 14px; font-weight: 500; line-height: 1.466667; color: rgb(153,153,153); text-decoration: none; transition: color 0.3s; }
+  .gsr-name:hover, .gsr-name:focus { color: rgb(113,127,224); text-decoration: none; }
+  .gsr-price { font-family: 'Poppins-Regular', 'Poppins', Arial, sans-serif; font-size: 14px; font-weight: 600; line-height: 1.466667; letter-spacing: 1px; color: rgb(102,102,102); }
+
+  .gsr-wish { display: block; position: relative; margin: 0; padding: 0; border: 0; background: none; line-height: 0; cursor: pointer; }
+  .gsr-heart { display: block; width: 20px; height: 20px; fill: none; stroke: rgb(85,85,85); stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), stroke 0.3s ease, fill 0.3s ease; }
+  .gsr-wish:hover .gsr-heart { transform: scale(1.22); stroke: rgb(255,51,102); }
+  .gsr-wish:active .gsr-heart { transform: scale(0.9); }
+  .gsr-wish.gsr-wished .gsr-heart { animation: gsrHeartbeat 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) both; fill: url(#gsrCherry); stroke: none; filter: drop-shadow(0 2px 4px rgba(255,51,102,0.15)); }
+  .gsr-wish.gsr-wished:hover .gsr-heart { filter: drop-shadow(0 5px 12px rgba(255,51,102,0.45)); }
+  @keyframes gsrHeartbeat {
+    0% { transform: scale(1); }
+    14% { transform: scale(1.25); }
+    28% { transform: scale(1.1); }
+    42% { transform: scale(1.32); }
+    70% { transform: scale(1); }
+  }
+
+  .gsr-arrow { position: absolute; z-index: 100; top: calc((100% - 60px) / 2); transform: translateY(-50%); display: block; margin: 0; padding: 16px 0; border: 0; background: transparent; line-height: 0; color: rgb(204,204,204); cursor: pointer; transition: all 0.4s; }
+  .gsr-arrow svg { display: block; width: 14px; height: 26px; }
+  .gsr-arrow:hover { color: rgb(102,102,102); }
+  .gsr-arrow:focus { outline: none; }
+  .gsr-arrow:disabled { opacity: 0.3; cursor: default; pointer-events: none; }
+  .gsr-section a:focus-visible, .gsr-section button:focus-visible { outline: 2px solid rgb(113,127,224); outline-offset: 2px; }
+  .gsr-prev { left: -40px; }
+  .gsr-next { right: -40px; }
+  .gsr-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+  @media (max-width: 1300px) {
+    .gsr-prev { left: 0; }
+    .gsr-next { right: 0; }
+  }
+  @media (max-width: 575px) {
+    .gsr-title { font-size: 40px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gsr-section *, .gsr-section *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  }
+</style>
+<section class="gsr-section" id="gsrReco" aria-roledescription="carousel" aria-label="Target Recommendation">
+  <svg class="gsr-defs" width="0" height="0" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="gsrCherry" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="rgb(255,51,102)"></stop>
+        <stop offset="100%" stop-color="rgb(217,20,68)"></stop>
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <div class="gsr-container">
+    <div class="gsr-head">
+      <h3 class="gsr-title">Target Recommendation</h3>
+    </div>
+
+    <div class="gsr-wrap">
+      <button type="button" class="gsr-arrow gsr-prev" aria-label="Previous">
+        <svg viewBox="0 0 14 26"><path d="M12 2 L2 13 L12 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      </button>
+
+      <div class="gsr-list">
+        <div class="gsr-track">
+
+          <div class="gsr-item">
+            <div class="gsr-card">
+              <div class="gsr-pic">
+                <a href="$entity1.pageUrl" class="gsr-pic-link"><img src="$entity1.thumbnailUrl" alt="$entity1.name" /></a>
+                <a href="$entity1.pageUrl" class="gsr-quick">Quick View</a>
+              </div>
+              <div class="gsr-txt">
+                <div class="gsr-txt-l">
+                  <a href="$entity1.pageUrl" class="gsr-name">$entity1.name</a>
+                  <span class="gsr-price">&#36;$entity1.value</span>
+                </div>
+                <div class="gsr-txt-r">
+                  <button type="button" class="gsr-wish" aria-label="Add to wishlist"><svg class="gsr-heart" viewBox="0 0 24 24" width="20" height="20"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gsr-item">
+            <div class="gsr-card">
+              <div class="gsr-pic">
+                <a href="$entity2.pageUrl" class="gsr-pic-link"><img src="$entity2.thumbnailUrl" alt="$entity2.name" /></a>
+                <a href="$entity2.pageUrl" class="gsr-quick">Quick View</a>
+              </div>
+              <div class="gsr-txt">
+                <div class="gsr-txt-l">
+                  <a href="$entity2.pageUrl" class="gsr-name">$entity2.name</a>
+                  <span class="gsr-price">&#36;$entity2.value</span>
+                </div>
+                <div class="gsr-txt-r">
+                  <button type="button" class="gsr-wish" aria-label="Add to wishlist"><svg class="gsr-heart" viewBox="0 0 24 24" width="20" height="20"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gsr-item">
+            <div class="gsr-card">
+              <div class="gsr-pic">
+                <a href="$entity3.pageUrl" class="gsr-pic-link"><img src="$entity3.thumbnailUrl" alt="$entity3.name" /></a>
+                <a href="$entity3.pageUrl" class="gsr-quick">Quick View</a>
+              </div>
+              <div class="gsr-txt">
+                <div class="gsr-txt-l">
+                  <a href="$entity3.pageUrl" class="gsr-name">$entity3.name</a>
+                  <span class="gsr-price">&#36;$entity3.value</span>
+                </div>
+                <div class="gsr-txt-r">
+                  <button type="button" class="gsr-wish" aria-label="Add to wishlist"><svg class="gsr-heart" viewBox="0 0 24 24" width="20" height="20"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gsr-item">
+            <div class="gsr-card">
+              <div class="gsr-pic">
+                <a href="$entity4.pageUrl" class="gsr-pic-link"><img src="$entity4.thumbnailUrl" alt="$entity4.name" /></a>
+                <a href="$entity4.pageUrl" class="gsr-quick">Quick View</a>
+              </div>
+              <div class="gsr-txt">
+                <div class="gsr-txt-l">
+                  <a href="$entity4.pageUrl" class="gsr-name">$entity4.name</a>
+                  <span class="gsr-price">&#36;$entity4.value</span>
+                </div>
+                <div class="gsr-txt-r">
+                  <button type="button" class="gsr-wish" aria-label="Add to wishlist"><svg class="gsr-heart" viewBox="0 0 24 24" width="20" height="20"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gsr-item">
+            <div class="gsr-card">
+              <div class="gsr-pic">
+                <a href="$entity5.pageUrl" class="gsr-pic-link"><img src="$entity5.thumbnailUrl" alt="$entity5.name" /></a>
+                <a href="$entity5.pageUrl" class="gsr-quick">Quick View</a>
+              </div>
+              <div class="gsr-txt">
+                <div class="gsr-txt-l">
+                  <a href="$entity5.pageUrl" class="gsr-name">$entity5.name</a>
+                  <span class="gsr-price">&#36;$entity5.value</span>
+                </div>
+                <div class="gsr-txt-r">
+                  <button type="button" class="gsr-wish" aria-label="Add to wishlist"><svg class="gsr-heart" viewBox="0 0 24 24" width="20" height="20"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gsr-item">
+            <div class="gsr-card">
+              <div class="gsr-pic">
+                <a href="$entity6.pageUrl" class="gsr-pic-link"><img src="$entity6.thumbnailUrl" alt="$entity6.name" /></a>
+                <a href="$entity6.pageUrl" class="gsr-quick">Quick View</a>
+              </div>
+              <div class="gsr-txt">
+                <div class="gsr-txt-l">
+                  <a href="$entity6.pageUrl" class="gsr-name">$entity6.name</a>
+                  <span class="gsr-price">&#36;$entity6.value</span>
+                </div>
+                <div class="gsr-txt-r">
+                  <button type="button" class="gsr-wish" aria-label="Add to wishlist"><svg class="gsr-heart" viewBox="0 0 24 24" width="20" height="20"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gsr-item">
+            <div class="gsr-card">
+              <div class="gsr-pic">
+                <a href="$entity7.pageUrl" class="gsr-pic-link"><img src="$entity7.thumbnailUrl" alt="$entity7.name" /></a>
+                <a href="$entity7.pageUrl" class="gsr-quick">Quick View</a>
+              </div>
+              <div class="gsr-txt">
+                <div class="gsr-txt-l">
+                  <a href="$entity7.pageUrl" class="gsr-name">$entity7.name</a>
+                  <span class="gsr-price">&#36;$entity7.value</span>
+                </div>
+                <div class="gsr-txt-r">
+                  <button type="button" class="gsr-wish" aria-label="Add to wishlist"><svg class="gsr-heart" viewBox="0 0 24 24" width="20" height="20"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gsr-item">
+            <div class="gsr-card">
+              <div class="gsr-pic">
+                <a href="$entity8.pageUrl" class="gsr-pic-link"><img src="$entity8.thumbnailUrl" alt="$entity8.name" /></a>
+                <a href="$entity8.pageUrl" class="gsr-quick">Quick View</a>
+              </div>
+              <div class="gsr-txt">
+                <div class="gsr-txt-l">
+                  <a href="$entity8.pageUrl" class="gsr-name">$entity8.name</a>
+                  <span class="gsr-price">&#36;$entity8.value</span>
+                </div>
+                <div class="gsr-txt-r">
+                  <button type="button" class="gsr-wish" aria-label="Add to wishlist"><svg class="gsr-heart" viewBox="0 0 24 24" width="20" height="20"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gsr-item">
+            <div class="gsr-card">
+              <div class="gsr-pic">
+                <a href="$entity9.pageUrl" class="gsr-pic-link"><img src="$entity9.thumbnailUrl" alt="$entity9.name" /></a>
+                <a href="$entity9.pageUrl" class="gsr-quick">Quick View</a>
+              </div>
+              <div class="gsr-txt">
+                <div class="gsr-txt-l">
+                  <a href="$entity9.pageUrl" class="gsr-name">$entity9.name</a>
+                  <span class="gsr-price">&#36;$entity9.value</span>
+                </div>
+                <div class="gsr-txt-r">
+                  <button type="button" class="gsr-wish" aria-label="Add to wishlist"><svg class="gsr-heart" viewBox="0 0 24 24" width="20" height="20"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gsr-item">
+            <div class="gsr-card">
+              <div class="gsr-pic">
+                <a href="$entity10.pageUrl" class="gsr-pic-link"><img src="$entity10.thumbnailUrl" alt="$entity10.name" /></a>
+                <a href="$entity10.pageUrl" class="gsr-quick">Quick View</a>
+              </div>
+              <div class="gsr-txt">
+                <div class="gsr-txt-l">
+                  <a href="$entity10.pageUrl" class="gsr-name">$entity10.name</a>
+                  <span class="gsr-price">&#36;$entity10.value</span>
+                </div>
+                <div class="gsr-txt-r">
+                  <button type="button" class="gsr-wish" aria-label="Add to wishlist"><svg class="gsr-heart" viewBox="0 0 24 24" width="20" height="20"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gsr-item">
+            <div class="gsr-card">
+              <div class="gsr-pic">
+                <a href="$entity11.pageUrl" class="gsr-pic-link"><img src="$entity11.thumbnailUrl" alt="$entity11.name" /></a>
+                <a href="$entity11.pageUrl" class="gsr-quick">Quick View</a>
+              </div>
+              <div class="gsr-txt">
+                <div class="gsr-txt-l">
+                  <a href="$entity11.pageUrl" class="gsr-name">$entity11.name</a>
+                  <span class="gsr-price">&#36;$entity11.value</span>
+                </div>
+                <div class="gsr-txt-r">
+                  <button type="button" class="gsr-wish" aria-label="Add to wishlist"><svg class="gsr-heart" viewBox="0 0 24 24" width="20" height="20"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gsr-item">
+            <div class="gsr-card">
+              <div class="gsr-pic">
+                <a href="$entity12.pageUrl" class="gsr-pic-link"><img src="$entity12.thumbnailUrl" alt="$entity12.name" /></a>
+                <a href="$entity12.pageUrl" class="gsr-quick">Quick View</a>
+              </div>
+              <div class="gsr-txt">
+                <div class="gsr-txt-l">
+                  <a href="$entity12.pageUrl" class="gsr-name">$entity12.name</a>
+                  <span class="gsr-price">&#36;$entity12.value</span>
+                </div>
+                <div class="gsr-txt-r">
+                  <button type="button" class="gsr-wish" aria-label="Add to wishlist"><svg class="gsr-heart" viewBox="0 0 24 24" width="20" height="20"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gsr-item">
+            <div class="gsr-card">
+              <div class="gsr-pic">
+                <a href="$entity13.pageUrl" class="gsr-pic-link"><img src="$entity13.thumbnailUrl" alt="$entity13.name" /></a>
+                <a href="$entity13.pageUrl" class="gsr-quick">Quick View</a>
+              </div>
+              <div class="gsr-txt">
+                <div class="gsr-txt-l">
+                  <a href="$entity13.pageUrl" class="gsr-name">$entity13.name</a>
+                  <span class="gsr-price">&#36;$entity13.value</span>
+                </div>
+                <div class="gsr-txt-r">
+                  <button type="button" class="gsr-wish" aria-label="Add to wishlist"><svg class="gsr-heart" viewBox="0 0 24 24" width="20" height="20"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gsr-item">
+            <div class="gsr-card">
+              <div class="gsr-pic">
+                <a href="$entity14.pageUrl" class="gsr-pic-link"><img src="$entity14.thumbnailUrl" alt="$entity14.name" /></a>
+                <a href="$entity14.pageUrl" class="gsr-quick">Quick View</a>
+              </div>
+              <div class="gsr-txt">
+                <div class="gsr-txt-l">
+                  <a href="$entity14.pageUrl" class="gsr-name">$entity14.name</a>
+                  <span class="gsr-price">&#36;$entity14.value</span>
+                </div>
+                <div class="gsr-txt-r">
+                  <button type="button" class="gsr-wish" aria-label="Add to wishlist"><svg class="gsr-heart" viewBox="0 0 24 24" width="20" height="20"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gsr-item">
+            <div class="gsr-card">
+              <div class="gsr-pic">
+                <a href="$entity15.pageUrl" class="gsr-pic-link"><img src="$entity15.thumbnailUrl" alt="$entity15.name" /></a>
+                <a href="$entity15.pageUrl" class="gsr-quick">Quick View</a>
+              </div>
+              <div class="gsr-txt">
+                <div class="gsr-txt-l">
+                  <a href="$entity15.pageUrl" class="gsr-name">$entity15.name</a>
+                  <span class="gsr-price">&#36;$entity15.value</span>
+                </div>
+                <div class="gsr-txt-r">
+                  <button type="button" class="gsr-wish" aria-label="Add to wishlist"><svg class="gsr-heart" viewBox="0 0 24 24" width="20" height="20"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gsr-item">
+            <div class="gsr-card">
+              <div class="gsr-pic">
+                <a href="$entity16.pageUrl" class="gsr-pic-link"><img src="$entity16.thumbnailUrl" alt="$entity16.name" /></a>
+                <a href="$entity16.pageUrl" class="gsr-quick">Quick View</a>
+              </div>
+              <div class="gsr-txt">
+                <div class="gsr-txt-l">
+                  <a href="$entity16.pageUrl" class="gsr-name">$entity16.name</a>
+                  <span class="gsr-price">&#36;$entity16.value</span>
+                </div>
+                <div class="gsr-txt-r">
+                  <button type="button" class="gsr-wish" aria-label="Add to wishlist"><svg class="gsr-heart" viewBox="0 0 24 24" width="20" height="20"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gsr-item">
+            <div class="gsr-card">
+              <div class="gsr-pic">
+                <a href="$entity17.pageUrl" class="gsr-pic-link"><img src="$entity17.thumbnailUrl" alt="$entity17.name" /></a>
+                <a href="$entity17.pageUrl" class="gsr-quick">Quick View</a>
+              </div>
+              <div class="gsr-txt">
+                <div class="gsr-txt-l">
+                  <a href="$entity17.pageUrl" class="gsr-name">$entity17.name</a>
+                  <span class="gsr-price">&#36;$entity17.value</span>
+                </div>
+                <div class="gsr-txt-r">
+                  <button type="button" class="gsr-wish" aria-label="Add to wishlist"><svg class="gsr-heart" viewBox="0 0 24 24" width="20" height="20"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gsr-item">
+            <div class="gsr-card">
+              <div class="gsr-pic">
+                <a href="$entity18.pageUrl" class="gsr-pic-link"><img src="$entity18.thumbnailUrl" alt="$entity18.name" /></a>
+                <a href="$entity18.pageUrl" class="gsr-quick">Quick View</a>
+              </div>
+              <div class="gsr-txt">
+                <div class="gsr-txt-l">
+                  <a href="$entity18.pageUrl" class="gsr-name">$entity18.name</a>
+                  <span class="gsr-price">&#36;$entity18.value</span>
+                </div>
+                <div class="gsr-txt-r">
+                  <button type="button" class="gsr-wish" aria-label="Add to wishlist"><svg class="gsr-heart" viewBox="0 0 24 24" width="20" height="20"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gsr-item">
+            <div class="gsr-card">
+              <div class="gsr-pic">
+                <a href="$entity19.pageUrl" class="gsr-pic-link"><img src="$entity19.thumbnailUrl" alt="$entity19.name" /></a>
+                <a href="$entity19.pageUrl" class="gsr-quick">Quick View</a>
+              </div>
+              <div class="gsr-txt">
+                <div class="gsr-txt-l">
+                  <a href="$entity19.pageUrl" class="gsr-name">$entity19.name</a>
+                  <span class="gsr-price">&#36;$entity19.value</span>
+                </div>
+                <div class="gsr-txt-r">
+                  <button type="button" class="gsr-wish" aria-label="Add to wishlist"><svg class="gsr-heart" viewBox="0 0 24 24" width="20" height="20"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gsr-item">
+            <div class="gsr-card">
+              <div class="gsr-pic">
+                <a href="$entity20.pageUrl" class="gsr-pic-link"><img src="$entity20.thumbnailUrl" alt="$entity20.name" /></a>
+                <a href="$entity20.pageUrl" class="gsr-quick">Quick View</a>
+              </div>
+              <div class="gsr-txt">
+                <div class="gsr-txt-l">
+                  <a href="$entity20.pageUrl" class="gsr-name">$entity20.name</a>
+                  <span class="gsr-price">&#36;$entity20.value</span>
+                </div>
+                <div class="gsr-txt-r">
+                  <button type="button" class="gsr-wish" aria-label="Add to wishlist"><svg class="gsr-heart" viewBox="0 0 24 24" width="20" height="20"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <button type="button" class="gsr-arrow gsr-next" aria-label="Next">
+        <svg viewBox="0 0 14 26"><path d="M2 2 L12 13 L2 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<script type="text/javascript">
+(function () {
+  var root = document.getElementById('gsrReco');
+  if (!root || root.getAttribute('data-gsr-ready')) return;
+  root.setAttribute('data-gsr-ready', '1');
+
+  var list = root.querySelector('.gsr-list');
+  var track = root.querySelector('.gsr-track');
+  var prevBtn = root.querySelector('.gsr-prev');
+  var nextBtn = root.querySelector('.gsr-next');
+  // Built at runtime so Velocity never treats it as a template variable
+  var DOLLAR = String.fromCharCode(36);
+  var SPEED = 500;
+  var WISH_KEY = 'wishlist';
+
+  // Velocity leaves unresolved variables as literal text starting with the dollar sign
+  function hasValue(text) {
+    text = (text || '').trim();
+    return text !== '' && text.indexOf(DOLLAR) !== 0;
+  }
+
+  // Shows feed values like 93.2 or 1234 as 93.20 / 1,234.00
+  function formatPrice(el) {
+    var raw = el.textContent.trim().slice(1).replace(/,/g, '');
+    var num = Number(raw);
+    if (raw !== '' && isFinite(num)) {
+      el.textContent = DOLLAR + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+  }
+
+  // Drop slots Target did not fill (missing name, image, link or price) or whose image already failed
+  var originals = Array.prototype.slice.call(track.children).filter(function (item) {
+    var img = item.querySelector('img');
+    var price = item.querySelector('.gsr-price');
+    var keep = hasValue(item.querySelector('.gsr-name').textContent) &&
+      hasValue(img.getAttribute('src')) &&
+      hasValue(item.querySelector('.gsr-name').getAttribute('href')) &&
+      hasValue(price.textContent.trim().slice(1)) &&
+      !(img.complete && img.naturalWidth === 0);
+    if (keep) formatPrice(price); else track.removeChild(item);
+    return keep;
+  });
+  if (!originals.length) { root.style.display = 'none'; return; }
+
+  var count = originals.length;
+  var perView = 0, current = 0, animating = false, settleTimer = null;
+
+  function getPerView() {
+    var w = window.innerWidth;
+    return w <= 576 ? 1 : w <= 768 ? 2 : w <= 992 ? 3 : 5;
+  }
+
+  function maxIndex() {
+    return Math.max(0, count - perView);
+  }
+
+  function basePercent() {
+    return -current * 100 / perView;
+  }
+
+  function updateArrows() {
+    var scrollable = count > perView;
+    prevBtn.style.display = scrollable ? '' : 'none';
+    nextBtn.style.display = scrollable ? '' : 'none';
+    prevBtn.disabled = current <= 0;
+    nextBtn.disabled = current >= maxIndex();
+  }
+
+  function setPosition(animate) {
+    track.style.transition = animate ? 'transform ' + SPEED + 'ms ease' : 'none';
+    track.style.transform = 'translate3d(' + basePercent() + '%, 0, 0)';
+  }
+
+  function build() {
+    clearTimeout(settleTimer);
+    animating = false;
+    perView = getPerView();
+    track.style.setProperty('--gsr-per-view', perView);
+    track.style.justifyContent = count > perView ? '' : 'center';
+    current = Math.min(current, maxIndex());
+    setPosition(false);
+    updateArrows();
+  }
+
+  function settle() {
+    clearTimeout(settleTimer);
+    animating = false;
+  }
+
+  // Moves a page at a time but stops exactly at the first / last product
+  function go(step) {
+    if (animating) return;
+    var target = Math.max(0, Math.min(current + step, maxIndex()));
+    if (target === current) { setPosition(true); return; }
+    animating = true;
+    current = target;
+    setPosition(true);
+    updateArrows();
+    settleTimer = setTimeout(settle, SPEED + 100);
+  }
+
+  track.addEventListener('transitionend', function (e) {
+    if (e.target === track && e.propertyName === 'transform') settle();
+  });
+
+  prevBtn.addEventListener('click', function (e) { e.preventDefault(); go(-perView); });
+  nextBtn.addEventListener('click', function (e) { e.preventDefault(); go(perView); });
+
+  // A product image that fails to load removes its card instead of showing an empty tile
+  track.addEventListener('error', function (e) {
+    if (e.target.tagName !== 'IMG') return;
+    var item = e.target.closest('.gsr-item');
+    var i = originals.indexOf(item);
+    if (i < 0) return;
+    originals.splice(i, 1);
+    track.removeChild(item);
+    count = originals.length;
+    if (!count) { root.style.display = 'none'; return; }
+    build();
+  }, true);
+
+  /* Keyboard: left / right arrows while focus is inside the carousel */
+  root.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowLeft') { e.preventDefault(); go(-perView); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); go(perView); }
+  });
+
+  // Tabbing to an off-screen card would make the browser scroll the hidden overflow; slide to it instead
+  list.addEventListener('scroll', function () { if (list.scrollLeft) list.scrollLeft = 0; });
+  list.addEventListener('focusin', function (e) {
+    var i = originals.indexOf(e.target.closest('.gsr-item'));
+    if (i < 0) return;
+    if (i < current) go(i - current);
+    else if (i >= current + perView) go(i - perView + 1 - current);
+  });
+
+  /* Mouse drag + touch swipe */
+  var startX = null, dragX = 0, dragged = false;
+
+  list.addEventListener('pointerdown', function (e) {
+    // Reset first so a drag that ended outside the list can't swallow the next real click
+    dragged = false;
+    if (animating || count <= perView) return;
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    if (e.target.closest('.gsr-wish')) return;
+    startX = e.clientX;
+    dragX = 0;
+    track.style.transition = 'none';
+    list.classList.add('gsr-grabbing');
+  });
+
+  window.addEventListener('pointermove', function (e) {
+    if (startX === null) return;
+    dragX = e.clientX - startX;
+    if (Math.abs(dragX) > 5) dragged = true;
+    // Rubber-band resistance when pulling past the first or last product
+    var pastEdge = (dragX > 0 && current <= 0) || (dragX < 0 && current >= maxIndex());
+    var shown = pastEdge ? dragX / 4 : dragX;
+    track.style.transform = 'translate3d(calc(' + basePercent() + '% + ' + shown + 'px), 0, 0)';
+  });
+
+  function endDrag() {
+    if (startX === null) return;
+    startX = null;
+    list.classList.remove('gsr-grabbing');
+    if (Math.abs(dragX) > list.offsetWidth / 5) {
+      go(dragX < 0 ? perView : -perView);
+    } else {
+      setPosition(true);
+    }
+  }
+  window.addEventListener('pointerup', endDrag);
+  window.addEventListener('pointercancel', endDrag);
+
+  // Stop the link click that fires at the end of a drag
+  list.addEventListener('click', function (e) {
+    if (dragged) {
+      e.preventDefault();
+      e.stopPropagation();
+      dragged = false;
+    }
+  }, true);
+  list.addEventListener('dragstart', function (e) { e.preventDefault(); });
+
+  /* Trackpad two-finger horizontal swipe */
+  var wheelAcc = 0, wheelLocked = false, wheelTimer = null;
+  list.addEventListener('wheel', function (e) {
+    if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+    e.preventDefault();
+    clearTimeout(wheelTimer);
+    wheelTimer = setTimeout(function () { wheelAcc = 0; wheelLocked = false; }, 200);
+    if (wheelLocked || animating) return;
+    wheelAcc += e.deltaX;
+    if (Math.abs(wheelAcc) > 60) {
+      go(wheelAcc > 0 ? perView : -perView);
+      wheelAcc = 0;
+      wheelLocked = true;
+    }
+  }, { passive: false });
+
+  var resizeTimer = null;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+      if (getPerView() !== perView) build();
+    }, 150);
+  });
+
+  /* Wishlist - shares the site's localStorage 'wishlist' format */
+  function readWishlist() {
+    try { return JSON.parse(window.localStorage.getItem(WISH_KEY)) || []; } catch (err) { return []; }
+  }
+
+  function cardName(el) {
+    return el.closest('.gsr-card').querySelector('.gsr-name').textContent.trim();
+  }
+
+  function syncHearts() {
+    var names = readWishlist().map(function (w) { return w.name; });
+    var hearts = root.querySelectorAll('.gsr-wish');
+    for (var i = 0; i < hearts.length; i++) {
+      hearts[i].classList.toggle('gsr-wished', names.indexOf(cardName(hearts[i])) > -1);
+    }
+  }
+
+  root.addEventListener('click', function (e) {
+    var btn = e.target.closest('.gsr-wish');
+    if (!btn) return;
+    e.preventDefault();
+
+    var card = btn.closest('.gsr-card');
+    var name = cardName(btn);
+    var wishlist = readWishlist();
+    var index = -1;
+    for (var i = 0; i < wishlist.length; i++) {
+      if (wishlist[i].name === name) { index = i; break; }
+    }
+
+    if (index > -1) {
+      wishlist.splice(index, 1);
+    } else {
+      wishlist.push({
+        name: name,
+        price: card.querySelector('.gsr-price').textContent.trim(),
+        image: card.querySelector('img').getAttribute('src'),
+        link: card.querySelector('.gsr-name').getAttribute('href')
+      });
+    }
+
+    try { window.localStorage.setItem(WISH_KEY, JSON.stringify(wishlist)); } catch (err) { /* storage unavailable */ }
+    syncHearts();
+
+    var badges = document.querySelectorAll('.icon-header-noti .heart-icon-header');
+    for (var b = 0; b < badges.length; b++) badges[b].parentNode.setAttribute('data-notify', wishlist.length);
+  });
+
+  syncHearts();
+  build();
+})();
+</script>
