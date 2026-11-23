@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Order Confirmed | GaneshStore — Premium Fashion & Accessories</title>
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="GaneshStore" />
+    <meta property="og:title" content="Order Confirmed | GaneshStore — Premium Fashion & Accessories" />
+    <meta property="og:description" content="Your GaneshStore order is confirmed. Handcrafted luxury essentials with premium materials, verified customer reviews, and white-glove express delivery." />
+    <meta property="og:image" content="images/icons/logo-01.png" />
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Order Confirmed | GaneshStore — Premium Fashion & Accessories" />
+    <meta name="twitter:description" content="Your GaneshStore order is confirmed. Handcrafted luxury essentials with premium materials, verified customer reviews, and white-glove express delivery." />
+    <meta name="twitter:image" content="images/icons/logo-01.png" />
+    <meta name="description" content="Your GaneshStore order is confirmed. Handcrafted luxury essentials with premium materials, verified customer reviews, and white-glove express delivery." />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <!--===============================================================================================-->
+  <link rel="icon" type="image/png" href="images/icons/favicon.png" />
+  <!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css" />
+  <!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="fonts/font-awesome-4.7.0/css/font-awesome.min.css" />
+  <!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="fonts/iconic/css/material-design-iconic-font.min.css" />
+  <!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="fonts/linearicons-v1.0.0/icon-font.min.css" />
+  <!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="vendor/animate/animate.css" />
+  <!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="vendor/css-hamburgers/hamburgers.min.css" />
+  <!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="vendor/animsition/css/animsition.min.css" />
+  <!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css" />
+  <!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="vendor/perfect-scrollbar/perfect-scrollbar.css" />
+  <!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="css/util.css" />
+  <link rel="stylesheet" type="text/css" href="css/main.css?v=2.1.0" />
+  <!--===============================================================================================-->
+  <!-- Order confirmation data: resolved before Adobe Launch loads so data elements can read it on Library Loaded. -->
+  <script>
+    (function () {
+      var orderId = new URLSearchParams(window.location.search).get('orderId');
+      var history = [];
+      try { history = JSON.parse(localStorage.getItem('order_history')) || []; } catch (e) {}
+      var order = null;
+      for (var i = history.length - 1; i >= 0 && orderId; i--) {
+        if (history[i] && history[i].order_id === orderId) { order = history[i]; break; }
+      }
+      var firstView = false;
+      try {
+        firstView = !!order && sessionStorage.getItem('gs-last-order-id') === orderId;
+        if (firstView) sessionStorage.removeItem('gs-last-order-id');
+      } catch (e) {}
+      window.gsOrderConfirmation = order ? {
+        purchaseID: order.order_id,
+        priceTotal: Math.round((parseFloat(order.total) || 0) * 100) / 100,
+        productListItems: (order.items || []).map(function (item) { return { SKU: item.SKU || item.sku || item.id }; }),
+        firstView: firstView,
+        order: order
+      } : null;
+    })();
+  </script>
+  <script src="https://assets.adobedtm.com/6268dc4b6b26/a79c12535bfd/launch-6b416d57c554-development.min.js" async></script>
+  <script src="js/datalayer.js?v=2.0.2"></script>
+
+    <script type="application/ld+json">
+    {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "GaneshStore",
+  "url": "https://ganeshstore.com",
+  "logo": "images/icons/logo-01.png",
+  "description": "Curated luxury fashion atelier, accessories, footwear, and bespoke craftsmanship.",
+  "sameAs": [
+    "https://www.facebook.com/ganeshstore",
+    "https://www.instagram.com/ganeshstore",
+    "https://www.pinterest.com/ganeshstore"
+  ]
+}
+    </script>
+  		<link rel="canonical" href="https://ganeshstore.com/order-confirmation.html" />
+</head>
+<body class="animsition">
+  <h1 class="sr-only">Order Confirmation</h1>
+
+  <!-- Header -->
+  <header class="header-v4">
+    <!-- Announcement Bar -->
+    <div class="announcement-bar">
+      Free shipping for standard orders over $100
+    </div>
+
+    <!-- Header desktop -->
+    <div class="container-menu-desktop">
+      <div class="wrap-menu-desktop how-shadow1">
+        <nav class="limiter-menu-desktop container">
+          <!-- Logo desktop -->
+          <a href="index.html" class="logo">
+            <img src="images/icons/logo-01.png" alt="IMG-LOGO" />
+          </a>
+
+          <!-- Menu desktop -->
+          <div class="menu-desktop">
+            <ul class="main-menu">
+              <li>
+                <a href="index.html">Home</a>
+              </li>
+              <li>
+                <a href="product.html">Shop</a>
+              </li>
+              <li class="label1" data-label1="hot">
+                <a href="product.html?category=sale">Sale</a>
+              </li>
+              <li>
+                <a href="blog.html">Blog</a>
+              </li>
+              <li>
+                <a href="about.html">About</a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Icon header -->
+          <div class="wrap-icon-header flex-w flex-r-m">
+            <div class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 js-show-modal-search">
+              <i class="zmdi zmdi-search"></i>
+            </div>
+            <div class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti js-show-cart" data-notify="0">
+              <i class="zmdi zmdi-shopping-cart"></i>
+            </div>
+            <a href="wishlist.html" class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti" data-notify="0">
+              <i class="zmdi zmdi-favorite-outline"></i>
+            </a>
+            <a href="signin.html" class="dis-block icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 js-auth-link-container">
+              <i class="zmdi zmdi-account js-auth-icon"></i>
+            </a>
+          </div>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Header Mobile -->
+    <div class="wrap-header-mobile">
+      <div class="logo-mobile">
+        <a href="index.html"><img src="images/icons/logo-01.png" alt="IMG-LOGO" /></a>
+      </div>
+      <div class="wrap-icon-header flex-w flex-r-m m-r-15">
+        <div class="icon-header-item cl2 hov-cl1 trans-04 p-r-11 js-show-modal-search">
+          <i class="zmdi zmdi-search"></i>
+        </div>
+        <div class="icon-header-item cl2 hov-cl1 trans-04 p-r-11 p-l-10 icon-header-noti js-show-cart" data-notify="0">
+          <i class="zmdi zmdi-shopping-cart"></i>
+        </div>
+        <a href="wishlist.html" class="icon-header-item cl2 hov-cl1 trans-04 p-r-11 p-l-10 icon-header-noti" data-notify="0">
+          <i class="zmdi zmdi-favorite-outline"></i>
+        </a>
+        <a href="signin.html" class="dis-block icon-header-item cl2 hov-cl1 trans-04 p-r-11 p-l-10 js-auth-link-container">
+          <i class="zmdi zmdi-account js-auth-icon"></i>
+        </a>
+      </div>
+      <div class="btn-show-menu-mobile hamburger hamburger--squeeze">
+        <span class="hamburger-box">
+          <span class="hamburger-inner"></span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Menu Mobile -->
+    <div class="menu-mobile">
+      <ul class="main-menu-m">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="product.html">Shop</a></li>
+        <li><a href="product.html?category=sale" class="label1 rs1" data-label1="hot">Sale</a></li>
+        <li><a href="blog.html">Blog</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Cart Drawer -->
+  <div class="wrap-header-cart js-panel-cart">
+    <div class="s-full js-hide-cart"></div>
+    <div class="header-cart flex-col-l p-l-65 p-r-25">
+      <div class="header-cart-title flex-w flex-sb-m p-b-8">
+        <span class="mtext-103 cl2"> Your Cart </span>
+        <div class="fs-35 lh-10 cl2 p-lr-5 pointer hov-cl1 trans-04 js-hide-cart">
+          <i class="zmdi zmdi-close"></i>
+        </div>
+      </div>
+      <div class="header-cart-content flex-w js-pscroll">
+        <ul class="header-cart-wrapitem w-full"></ul>
+        <div class="w-full">
+          <div class="header-cart-total w-full p-tb-40">Total: $0.00</div>
+          <div class="header-cart-buttons flex-w w-full">
+            <a href="shoping-cart.html" class="flex-c-m stext-101 cl0 size-107 bg3 bor2 hov-btn3 p-lr-15 trans-04 m-r-8 m-b-10">View Cart</a>
+            <a href="checkout.html" class="flex-c-m stext-101 cl0 size-107 bg3 bor2 hov-btn3 p-lr-15 trans-04 m-b-10">Check Out</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="bg0 gs-confirm-page" id="orderConfirmationPage">
+    <div class="container">
+
+      <!-- Shown when there is no matching order (direct visit / cleared storage) -->
+      <div class="gs-confirm-empty" id="confirmEmptyState" style="display: none;">
+        <div class="gs-confirm-empty-icon"><i class="zmdi zmdi-receipt"></i></div>
+        <h2>No recent order found</h2>
+        <p>This page shows your receipt right after checkout. Your past orders are always available in Order History.</p>
+        <div class="gs-confirm-actions">
+          <a href="order-history.html" class="gs-confirm-btn gs-confirm-btn-ghost"><i class="zmdi zmdi-time-restore"></i> Order History</a>
+          <a href="product.html" class="gs-confirm-btn gs-confirm-btn-primary">Continue Shopping <i class="zmdi zmdi-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <div id="confirmContent" style="display: none;">
+        <!-- Hero -->
+        <div class="gs-confirm-hero" id="receiptContainer">
+          <div class="gs-confirm-check" aria-hidden="true">
+            <svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24" /><path d="M15 27l7 7 15-16" /></svg>
+          </div>
+          <span class="gs-confirm-eyebrow">Order confirmed</span>
+          <h2 class="gs-confirm-title" id="confirmGreeting">Thank you for your order!</h2>
+          <p class="gs-confirm-sub">A confirmation has been sent to <strong id="receiptEmail"></strong>.</p>
+
+          <div class="gs-confirm-id">
+            <span>Order</span>
+            <strong id="receiptOrderId"></strong>
+            <button type="button" class="gs-confirm-copy print-hide" id="btnCopyOrderId" aria-label="Copy order number"><i class="zmdi zmdi-copy"></i></button>
+          </div>
+
+          <!-- Progress -->
+          <ol class="gs-confirm-steps" aria-label="Order progress">
+            <li class="is-done"><span><i class="zmdi zmdi-check"></i></span>Confirmed</li>
+            <li class="is-active"><span><i class="zmdi zmdi-assignment-check"></i></span>Processing</li>
+            <li><span><i class="zmdi zmdi-truck"></i></span>Shipped</li>
+            <li><span><i class="zmdi zmdi-home"></i></span>Delivered</li>
+          </ol>
+        </div>
+
+        <div class="row gs-confirm-grid">
+          <!-- Details -->
+          <div class="col-lg-5 m-b-30">
+            <div class="gs-confirm-card">
+              <h3 class="gs-confirm-card-title">Delivery details</h3>
+              <dl class="gs-confirm-meta">
+                <div><dt><i class="zmdi zmdi-calendar-check"></i> Estimated delivery</dt><dd id="receiptEta"></dd></div>
+                <div><dt><i class="zmdi zmdi-truck"></i> Shipping method</dt><dd id="receiptShippingMethod"></dd></div>
+                <div><dt><i class="zmdi zmdi-pin"></i> Ship to</dt><dd id="receiptAddress"></dd></div>
+                <div><dt><i class="zmdi zmdi-card"></i> Payment</dt><dd id="receiptPayment"></dd></div>
+                <div><dt><i class="zmdi zmdi-calendar"></i> Order date</dt><dd id="receiptDate"></dd></div>
+                <div><dt><i class="zmdi zmdi-pin-drop"></i> Tracking number</dt><dd id="receiptTrackingNumber" class="gs-confirm-mono"></dd></div>
+              </dl>
+            </div>
+          </div>
+
+          <!-- Items + totals -->
+          <div class="col-lg-7 m-b-30">
+            <div class="gs-confirm-card">
+              <h3 class="gs-confirm-card-title">Items <span class="gs-confirm-count" id="receiptItemCount">0</span></h3>
+              <ul class="gs-confirm-items" id="receiptTableBody"></ul>
+
+              <div class="gs-confirm-totals">
+                <div><span>Subtotal</span><span id="receiptSubtotal">$0.00</span></div>
+                <div class="gs-confirm-discount" id="receiptDiscountRow" style="display: none;"><span>Discount</span><span id="receiptDiscount">- $0.00</span></div>
+                <div><span>Shipping</span><span id="receiptShipping">$0.00</span></div>
+                <div><span>Tax</span><span id="receiptTax">$0.00</span></div>
+                <div class="gs-confirm-grand"><span>Total paid</span><strong id="receiptTotal">$0.00</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="gs-confirm-actions receipt-cta-buttons print-hide">
+          <button type="button" class="gs-confirm-btn gs-confirm-btn-ghost" id="btnPrintInvoice"><i class="zmdi zmdi-print"></i> Print invoice</button>
+          <button type="button" class="gs-confirm-btn gs-confirm-btn-ghost" id="btnTrackThisPackage"><i class="zmdi zmdi-pin-drop"></i> Track package</button>
+          <a href="product.html" class="gs-confirm-btn gs-confirm-btn-primary">Continue shopping <i class="zmdi zmdi-arrow-right"></i></a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Interactive Live Order Tracking Modal -->
+  <div class="tracking-modal-overlay" id="orderTrackingModal" style="display: none;">
+    <div class="tracking-modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h4 style="font-weight: 700; font-size: 18px; color: #222; margin: 0;">
+          <i class="zmdi zmdi-truck" style="color: #717fe0; margin-right: 6px;"></i> Live Shipment Tracker
+        </h4>
+        <span style="font-size: 26px; cursor: pointer; color: #888;" onclick="closeTrackingModal()">&times;</span>
+      </div>
+
+      <div style="background: #f8f9fa; padding: 14px; border-radius: 10px; font-size: 13px; margin-bottom: 15px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+          <span style="color: #666;">Tracking Number:</span>
+          <strong style="color: #222;" id="trk-number">GS-TRK-892147</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+          <span style="color: #666;">Carrier:</span>
+          <strong style="color: #717fe0;">GaneshStore Express Priority</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: #666;">Estimated Delivery:</span>
+          <strong style="color: #2e7d32;" id="trk-est-delivery">Aug 26, 2026</strong>
+        </div>
+      </div>
+
+      <!-- 5-Step Timeline -->
+      <div class="tracking-timeline" id="trk-timeline-container">
+        <!-- Populated dynamically via JS -->
+      </div>
+
+      <button type="button" class="btn-auth-submit" style="margin-top: 15px; height: 42px;" onclick="closeTrackingModal()">
+        Close Tracker
+      </button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg3 p-t-75 p-b-32 print-hide">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-6 col-lg-3 p-b-50">
+          <h4 class="stext-301 cl0 p-b-30">Categories</h4>
+          <ul>
+            <li class="p-b-10"><a href="#" class="stext-107 cl7 hov-cl1 trans-04">Women</a></li>
+            <li class="p-b-10"><a href="#" class="stext-107 cl7 hov-cl1 trans-04">Men</a></li>
+            <li class="p-b-10"><a href="#" class="stext-107 cl7 hov-cl1 trans-04">Shoes</a></li>
+            <li class="p-b-10"><a href="#" class="stext-107 cl7 hov-cl1 trans-04">Watches</a></li>
+          </ul>
+        </div>
+        <div class="col-sm-6 col-lg-3 p-b-50">
+          <h4 class="stext-301 cl0 p-b-30">Help</h4>
+          <ul>
+            <li class="p-b-10"><a href="#" class="stext-107 cl7 hov-cl1 trans-04">Track Order</a></li>
+            <li class="p-b-10"><a href="#" class="stext-107 cl7 hov-cl1 trans-04">Returns</a></li>
+            <li class="p-b-10"><a href="#" class="stext-107 cl7 hov-cl1 trans-04">Shipping</a></li>
+            <li class="p-b-10"><a href="#" class="stext-107 cl7 hov-cl1 trans-04">FAQs</a></li>
+          </ul>
+        </div>
+        <div class="col-sm-6 col-lg-3 p-b-50">
+          <h4 class="stext-301 cl0 p-b-30">GET IN TOUCH</h4>
+          <p class="stext-107 cl7 size-201">
+            Any questions? Let us know in store at 8th floor, 379 Hudson St, New York, NY 10018 or call us on (+1) 96 716 6879
+          </p>
+          <div class="p-t-27">
+            <a href="#" class="fs-18 cl7 hov-cl1 trans-04 m-r-16"><i class="fa fa-facebook"></i></a>
+            <a href="#" class="fs-18 cl7 hov-cl1 trans-04 m-r-16"><i class="fa fa-instagram"></i></a>
+            <a href="#" class="fs-18 cl7 hov-cl1 trans-04 m-r-16"><i class="fa fa-pinterest-p"></i></a>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3 p-b-50">
+          <h4 class="stext-301 cl0 p-b-30">Newsletter</h4>
+          <form>
+            <div class="wrap-input1 w-full p-b-4">
+              <input class="input1 bg-none plh1 stext-107 cl7" type="text" name="email" placeholder="email@example.com" />
+              <div class="focus-input1 trans-04"></div>
+            </div>
+            <div class="p-t-18">
+              <button class="flex-c-m stext-101 cl0 size-103 bg1 bor1 hov-btn2 p-lr-15 trans-04">Subscribe</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="p-t-40">
+        <div class="flex-c-m flex-w p-b-18">
+          <a href="#" class="m-all-1"><img src="images/icons/icon-pay-01.png" alt="ICON-PAY" /></a>
+          <a href="#" class="m-all-1"><img src="images/icons/icon-pay-02.png" alt="ICON-PAY" /></a>
+          <a href="#" class="m-all-1"><img src="images/icons/icon-pay-03.png" alt="ICON-PAY" /></a>
+          <a href="#" class="m-all-1"><img src="images/icons/icon-pay-04.png" alt="ICON-PAY" /></a>
+          <a href="#" class="m-all-1"><img src="images/icons/icon-pay-05.png" alt="ICON-PAY" /></a>
+        </div>
+        <p class="stext-107 cl6 txt-center">
+          Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | Made with <i class="fa fa-heart-o" aria-hidden="true"></i> by Colorlib
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!--===============================================================================================-->
+  <script src="vendor/jquery/jquery-3.2.1.min.js"></script>
+  <!--===============================================================================================-->
+  <script src="vendor/animsition/js/animsition.min.js"></script>
+  <!--===============================================================================================-->
+  <script src="vendor/bootstrap/js/popper.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+  <!--===============================================================================================-->
+  <script src="vendor/select2/select2.min.js"></script>
+  <!--===============================================================================================-->
+  <script src="vendor/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+  <!--===============================================================================================-->
+  <script src="vendor/sweetalert/sweetalert.min.js"></script>
+  <!--===============================================================================================-->
+  <script src="js/main.js?v=2.1.1"></script>
+</body>
+</html>

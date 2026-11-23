@@ -30,14 +30,14 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
     if (!document.querySelector('link[data-gs-experience]')) {
         var link = document.createElement('link');
         link.rel = 'stylesheet';
-        link.href = base + 'css/experience.css?' + ver + '&x=1';
+        link.href = base + 'css/experience.css?' + ver + '&x=2';
         link.setAttribute('data-gs-experience', '');
         document.head.appendChild(link);
     }
     if (!document.querySelector('script[data-gs-experience]')) {
         var load = function () {
             var s = document.createElement('script');
-            s.src = base + 'js/experience.js?' + ver + '&x=1';
+            s.src = base + 'js/experience.js?' + ver + '&x=2';
             s.setAttribute('data-gs-experience', '');
             document.body.appendChild(s);
         };
@@ -586,6 +586,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
     // Helper to save wishlist to localStorage
     function saveWishlist(wishlist) {
         localStorage.setItem('wishlist', JSON.stringify(wishlist));
+        $(document).trigger('wishlistUpdated');
         updateWishlistBadges();
         if (typeof syncWishlistToSupabase === 'function') {
             syncWishlistToSupabase();
@@ -1693,6 +1694,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         initPDPSocialShare();
         initNewsletter();
         initCheckout();
+        initOrderConfirmation();
         autoPopulateCheckout();
         $(window).on('load', function() {
             initWishlist();
@@ -3863,89 +3865,6 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             $('.mobile-summary-collapse').toggleClass('open');
         });
 
-        // 17. Printable Invoice PDF handler & Track Package modal handler
-        $(document).on('click', '#btnPrintInvoice', function(e) {
-            e.preventDefault();
-            window.print();
-        });
-
-        window.openTrackingModal = function(trackingNumber) {
-            var $modal = $('#orderTrackingModal');
-            var trk = trackingNumber || $('#receiptTrackingNumber').text() || 'GS-TRK-892415';
-            
-            if (!$modal.length) {
-                showPremiumToast('Tracking: ' + trk + ' (Status: In Transit - On Schedule)', 'info');
-                return;
-            }
-            
-            $('#trk-number').text(trk);
-            var est = new Date(Date.now() + 86400000 * 3).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            $('#trk-est-delivery').text(est);
-
-            var milestones = [
-                { title: 'Order Confirmed', desc: 'Payment verified & order queued', done: true, time: 'Just now' },
-                { title: 'Quality Verification', desc: 'Hand-inspected by GaneshStore Atelier', done: true, time: 'In Progress' },
-                { title: 'Dispatched & Carrier Handover', desc: 'Picked up by FedEx Express Priority', done: false, time: 'Pending' },
-                { title: 'Out for Delivery', desc: 'Assigned to regional courier', done: false, time: 'Pending' },
-                { title: 'Delivered', desc: 'Direct-to-door white glove delivery', done: false, time: 'Estimated ' + est }
-            ];
-
-            var $tl = $('#trk-timeline-container');
-            $tl.empty();
-            milestones.forEach(function(m) {
-                var item = 
-                    '<div class="tracking-item ' + (m.done ? 'completed' : '') + '">' +
-                    '  <div class="tracking-item-dot"><i class="zmdi ' + (m.done ? 'zmdi-check' : 'zmdi-circle-o') + '"></i></div>' +
-                    '  <div class="tracking-item-content">' +
-                    '    <h5>' + m.title + '</h5>' +
-                    '    <p>' + m.desc + '</p>' +
-                    '    <span class="tracking-time">' + m.time + '</span>' +
-                    '  </div>' +
-                    '</div>';
-                $tl.append(item);
-            });
-
-            $modal.fadeIn(200);
-        };
-
-        window.closeTrackingModal = function() {
-            $('#orderTrackingModal').fadeOut(200);
-        };
-
-        $(document).on('click', '#btnTrackThisPackage', function(e) {
-            e.preventDefault();
-            var trkNo = $('#receiptTrackingNumber').text() || 'GS-TRK-892415';
-            window.openTrackingModal(trkNo);
-        });
-
-        // Confetti explosion script helper
-        function triggerConfettiBurst() {
-            var colors = ['#717fe0', '#ff3366', '#ffd700', '#0f766e', '#3081ed'];
-            for (var i = 0; i < 70; i++) {
-                var $particle = $('<div class="confetti-particle"></div>');
-                var randomColor = colors[Math.floor(Math.random() * colors.length)];
-                var randomLeft = Math.random() * 100;
-                var randomDelay = Math.random() * 2;
-                var randomSize = Math.floor(Math.random() * 8) + 6;
-
-                $particle.css({
-                    'background-color': randomColor,
-                    'left': randomLeft + '%',
-                    'width': randomSize + 'px',
-                    'height': randomSize + 'px',
-                    'animation-delay': randomDelay + 's'
-                });
-                $('body').append($particle);
-
-                // Auto clean particle
-                (function($p) {
-                    setTimeout(function() {
-                        $p.remove();
-                    }, 4500);
-                })($particle);
-            }
-        }
-
         // 18. Place Order Submission
         $('.js-btn-place-order').on('click', function(e) {
             e.preventDefault();
@@ -4092,48 +4011,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                         };
 
                         function completeTransaction() {
-                            $overlay.hide();
-                            $('#checkoutMainRow').hide();
-                            $('.bread-crumb').hide();
-                            $('.mobile-summary-toggle').hide();
-                            $('.mobile-summary-collapse').removeClass('open').hide();
-
-                            // Populate invoice receipt details
-                            $('#receiptOrderId').text(orderId);
-                            $('#receiptTrackingNumber').text(trackingNumber);
-                            $('#receiptDate').text(new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }));
-                            $('#receiptEmail').text(emailVal);
-                            $('#receiptPayment').text(effectivePayment);
-                            $('#receiptAddress').text(addrVal);
-
-                            // Populate items table
-                            var $receiptTable = $('#receiptTableBody');
-                            $receiptTable.empty();
-                            enrichedItems.forEach(function(item) {
-                                var skuBadge = (item.SKU || item.sku) ? '<span style="font-size:11px;color:#0f766e;margin-left:6px;font-family:monospace;font-weight:600;">[' + (item.SKU || item.sku) + ']</span>' : '';
-                                var row = 
-                                    '<tr>' +
-                                    '  <td>' + item.name + ' <span style="font-size:11px;color:#888;">(' + item.size + ' / ' + item.color + ')</span>' + skuBadge + '</td>' +
-                                    '  <td style="text-align:center;">' + item.quantity + '</td>' +
-                                    '  <td style="text-align:right;">' + item.price + '</td>' +
-                                    '</tr>';
-                                $receiptTable.append(row);
-                            });
-
-                            $('#receiptSubtotal').text('$ ' + subtotalNum.toFixed(2));
-                            if (discountNum > 0) {
-                                $('#receiptDiscountRow').show();
-                                $('#receiptDiscount').text('- $ ' + discountNum.toFixed(2));
-                            } else {
-                                $('#receiptDiscountRow').hide();
-                            }
-                            $('#receiptShipping').text(shippingFee > 0 ? '$ 15.00' : 'Free');
-                            $('#receiptTax').text('$ ' + taxNum.toFixed(2));
-                            $('#receiptTotal').text('$ ' + totalNum.toFixed(2));
-
-                            $('#receiptContainer').show();
-                            
-                            // Save to local order history
+                            // Save to local order history (order-confirmation.html reads it from here)
                             var history = [];
                             try {
                                 history = JSON.parse(localStorage.getItem('order_history')) || [];
@@ -4156,9 +4034,9 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                             //     window.trackACDLPurchase(orderData);
                             // }
 
-                            // Fireworks / confetti explosion
-                            triggerConfettiBurst();
-                            showPremiumToast('Order confirmed! Invoice & Tracking sent to ' + emailVal, 'success');
+                            // Marks the confirmation page's first view so reloads can be told apart.
+                            try { sessionStorage.setItem('gs-last-order-id', orderId); } catch (err) {}
+                            window.location.replace('order-confirmation.html?orderId=' + encodeURIComponent(orderId));
                         }
 
                         // Create order through BackendService or Supabase if available
@@ -4191,6 +4069,132 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             }, 800);
 
         });
+    }
+
+    // ====================================================================
+    // ORDER CONFIRMATION (THANK-YOU) PAGE
+    // The order is resolved in the page <head> (window.gsOrderConfirmation)
+    // before Adobe Launch loads; this only renders it.
+    // ====================================================================
+    function initOrderConfirmation() {
+        var $page = $('#orderConfirmationPage');
+        if (!$page.length) return;
+
+        var conf = window.gsOrderConfirmation;
+        var order = conf && conf.order;
+        if (!order) {
+            $('#confirmEmptyState').show();
+            return;
+        }
+
+        var esc = function(v) { return $('<div>').text(v == null ? '' : String(v)).html(); };
+        var money = function(n) { return '$' + (parseFloat(n) || 0).toFixed(2); };
+        var created = order.created_at ? new Date(order.created_at) : new Date();
+        var fmtDate = function(d) { return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); };
+        var isExpress = /express/i.test(order.shipping_method || '');
+        var eta = new Date(created.getTime() + 86400000 * (isExpress ? 2 : 5));
+        var firstName = String(order.customer_name || '').trim().split(/\s+/)[0];
+
+        $('#confirmGreeting').text(firstName ? 'Thank you, ' + firstName + '!' : 'Thank you for your order!');
+        $('#receiptEmail').text(order.email || 'your inbox');
+        $('#receiptOrderId').text(order.order_id);
+        $('#receiptTrackingNumber').text(order.tracking_number || '—');
+        $('#receiptDate').text(fmtDate(created));
+        $('#receiptEta').text(fmtDate(eta));
+        $('#receiptPayment').text(String(order.payment_method || '—').replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, function(c) { return c.toUpperCase(); }));
+        $('#receiptShippingMethod').text(order.shipping_method || 'Standard Delivery');
+        $('#receiptAddress').text(order.shipping_address || '');
+
+        var rows = (order.items || []).map(function(item) {
+            var qty = parseInt(item.quantity || 1, 10);
+            var lineTotal = typeof item.priceTotal === 'number' ? item.priceTotal : (parseFloat(item.priceValue) || 0) * qty;
+            var variant = [item.size, item.color].filter(function(v) { return v && v !== 'undefined'; }).join(' / ');
+            return '<li class="gs-confirm-item">' +
+                (item.image ? '<img src="' + esc(item.image) + '" alt="" loading="lazy">' : '<span class="gs-confirm-item-ph"><i class="zmdi zmdi-shopping-basket"></i></span>') +
+                '<div class="gs-confirm-item-info">' +
+                '  <span class="gs-confirm-item-name">' + esc(item.name) + '</span>' +
+                '  <span class="gs-confirm-item-meta">' + (variant ? esc(variant) + ' · ' : '') + 'Qty ' + qty + ' · <code>' + esc(item.SKU || item.sku || '') + '</code></span>' +
+                '</div>' +
+                '<span class="gs-confirm-item-price">' + money(lineTotal) + '</span>' +
+                '</li>';
+        });
+        $('#receiptTableBody').html(rows.join(''));
+        $('#receiptItemCount').text((order.items || []).reduce(function(s, i) { return s + parseInt(i.quantity || 1, 10); }, 0));
+
+        $('#receiptSubtotal').text(money(order.subtotal));
+        if (parseFloat(order.discount) > 0) {
+            $('#receiptDiscountRow').show();
+            $('#receiptDiscount').text('- ' + money(order.discount));
+        }
+        $('#receiptShipping').text(parseFloat(order.shipping_fee) > 0 ? money(order.shipping_fee) : 'Free');
+        $('#receiptTax').text(money(order.tax));
+        $('#receiptTotal').text(money(order.total));
+
+        $('#confirmContent').show();
+        document.title = 'Order Confirmed · ' + order.order_id + ' | GaneshStore';
+
+        $('#btnPrintInvoice').on('click', function(e) {
+            e.preventDefault();
+            window.print();
+        });
+
+        $('#btnCopyOrderId').on('click', function() {
+            var $btn = $(this);
+            var done = function() {
+                $btn.addClass('is-copied').find('i').attr('class', 'zmdi zmdi-check');
+                setTimeout(function() { $btn.removeClass('is-copied').find('i').attr('class', 'zmdi zmdi-copy'); }, 1600);
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(order.order_id).then(done, done);
+            } else {
+                done();
+            }
+        });
+
+        window.openTrackingModal = function() {
+            var milestones = [
+                { title: 'Order Confirmed', desc: 'Payment verified & order queued', done: true, time: fmtDate(created) },
+                { title: 'Quality Verification', desc: 'Hand-inspected by GaneshStore Atelier', done: true, time: 'In progress' },
+                { title: 'Dispatched', desc: 'Handed over to ' + (isExpress ? 'Express Priority' : 'Standard') + ' carrier', done: false, time: 'Pending' },
+                { title: 'Out for Delivery', desc: 'Assigned to regional courier', done: false, time: 'Pending' },
+                { title: 'Delivered', desc: 'Direct-to-door delivery', done: false, time: 'Estimated ' + fmtDate(eta) }
+            ];
+            $('#trk-number').text(order.tracking_number || '—');
+            $('#trk-est-delivery').text(fmtDate(eta));
+            $('#trk-timeline-container').html(milestones.map(function(m) {
+                return '<div class="tracking-item ' + (m.done ? 'completed' : '') + '">' +
+                    '  <div class="tracking-item-dot"><i class="zmdi ' + (m.done ? 'zmdi-check' : 'zmdi-circle-o') + '"></i></div>' +
+                    '  <div class="tracking-item-content"><h5>' + m.title + '</h5><p>' + m.desc + '</p><span class="tracking-time">' + m.time + '</span></div>' +
+                    '</div>';
+            }).join(''));
+            $('#orderTrackingModal').fadeIn(200);
+        };
+        window.closeTrackingModal = function() {
+            $('#orderTrackingModal').fadeOut(200);
+        };
+        $('#btnTrackThisPackage').on('click', function(e) {
+            e.preventDefault();
+            window.openTrackingModal();
+        });
+        $(document).on('keydown', function(e) {
+            if (e.key === 'Escape') window.closeTrackingModal();
+        });
+
+        var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (conf.firstView && !reduceMotion) {
+            var colors = ['#0f766e', '#717fe0', '#ff3366', '#ffd700', '#3081ed'];
+            for (var i = 0; i < 60; i++) {
+                var size = Math.floor(Math.random() * 7) + 6;
+                $('<div class="confetti-particle"></div>').css({
+                    'background-color': colors[i % colors.length],
+                    left: (Math.random() * 100) + '%',
+                    width: size + 'px',
+                    height: size + 'px',
+                    'animation-delay': (Math.random() * 1.6) + 's',
+                    'animation-iteration-count': 1
+                }).appendTo('body').delay(4500).queue(function() { $(this).remove(); });
+            }
+        }
     }
 
     /*==================================================================
@@ -4701,18 +4705,18 @@ function initStickyPDPBar() {
 
     var $bar = $('#sticky-pdp-bar');
 
-    // Show only once the main CTA has scrolled out of view above the fold
-    if ('IntersectionObserver' in window) {
-        new IntersectionObserver(function(entries) {
-            var entry = entries[0];
-            $bar.toggleClass('visible', !entry.isIntersecting && entry.boundingClientRect.top < 0);
-        }, { threshold: 0 }).observe($addCartBtn[0]);
-    } else {
-        var btnTop = $addCartBtn.offset().top + $addCartBtn.outerHeight();
-        $(window).on('scroll', function() {
-            $bar.toggleClass('visible', $(window).scrollTop() > btnTop);
-        });
-    }
+    // Also handle jumps from below to above the viewport, which an intersection-only observer misses.
+    var pendingBarUpdate = false;
+    var updateBar = function() {
+        pendingBarUpdate = false;
+        $bar.toggleClass('visible', $addCartBtn[0].getBoundingClientRect().bottom <= 0);
+    };
+    $(window).on('scroll resize', function() {
+        if (pendingBarUpdate) return;
+        pendingBarUpdate = true;
+        requestAnimationFrame(updateBar);
+    });
+    updateBar();
 
     $(document).off('click', '.js-sticky-add-cart').on('click', '.js-sticky-add-cart', function() {
         var $mainBtn = $addCartBtn;

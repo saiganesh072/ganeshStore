@@ -31,6 +31,7 @@ console.log('===================================================================
 // -----------------------------------------------------------------------------
 console.log('--- Suite 1: HTML Architecture & Markup Integrity ---');
 const checkoutHtml = fs.readFileSync(path.join(__dirname, 'checkout.html'), 'utf8');
+const confirmHtml = fs.readFileSync(path.join(__dirname, 'order-confirmation.html'), 'utf8');
 const cartHtml = fs.readFileSync(path.join(__dirname, 'shoping-cart.html'), 'utf8');
 const mainCss = fs.readFileSync(path.join(__dirname, 'css', 'main.css'), 'utf8');
 const mainJs = fs.readFileSync(path.join(__dirname, 'js', 'main.js'), 'utf8');
@@ -63,9 +64,11 @@ assert(checkoutHtml.includes('cod-info-box') && checkoutHtml.includes('zero extr
 // 6. Summary Card, Coupons & Receipt
 assert(checkoutHtml.includes('activeCouponPill') && checkoutHtml.includes('btnRemoveCoupon'), 'Checkout order summary contains dynamic active coupon pill with remove button');
 assert(checkoutHtml.includes('checkoutTaxAmount'), 'Checkout order summary contains sales tax calculation line');
-assert(checkoutHtml.includes('receiptTrackingNumber') && checkoutHtml.includes('btnTrackThisPackage'), 'Receipt screen contains live tracking number and Track Package button');
-assert(checkoutHtml.includes('orderTrackingModal'), 'Checkout contains live interactive order tracking modal');
-assert(checkoutHtml.includes('btnPrintInvoice'), 'Receipt screen contains Print Invoice button');
+assert(confirmHtml.includes('receiptTrackingNumber') && confirmHtml.includes('btnTrackThisPackage'), 'Confirmation page contains live tracking number and Track Package button');
+assert(confirmHtml.includes('orderTrackingModal'), 'Confirmation page contains live interactive order tracking modal');
+assert(confirmHtml.includes('btnPrintInvoice'), 'Confirmation page contains Print Invoice button');
+assert(confirmHtml.indexOf('window.gsOrderConfirmation') > -1 && confirmHtml.indexOf('window.gsOrderConfirmation') < confirmHtml.indexOf('assets.adobedtm.com'), 'Confirmation order data is resolved before Adobe Launch loads');
+assert(mainJs.includes("order-confirmation.html?orderId="), 'Checkout redirects to the separate order confirmation page');
 
 // 7. Shopping Cart Markup
 assert(cartHtml.includes('wrap-table-shopping-cart'), 'Shopping cart has table container');
