@@ -1,0 +1,769 @@
+/* ==========================================================================
+   GaneshStore Experience Layer
+   Frosted-glass surfaces (iOS / HyperOS style) + spring motion.
+   Loaded after main.css on every page. Glass is used only where there is
+   content behind a surface to blur: sticky/floating chrome, overlays, sheets.
+   ========================================================================== */
+
+:root {
+  --gs-ink: #111827;
+  --gs-ink-soft: #4b5563;
+  --gs-muted: #6b7280;
+  --gs-accent: #0f766e;
+  --gs-accent-2: #717fe0;
+
+  --gs-glass-bg: rgba(255, 255, 255, 0.62);
+  --gs-glass-bg-strong: rgba(255, 255, 255, 0.78);
+  --gs-glass-border: rgba(255, 255, 255, 0.7);
+  --gs-glass-filter: blur(28px) saturate(180%);
+  --gs-glass-sheen: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  --gs-glass-shadow: 0 0 0 0.5px rgba(15, 23, 42, 0.06), 0 16px 44px rgba(15, 23, 42, 0.14);
+
+  --gs-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --gs-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --gs-dur-fast: 0.2s;
+  --gs-dur: 0.45s;
+  --gs-dur-slow: 0.7s;
+}
+
+/* Without backdrop-filter support, glass surfaces fall back to near-opaque white */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root {
+    --gs-glass-bg: rgba(255, 255, 255, 0.97);
+    --gs-glass-bg-strong: rgba(255, 255, 255, 0.98);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   1. HEADER: HyperOS-style frosted bar once scrolled
+   -------------------------------------------------------------------------- */
+.fix-menu-desktop .wrap-menu-desktop {
+  background: var(--gs-glass-bg) !important;
+  backdrop-filter: var(--gs-glass-filter) !important;
+  -webkit-backdrop-filter: var(--gs-glass-filter) !important;
+  border-bottom: 0.5px solid rgba(15, 23, 42, 0.08) !important;
+  box-shadow: var(--gs-glass-sheen), 0 8px 30px rgba(15, 23, 42, 0.06) !important;
+}
+
+/* Modern line icons for header actions (rendered via mask so any script can re-render the <i>) */
+.wrap-icon-header .zmdi-search::before,
+.wrap-icon-header .zmdi-shopping-cart::before,
+.wrap-icon-header .zmdi-account::before {
+  content: '' !important;
+  display: block;
+  width: 23px;
+  height: 23px;
+  background-color: currentColor;
+  -webkit-mask: var(--gs-icon) center / contain no-repeat;
+  mask: var(--gs-icon) center / contain no-repeat;
+}
+
+.wrap-icon-header .zmdi-search {
+  --gs-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.6-3.6'/%3E%3C/svg%3E");
+}
+
+.wrap-icon-header .zmdi-shopping-cart {
+  --gs-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 8z'/%3E%3Cpath d='M9 10V7a3 3 0 0 1 6 0v3'/%3E%3C/svg%3E");
+}
+
+.wrap-icon-header .zmdi-account {
+  --gs-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4.5 20.5c0-3.9 3.4-6.5 7.5-6.5s7.5 2.6 7.5 6.5'/%3E%3C/svg%3E");
+}
+
+.wrap-icon-header .icon-header-item {
+  transition: color var(--gs-dur-fast) ease, transform var(--gs-dur-fast) var(--gs-ease-spring) !important;
+}
+
+.wrap-icon-header .icon-header-item:active {
+  transform: scale(0.88);
+}
+
+/* --------------------------------------------------------------------------
+   2. MOBILE MENU: floating glass sheet with staggered items
+   -------------------------------------------------------------------------- */
+@media (max-width: 991px) {
+  .menu-mobile.gs-menu {
+    display: block !important;
+    position: fixed;
+    top: var(--gs-mm-top, 72px);
+    left: 12px;
+    right: 12px;
+    width: auto;
+    z-index: 1200;
+    max-height: calc(100vh - var(--gs-mm-top, 72px) - 24px);
+    overflow-y: auto;
+    border-radius: 24px;
+    background: var(--gs-glass-bg-strong);
+    backdrop-filter: var(--gs-glass-filter);
+    -webkit-backdrop-filter: var(--gs-glass-filter);
+    border: 1px solid var(--gs-glass-border);
+    box-shadow: var(--gs-glass-sheen), var(--gs-glass-shadow);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-12px) scale(0.97);
+    transform-origin: top center;
+    transition: opacity 0.3s ease, transform 0.45s var(--gs-ease-out), visibility 0s linear 0.45s;
+  }
+
+  .gs-menu-open .menu-mobile.gs-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition: opacity 0.3s ease, transform 0.5s var(--gs-ease-spring), visibility 0s;
+  }
+
+  .menu-mobile.gs-menu .main-menu-m {
+    background: transparent;
+    padding: 10px 8px 6px;
+  }
+
+  .menu-mobile.gs-menu .main-menu-m > li {
+    color: var(--gs-ink);
+    border-radius: 14px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.35s ease, transform 0.45s var(--gs-ease-out), background-color 0.2s ease;
+  }
+
+  .gs-menu-open .menu-mobile.gs-menu .main-menu-m > li {
+    opacity: 1;
+    transform: none;
+  }
+
+  .gs-menu-open .menu-mobile.gs-menu .main-menu-m > li:nth-child(1) { transition-delay: 0.04s; }
+  .gs-menu-open .menu-mobile.gs-menu .main-menu-m > li:nth-child(2) { transition-delay: 0.08s; }
+  .gs-menu-open .menu-mobile.gs-menu .main-menu-m > li:nth-child(3) { transition-delay: 0.12s; }
+  .gs-menu-open .menu-mobile.gs-menu .main-menu-m > li:nth-child(4) { transition-delay: 0.16s; }
+  .gs-menu-open .menu-mobile.gs-menu .main-menu-m > li:nth-child(5) { transition-delay: 0.2s; }
+  .gs-menu-open .menu-mobile.gs-menu .main-menu-m > li:nth-child(6) { transition-delay: 0.24s; }
+
+  .menu-mobile.gs-menu .main-menu-m > li:active {
+    background-color: rgba(15, 23, 42, 0.05);
+  }
+
+  .menu-mobile.gs-menu .main-menu-m > li > a {
+    display: flex;
+    align-items: center;
+    color: var(--gs-ink) !important;
+    font-family: Poppins-Medium, sans-serif;
+    font-size: 17px;
+    line-height: 1.4;
+    padding: 13px 14px;
+  }
+
+  .menu-mobile.gs-menu .main-menu-m > li.active-menu > a,
+  .menu-mobile.gs-menu .main-menu-m > li > a[aria-current="page"] {
+    color: var(--gs-accent) !important;
+  }
+
+  .menu-mobile.gs-menu .arrow-main-menu-m {
+    color: var(--gs-muted);
+    top: 6px;
+  }
+
+  .menu-mobile.gs-menu .sub-menu-m {
+    background: rgba(15, 23, 42, 0.03);
+    border-radius: 12px;
+    margin: 0 6px 8px;
+  }
+
+  .menu-mobile.gs-menu .sub-menu-m a {
+    color: var(--gs-ink-soft) !important;
+  }
+
+  /* Quick actions row injected by experience.js */
+  .gs-menu-quick {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 6px 12px 14px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.35s ease 0.24s, transform 0.45s var(--gs-ease-out) 0.24s;
+  }
+
+  .gs-menu-open .gs-menu-quick {
+    opacity: 1;
+    transform: none;
+  }
+
+  .gs-menu-quick a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 6px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.7);
+    border: 0.5px solid rgba(15, 23, 42, 0.08);
+    color: var(--gs-ink);
+    font-family: Poppins-Medium, sans-serif;
+    font-size: 12px;
+    transition: transform 0.2s var(--gs-ease-spring), background-color 0.2s ease;
+  }
+
+  .gs-menu-quick a:active {
+    transform: scale(0.95);
+  }
+
+  .gs-menu-quick i {
+    font-size: 20px;
+    color: var(--gs-accent);
+  }
+
+  .gs-menu-quick .gs-count {
+    font-size: 11px;
+    color: var(--gs-muted);
+  }
+
+  .gs-menu-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 1150;
+    background: rgba(15, 23, 42, 0.18);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+  }
+
+  .gs-menu-open .gs-menu-scrim {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease, visibility 0s;
+  }
+
+  /* Keep the bar (logo + close button) above the scrim */
+  .gs-menu-open .wrap-header-mobile {
+    z-index: 1201;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   3. PRODUCT CARDS: glass quick-view pill, soft image lift
+   -------------------------------------------------------------------------- */
+.block2 .block2-pic {
+  border-radius: 18px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.block2 .block2-pic img {
+  transition: transform 0.8s var(--gs-ease-out) !important;
+}
+
+.block2:hover .block2-pic img {
+  transform: scale(1.045);
+}
+
+.block2 .block2-btn {
+  background: rgba(255, 255, 255, 0.58) !important;
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+  box-shadow: var(--gs-glass-sheen), 0 8px 24px rgba(15, 23, 42, 0.14) !important;
+  color: var(--gs-ink) !important;
+  border-radius: 999px !important;
+  font-family: Poppins-Medium, sans-serif;
+  transition: transform 0.45s var(--gs-ease-spring), opacity 0.3s ease, background-color 0.2s ease !important;
+}
+
+.block2 .block2-btn:hover {
+  background: rgba(17, 24, 39, 0.82) !important;
+  color: #fff !important;
+  border-color: rgba(17, 24, 39, 0.82) !important;
+}
+
+/* --------------------------------------------------------------------------
+   4. QUICK VIEW: blurred backdrop + spring sheet
+   -------------------------------------------------------------------------- */
+.wrap-modal1 {
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+}
+
+.wrap-modal1 .overlay-modal1 {
+  background: rgba(15, 23, 42, 0.32);
+  opacity: 1;
+}
+
+.wrap-modal1 .how-pos3-parent {
+  border-radius: 28px;
+  box-shadow: 0 30px 80px rgba(15, 23, 42, 0.25);
+  transform: translateY(28px) scale(0.97);
+  transition: transform 0.55s var(--gs-ease-spring);
+}
+
+.wrap-modal1.show-modal1 .how-pos3-parent {
+  transform: none;
+}
+
+.wrap-modal1 .how-pos3 {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 0 0 0.5px rgba(15, 23, 42, 0.1), 0 6px 16px rgba(15, 23, 42, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 16px;
+  right: 16px;
+}
+
+.wrap-modal1 .how-pos3 img {
+  width: 14px;
+}
+
+/* --------------------------------------------------------------------------
+   5. SHOP: sticky glass toolbar, refined category pills, empty state
+   -------------------------------------------------------------------------- */
+.gs-catalog-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  margin-left: -16px;
+  margin-right: -16px;
+  padding: 6px 16px !important;
+  margin-bottom: 40px;
+  border-radius: 22px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, backdrop-filter 0.3s ease;
+}
+
+@media (min-width: 992px) {
+  .gs-catalog-toolbar {
+    top: 82px;
+  }
+}
+
+.gs-catalog-toolbar.is-stuck {
+  background: var(--gs-glass-bg);
+  backdrop-filter: var(--gs-glass-filter);
+  -webkit-backdrop-filter: var(--gs-glass-filter);
+  box-shadow: var(--gs-glass-sheen), 0 0 0 0.5px rgba(15, 23, 42, 0.07), 0 12px 32px rgba(15, 23, 42, 0.1);
+}
+
+.gs-catalog-toolbar.is-stuck .panel-filter {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.gs-catalog-sentinel {
+  height: 1px;
+  margin-bottom: -1px;
+}
+
+.filter-tope-group button.how-active1 {
+  background: var(--gs-ink) !important;
+  border-color: var(--gs-ink) !important;
+  box-shadow: 0 6px 16px rgba(17, 24, 39, 0.18) !important;
+}
+
+.filter-tope-group button {
+  transition: background-color 0.25s ease, color 0.25s ease, transform 0.35s var(--gs-ease-spring), box-shadow 0.25s ease !important;
+}
+
+.filter-tope-group button:active {
+  transform: scale(0.95);
+}
+
+.no-results-message {
+  text-align: center;
+  padding: 64px 20px 24px;
+  width: 100%;
+  animation: gsFadeUp 0.6s var(--gs-ease-out) both;
+}
+
+.no-results-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: var(--gs-accent);
+  background: rgba(15, 118, 110, 0.08);
+}
+
+.no-results-title {
+  font-family: Poppins-SemiBold, Poppins-Medium, sans-serif;
+  font-size: 20px;
+  color: var(--gs-ink);
+  margin-bottom: 6px;
+}
+
+.no-results-text {
+  font-family: Poppins-Regular, sans-serif;
+  font-size: 14px;
+  color: var(--gs-muted);
+  margin-bottom: 22px;
+}
+
+.no-results-btn {
+  font-family: Poppins-Medium, sans-serif;
+  font-size: 13px;
+  padding: 11px 26px;
+  border-radius: 999px;
+  background: var(--gs-ink);
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.3s var(--gs-ease-spring), background-color 0.2s ease;
+}
+
+.no-results-btn:hover {
+  background: var(--gs-accent);
+  transform: translateY(-1px);
+}
+
+/* --------------------------------------------------------------------------
+   6. PRODUCT PAGE: option values, accessible swatches, floating buy bar
+   -------------------------------------------------------------------------- */
+.premium-option-label .gs-option-value {
+  margin-left: 6px;
+  color: var(--gs-ink);
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: Poppins-Medium, sans-serif;
+  animation: gsFadeIn 0.3s ease both;
+}
+
+.size-pill-item,
+.color-swatch-item {
+  transition: transform 0.35s var(--gs-ease-spring), box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease !important;
+}
+
+.size-pill-item:active,
+.color-swatch-item:active {
+  transform: scale(0.9) !important;
+}
+
+.size-pill-item:focus-visible,
+.color-swatch-item:focus-visible {
+  outline: 2.5px solid var(--gs-accent-2);
+  outline-offset: 3px;
+}
+
+/* Floating glass capsule. Replaces the top bar that was hidden under the fixed header */
+.sticky-pdp-bar {
+  top: auto !important;
+  bottom: 18px;
+  left: 50% !important;
+  width: min(720px, calc(100% - 24px)) !important;
+  height: auto !important;
+  padding: 10px 10px 10px 12px !important;
+  border-radius: 999px !important;
+  background: var(--gs-glass-bg-strong) !important;
+  backdrop-filter: var(--gs-glass-filter) !important;
+  -webkit-backdrop-filter: var(--gs-glass-filter) !important;
+  border: 1px solid var(--gs-glass-border) !important;
+  box-shadow: var(--gs-glass-sheen), var(--gs-glass-shadow) !important;
+  z-index: 1050 !important;
+  transform: translate(-50%, calc(100% + 40px)) !important;
+  opacity: 0;
+  transition: transform 0.55s var(--gs-ease-spring), opacity 0.3s ease !important;
+}
+
+.sticky-pdp-bar.visible {
+  transform: translate(-50%, 0) !important;
+  opacity: 1;
+}
+
+.sticky-pdp-bar .sticky-pdp-left {
+  gap: 12px;
+  min-width: 0;
+}
+
+.sticky-pdp-bar .sticky-pdp-meta {
+  min-width: 0;
+}
+
+.sticky-pdp-bar .sticky-pdp-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sticky-pdp-bar .sticky-pdp-title {
+  font-family: Poppins-Medium, sans-serif;
+  font-size: 14px;
+  color: var(--gs-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sticky-pdp-bar .sticky-pdp-price {
+  font-family: Poppins-Regular, sans-serif;
+  font-size: 12.5px;
+  color: var(--gs-muted);
+}
+
+.sticky-pdp-bar .sticky-pdp-right {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.sticky-pdp-btn {
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 999px;
+  background: var(--gs-ink);
+  color: #fff;
+  font-family: Poppins-Medium, sans-serif;
+  font-size: 13px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 0.3s var(--gs-ease-spring), background-color 0.2s ease;
+}
+
+.sticky-pdp-btn:hover {
+  background: var(--gs-accent);
+}
+
+.sticky-pdp-btn:active {
+  transform: scale(0.95);
+}
+
+.sticky-pdp-btn--ghost {
+  background: rgba(15, 23, 42, 0.06);
+  color: var(--gs-ink);
+}
+
+.sticky-pdp-btn--ghost:hover {
+  background: rgba(15, 23, 42, 0.12);
+  color: var(--gs-ink);
+}
+
+@media (max-width: 575px) {
+  .sticky-pdp-bar {
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    border-radius: 24px !important;
+  }
+  .sticky-pdp-bar .sticky-pdp-meta,
+  .sticky-pdp-btn--ghost {
+    display: none;
+  }
+  .sticky-pdp-bar .sticky-pdp-right {
+    flex: 1;
+    justify-content: flex-end;
+  }
+  .sticky-pdp-btn {
+    flex: 1;
+    max-width: 260px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   7. OVERLAYS & FLOATING CONTROLS
+   -------------------------------------------------------------------------- */
+.luxury-search-overlay {
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(36px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(36px) saturate(180%) !important;
+}
+
+.luxury-search-overlay .luxury-search-input-wrap {
+  transform: translateY(-14px) scale(0.98);
+  opacity: 0;
+  transition: transform 0.55s var(--gs-ease-spring) 0.05s, opacity 0.35s ease 0.05s;
+}
+
+.luxury-search-overlay.active .luxury-search-input-wrap {
+  transform: none;
+  opacity: 1;
+}
+
+.scroll-progress-btn {
+  background: var(--gs-glass-bg-strong) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid var(--gs-glass-border) !important;
+  box-shadow: var(--gs-glass-sheen), 0 10px 28px rgba(15, 23, 42, 0.14) !important;
+}
+
+/* Lift the back-to-top button while the floating buy bar is visible */
+.sticky-pdp-bar.visible ~ .scroll-progress-btn {
+  transform: translateY(-78px);
+}
+
+/* --------------------------------------------------------------------------
+   8. CHECKOUT: quick-fill card + express pay
+   -------------------------------------------------------------------------- */
+.gs-quickfill {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  padding: 14px 14px 14px 16px;
+  border-radius: 20px;
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgba(113, 127, 224, 0.12) 0%, rgba(113, 127, 224, 0) 55%),
+    radial-gradient(120% 140% at 100% 100%, rgba(15, 118, 110, 0.12) 0%, rgba(15, 118, 110, 0) 55%),
+    #fff;
+  border: 1px solid rgba(15, 23, 42, 0.07);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+
+.gs-quickfill-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--gs-accent-2) 0%, var(--gs-accent) 100%);
+  box-shadow: 0 8px 18px rgba(113, 127, 224, 0.3);
+}
+
+.gs-quickfill-copy {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.gs-quickfill-eyebrow {
+  display: inline-block;
+  font-family: Poppins-Medium, sans-serif;
+  font-size: 10.5px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--gs-accent-2);
+  background: rgba(113, 127, 224, 0.1);
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-bottom: 4px;
+}
+
+.gs-quickfill-title {
+  display: block;
+  font-family: Poppins-SemiBold, Poppins-Medium, sans-serif;
+  font-size: 15px;
+  color: var(--gs-ink);
+}
+
+.gs-quickfill-text {
+  margin: 2px 0 0;
+  font-family: Poppins-Regular, sans-serif;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--gs-muted);
+}
+
+.gs-quickfill-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.gs-qf-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  font-family: Poppins-Medium, sans-serif;
+  font-size: 13px;
+  color: #fff;
+  background: var(--gs-ink);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.3s var(--gs-ease-spring), background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.gs-qf-btn:hover {
+  background: var(--gs-accent);
+  box-shadow: 0 8px 18px rgba(15, 118, 110, 0.25);
+}
+
+.gs-qf-btn:active {
+  transform: scale(0.95);
+}
+
+.gs-qf-btn--ghost {
+  color: var(--gs-ink);
+  background: rgba(15, 23, 42, 0.06);
+}
+
+.gs-qf-btn--ghost:hover {
+  color: var(--gs-ink);
+  background: rgba(15, 23, 42, 0.11);
+  box-shadow: none;
+}
+
+@media (max-width: 575px) {
+  .gs-quickfill-actions {
+    width: 100%;
+  }
+  .gs-qf-btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+.express-checkout-box {
+  border-radius: 20px !important;
+  border: 1px solid rgba(15, 23, 42, 0.07) !important;
+  background: #fff !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05) !important;
+}
+
+.btn-express-pay {
+  border-radius: 999px !important;
+  transition: transform 0.3s var(--gs-ease-spring), box-shadow 0.2s ease !important;
+}
+
+.btn-express-pay:active {
+  transform: scale(0.97);
+}
+
+/* --------------------------------------------------------------------------
+   9. MOTION: scroll reveal (only when JS opted in) + shared keyframes
+   -------------------------------------------------------------------------- */
+.gs-motion .gs-reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.7s var(--gs-ease-out), transform 0.8s var(--gs-ease-out);
+  transition-delay: var(--gs-delay, 0s);
+}
+
+.gs-motion .gs-reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes gsFadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes gsFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gs-motion .gs-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .sticky-pdp-bar,
+  .menu-mobile.gs-menu,
+  .menu-mobile.gs-menu .main-menu-m > li,
+  .gs-menu-quick,
+  .wrap-modal1 .how-pos3-parent,
+  .block2 .block2-pic img {
+    transition-duration: 0.01ms !important;
+  }
+}

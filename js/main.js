@@ -22,6 +22,33 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
     document.head.appendChild(script);
 }
 
+// Experience layer (glass UI + motion). Loaded from here so every page gets it without per-page tags.
+(function () {
+    var self = document.currentScript;
+    var base = self && self.src ? self.src.replace(/js\/main\.js(\?.*)?$/, '') : '';
+    var ver = self && self.src && self.src.indexOf('?') > -1 ? self.src.split('?')[1] : 'v=1';
+    if (!document.querySelector('link[data-gs-experience]')) {
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = base + 'css/experience.css?' + ver + '&x=1';
+        link.setAttribute('data-gs-experience', '');
+        document.head.appendChild(link);
+    }
+    if (!document.querySelector('script[data-gs-experience]')) {
+        var load = function () {
+            var s = document.createElement('script');
+            s.src = base + 'js/experience.js?' + ver + '&x=1';
+            s.setAttribute('data-gs-experience', '');
+            document.body.appendChild(s);
+        };
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', load);
+        } else {
+            load();
+        }
+    }
+})();
+
 (function ($) {
     "use strict";
 
@@ -1135,18 +1162,20 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             $('.filter-col2 a').removeClass('filter-link-active');
             $link.addClass('filter-link-active');
             
-            if (text.indexOf('all') > -1) {
+            // Map by the range's lower bound; substring matching misfires ("$50.00" contains "0.00").
+            var lowerBound = parseFloat((text.match(/\$?\s*(\d+(?:\.\d+)?)/) || [])[1]);
+            if (text.indexOf('all') > -1 || isNaN(lowerBound)) {
                 window.activeFilters.priceRange = 'all';
-            } else if (text.indexOf('0.00') > -1) {
-                window.activeFilters.priceRange = '0-50';
-            } else if (text.indexOf('50.00 - $100.00') > -1 || text.indexOf('50.00') > -1) {
-                window.activeFilters.priceRange = '50-100';
-            } else if (text.indexOf('100.00 - $150.00') > -1 || text.indexOf('100.00') > -1) {
-                window.activeFilters.priceRange = '100-150';
-            } else if (text.indexOf('150.00 - $200.00') > -1 || text.indexOf('150.00') > -1) {
-                window.activeFilters.priceRange = '150-200';
-            } else if (text.indexOf('200.00+') > -1 || text.indexOf('200+') > -1) {
+            } else if (lowerBound >= 200) {
                 window.activeFilters.priceRange = '200+';
+            } else if (lowerBound >= 150) {
+                window.activeFilters.priceRange = '150-200';
+            } else if (lowerBound >= 100) {
+                window.activeFilters.priceRange = '100-150';
+            } else if (lowerBound >= 50) {
+                window.activeFilters.priceRange = '50-100';
+            } else {
+                window.activeFilters.priceRange = '0-50';
             }
             
             window.executeCombinedFilters();
@@ -1457,22 +1486,20 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         if (!$container || !$container.length) return;
         // Small delay to let Isotope finish layout
         setTimeout(function() {
-            var visibleItems = $container.find('.isotope-item:not(.isotope-hidden)').length;
-            // Fallback: check display style
-            if (visibleItems === 0) {
-                visibleItems = $container.children().filter(function() {
-                    return $(this).css('display') !== 'none' && !$(this).hasClass('isotope-hidden');
-                }).length;
-            }
+            // Isotope v3 never adds an "isotope-hidden" class; ask the instance what it kept.
+            var iso = $container.data('isotope');
+            var visibleItems = iso ? iso.filteredItems.length : $container.children().filter(function() {
+                return $(this).css('display') !== 'none';
+            }).length;
             var $emptyMsg = $container.siblings('.no-results-message');
             if (visibleItems === 0) {
                 if (!$emptyMsg.length) {
                     $emptyMsg = $(
-                        '<div class="no-results-message" style="text-align: center; padding: 60px 20px; width: 100%;">' +
-                        '  <i class="zmdi zmdi-search" style="font-size: 48px; color: #ccc; display: block; margin-bottom: 16px;"></i>' +
-                        '  <h4 style="font-family: Poppins-SemiBold; font-size: 20px; color: #333; margin-bottom: 8px;">No products found</h4>' +
-                        '  <p style="font-family: Poppins-Regular; font-size: 14px; color: #888; margin-bottom: 24px;">Try adjusting your filters or search terms.</p>' +
-                        '  <button class="js-clear-all-filters" style="font-family: Poppins-Medium; font-size: 13px; padding: 10px 28px; border: 2px solid #717fe0; color: #717fe0; background: transparent; border-radius: 25px; cursor: pointer; transition: all 0.3s cubic-bezier(0.25,1,0.5,1);" onmouseover="this.style.background=\'#717fe0\';this.style.color=\'#fff\';" onmouseout="this.style.background=\'transparent\';this.style.color=\'#717fe0\';">Clear All Filters</button>' +
+                        '<div class="no-results-message" role="status">' +
+                        '  <span class="no-results-icon"><i class="zmdi zmdi-search"></i></span>' +
+                        '  <h4 class="no-results-title">No products found</h4>' +
+                        '  <p class="no-results-text">Try another category, price range or search term.</p>' +
+                        '  <button type="button" class="js-clear-all-filters no-results-btn">Clear all filters</button>' +
                         '</div>'
                     );
                     $container.after($emptyMsg);
@@ -1482,6 +1509,8 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                         window.activeFilters = { category: '*', priceRange: 'all', color: 'all', tag: 'all', searchQuery: '' };
                         $('.filter-tope-group button').removeClass('how-active1');
                         $('.filter-tope-group button[data-filter="*"]').addClass('how-active1');
+                        $('.filter-col1 a, .filter-col2 a, .filter-col3 a').removeClass('filter-link-active');
+                        $('.filter-col4 a').removeClass('active-tag-premium');
                         if (typeof window.executeCombinedFilters === 'function') {
                             window.executeCombinedFilters();
                         }
@@ -1493,6 +1522,12 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                         }
                     });
                 }
+                var isSaleView = /[?&]category=sale\b/i.test(window.location.search) && window.activeFilters.category === '*';
+                $emptyMsg.find('.no-results-title').text(isSaleView ? 'No sale items right now' : 'No products found');
+                $emptyMsg.find('.no-results-text').text(isSaleView
+                    ? 'New markdowns drop regularly. Browse the full collection in the meantime.'
+                    : 'Try another category, price range or search term.');
+                $emptyMsg.find('.js-clear-all-filters').text(isSaleView ? 'Browse all products' : 'Clear all filters');
                 $emptyMsg.show();
             } else {
                 $emptyMsg.hide();
@@ -1506,16 +1541,52 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         if (!isPDP) return;
 
         var pageUrl = encodeURIComponent(window.location.href);
-        var productName = encodeURIComponent($('.js-name-detail').text().trim() || document.title);
+        var productName = encodeURIComponent($('.sec-product-detail .js-name-detail').first().text().trim() || document.title);
+
+        // Google+ was shut down in 2019: turn that slot into WhatsApp, and add a copy/native-share button
+        $('.fa-google-plus').each(function() {
+            var $a = $(this).closest('a');
+            $(this).attr('class', 'fa fa-whatsapp');
+            $a.attr('data-tooltip', 'WhatsApp');
+            if (!$a.siblings('.js-share-native').length) {
+                $a.after('<a href="#" class="fs-14 cl3 hov-cl1 trans-04 lh-10 p-lr-5 p-tb-2 m-r-8 tooltip100 js-share-native" data-tooltip="Copy link" aria-label="Share or copy link"><i class="fa fa-link"></i></a>');
+            }
+        });
+
+        $(document).off('click.share').on('click.share', '.js-share-native', function(e) {
+            e.preventDefault();
+            var url = window.location.href.split('?')[0];
+            var title = decodeURIComponent(productName);
+            if (navigator.share && window.matchMedia('(pointer: coarse)').matches) {
+                navigator.share({ title: title, url: url }).catch(function() {});
+                return;
+            }
+            var done = function() { showPremiumToast('Link copied. Share <strong>' + title + '</strong> anywhere.', 'info'); };
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(url).then(done, done);
+            } else {
+                var tmp = document.createElement('input');
+                tmp.value = url;
+                document.body.appendChild(tmp);
+                tmp.select();
+                document.execCommand('copy');
+                document.body.removeChild(tmp);
+                done();
+            }
+        });
 
         // Wire up social share icons
-        $('.flex-w.flex-m.p-l-100.p-t-40 a, .flex-w.flex-r-m a').each(function() {
+        $('.sec-product-detail .premium-share-row a, .sec-product-detail a.tooltip100, .flex-w.flex-m.p-l-100.p-t-40 a').each(function() {
             var $link = $(this);
             var $icon = $link.find('i, .fa');
             if (!$icon.length) return;
             var iconClass = $icon.attr('class') || '';
 
-            if (iconClass.indexOf('fa-facebook') > -1) {
+            if (iconClass.indexOf('fa-whatsapp') > -1) {
+                $link.attr('href', 'https://wa.me/?text=' + productName + '%20' + pageUrl);
+                $link.attr('target', '_blank');
+                $link.attr('rel', 'noopener noreferrer');
+            } else if (iconClass.indexOf('fa-facebook') > -1) {
                 $link.attr('href', 'https://www.facebook.com/sharer/sharer.php?u=' + pageUrl);
                 $link.attr('target', '_blank');
                 $link.attr('rel', 'noopener noreferrer');
@@ -3029,46 +3100,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
         }
     });
 
-    /*==================================================================
-    [ Sticky Mobile Cart Action Ribbon ]*/
-    if ($('.js-addcart-detail').length > 0 && $(window).width() <= 576) {
-        var productName = $('.js-name-detail').text().trim() || 'Product';
-        var productPrice = $('.mtext-106').text().trim() || '';
-        var productImg = $('.wrap-pic-w img').first().attr('src') || '';
-        
-        var stickyBarHtml = 
-            '<div class="js-sticky-mobile-bar" style="position: fixed; bottom: -80px; left: 0; width: 100%; background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(0,0,0,0.08); box-shadow: 0 -6px 20px rgba(0,0,0,0.06); padding: 10px 20px; z-index: 999; display: flex; justify-content: space-between; align-items: center; transition: all 0.4s ease;">' +
-            '  <div style="display: flex; align-items: center; gap: 10px;">' +
-            '    <img src="' + productImg + '" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">' +
-            '    <div style="display: flex; flex-direction: column;">' +
-            '      <span style="font-family: Poppins-Medium; font-size: 12px; color: #222; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + productName + '</span>' +
-            '      <span style="font-family: Poppins-Regular; font-size: 11px; color: #888;">' + productPrice + '</span>' +
-            '    </div>' +
-            '  </div>' +
-            '  <button class="js-sticky-buy-trigger" style="background: linear-gradient(135deg, #9b51e0, #3081ed); border: none; color: #fff; padding: 8px 16px; border-radius: 20px; font-family: Poppins-Medium; font-size: 12px; cursor: pointer; box-shadow: 0 4px 10px rgba(155, 81, 224, 0.2); outline: none;">Add to Cart</button>' +
-            '</div>';
-        
-        $('body').append(stickyBarHtml);
-        
-        $(window).on('scroll', function() {
-            var $mainBtn = $('.js-addcart-detail');
-            var triggerTop = $mainBtn.offset().top + $mainBtn.outerHeight();
-            if ($(window).scrollTop() > triggerTop) {
-                $('.js-sticky-mobile-bar').css('bottom', '0');
-            } else {
-                $('.js-sticky-mobile-bar').css('bottom', '-80px');
-            }
-        });
-        
-        $(document).on('click', '.js-sticky-buy-trigger', function() {
-            var $mainBtn = $('.js-addcart-detail').first();
-            if ($mainBtn.hasClass('is-in-bag')) {
-                window.location.href = 'shoping-cart.html';
-                return;
-            }
-            $mainBtn.trigger('click');
-        });
-    }
+    // The mobile sticky ribbon was merged into the single floating #sticky-pdp-bar (see initStickyPDPBar).
 
     // 1. Dynamic Option Swatches (Color & Size) Builder
     function initPremiumPDPSwatches() {
@@ -4614,44 +4646,76 @@ $(document).ready(function() {
    10 MASTERPIECE LUXURY FEATURES - JAVASCRIPT ENGINE
    ==================================================================== */
 
+// Shared PDP helpers. Every PDP also contains a quick-view modal with its own .js-name-detail /
+// .js-addcart-detail, so always scope reads to the real product section.
+function gsIsPDP() {
+    return $('.sec-product-detail .js-addcart-detail').length > 0;
+}
+function gsCleanPrice(text) {
+    var m = String(text || '').match(/\$\s?[\d,]+(\.\d+)?/);
+    return m ? m[0].replace(/\s/g, '') : String(text || '').trim();
+}
+function gsPdpName() {
+    return $('.sec-product-detail .js-name-detail').first().text().trim();
+}
+function gsPdpPrice() {
+    return gsCleanPrice($('.sec-product-detail .mtext-106').first().text());
+}
+
+// Native free-scroll arrows for dynamically rendered .slick2 rows
+function gsBindScrollerArrows($wrap) {
+    var $track = $wrap.find('.slick2').first();
+    var step = function(dir) {
+        var card = $track.children('.item-slick2').first().outerWidth() || 300;
+        $track[0].scrollBy({ left: dir * card, behavior: 'smooth' });
+    };
+    $wrap.find('.prev-slick2').off('click').on('click', function(e) { e.preventDefault(); step(-1); });
+    $wrap.find('.next-slick2').off('click').on('click', function(e) { e.preventDefault(); step(1); });
+}
+
 // Feature 1: Sticky PDP Floating Buy Bar
 function initStickyPDPBar() {
-    var $addCartBtn = $('.js-addcart-detail');
-    if (!$addCartBtn.length) return;
+    if (!gsIsPDP()) return;
+    var $addCartBtn = $('.sec-product-detail .js-addcart-detail').first();
 
-    var pName = $('.js-name-detail').text().trim() || 'Product';
-    var pPrice = $('.mtext-106').first().text().trim() || '$58.79';
-    var pImg = $('.wrap-pic-w img').first().attr('src') || 'images/product-01.jpg';
+    var pName = gsPdpName() || 'Product';
+    var pPrice = gsPdpPrice();
+    var pImg = $('.sec-product-detail .wrap-pic-w img').first().attr('src') || 'images/product-01.jpg';
 
-    var barHtml = '<div class="sticky-pdp-bar" id="sticky-pdp-bar">' +
+    var inCart = $addCartBtn.hasClass('is-in-bag');
+    var barHtml = '<div class="sticky-pdp-bar" id="sticky-pdp-bar" role="region" aria-label="Quick purchase">' +
         '<div class="sticky-pdp-left">' +
-        '  <img src="' + pImg + '" class="sticky-pdp-thumb" alt="Thumb">' +
-        '  <div>' +
+        '  <img src="' + pImg + '" class="sticky-pdp-thumb" alt="">' +
+        '  <div class="sticky-pdp-meta">' +
         '    <div class="sticky-pdp-title">' + pName + '</div>' +
         '    <div class="sticky-pdp-price">' + pPrice + '</div>' +
         '  </div>' +
         '</div>' +
         '<div class="sticky-pdp-right">' +
-        '  <button class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04 js-sticky-add-cart" style="height: 42px; border-radius: 21px;">Add to Cart</button>' +
-        '  <button class="btn-buy-now js-sticky-buy-now" style="height: 42px;">Buy Now</button>' +
+        '  <button type="button" class="sticky-pdp-btn sticky-pdp-btn--ghost js-sticky-buy-now">Buy Now</button>' +
+        '  <button type="button" class="sticky-pdp-btn js-sticky-add-cart">' + (inCart ? 'Go to Cart' : 'Add to Cart') + '</button>' +
         '</div>' +
         '</div>';
 
     $('body').append(barHtml);
 
     var $bar = $('#sticky-pdp-bar');
-    var btnTop = $addCartBtn.offset().top + 100;
 
-    $(window).on('scroll', function() {
-        if ($(window).scrollTop() > btnTop) {
-            $bar.addClass('visible');
-        } else {
-            $bar.removeClass('visible');
-        }
-    });
+    // Show only once the main CTA has scrolled out of view above the fold
+    if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function(entries) {
+            var entry = entries[0];
+            $bar.toggleClass('visible', !entry.isIntersecting && entry.boundingClientRect.top < 0);
+        }, { threshold: 0 }).observe($addCartBtn[0]);
+    } else {
+        var btnTop = $addCartBtn.offset().top + $addCartBtn.outerHeight();
+        $(window).on('scroll', function() {
+            $bar.toggleClass('visible', $(window).scrollTop() > btnTop);
+        });
+    }
 
     $(document).off('click', '.js-sticky-add-cart').on('click', '.js-sticky-add-cart', function() {
-        var $mainBtn = $('.js-addcart-detail').first();
+        var $mainBtn = $addCartBtn;
         if ($mainBtn.hasClass('is-in-bag')) {
             window.location.href = 'shoping-cart.html';
             return;
@@ -4660,7 +4724,7 @@ function initStickyPDPBar() {
     });
 
     $(document).off('click', '.js-sticky-buy-now').on('click', '.js-sticky-buy-now', function() {
-        $('.js-addcart-detail').first().trigger('click');
+        $addCartBtn.trigger('click');
         setTimeout(function() {
             window.location.href = 'checkout.html';
         }, 400);
@@ -4768,12 +4832,13 @@ function initSizeGuideModal() {
 
 // Feature 5: Recently Viewed Products Drawer
 function initRecentlyViewedTracker() {
-    var pName = $('.js-name-detail').text().trim();
+    if (!gsIsPDP()) return;
+    var pName = gsPdpName();
     if (!pName) return;
 
-    var pPrice = $('.mtext-106').first().text().trim() || '$58.79';
-    var pImg = $('.wrap-pic-w img').first().attr('src') || 'images/product-01.jpg';
-    var pUrl = window.location.href;
+    var pPrice = gsPdpPrice();
+    var pImg = $('.sec-product-detail .wrap-pic-w img').first().attr('src') || 'images/product-01.jpg';
+    var pUrl = window.location.pathname.split('/').pop() || window.location.href;
 
     var recentList = [];
     try {
@@ -4782,8 +4847,13 @@ function initRecentlyViewedTracker() {
         recentList = [];
     }
 
-    // Filter out duplicates
-    recentList = recentList.filter(function(item) { return item.name !== pName; });
+    // Repair entries saved by older builds (doubled names, badge text in price), then de-dupe
+    recentList = recentList.map(function(item) {
+        var name = String(item.name || '').split('\n')[0].trim();
+        var half = name.length / 2;
+        if (name.length % 2 === 0 && name.slice(0, half) === name.slice(half)) name = name.slice(0, half);
+        return { name: name, price: gsCleanPrice(item.price), img: item.img, url: item.url };
+    }).filter(function(item) { return item.name && item.name !== pName; });
 
     // Prepend current product
     recentList.unshift({ name: pName, price: pPrice, img: pImg, url: pUrl });
@@ -4805,6 +4875,11 @@ function renderRecentlyViewedRibbon() {
 
     var $container = $('#recently-viewed-ribbon');
     if (!$container.length) return;
+
+    // The current product is already on screen; show the others
+    var currentName = gsPdpName();
+    recentList = recentList.filter(function(item) { return item.name !== currentName; });
+    if (!recentList.length) return;
 
     var itemsHtml = '';
     recentList.forEach(function(item) {
@@ -4833,32 +4908,16 @@ function renderRecentlyViewedRibbon() {
     var ribbonHtml = '<div class="recently-viewed-container">' +
         '<div class="container">' +
         '  <div class="recently-viewed-title p-b-45"><h3 class="ltext-106 cl5 txt-center">Recently Viewed</h3></div>' +
-        '  <div class="wrap-slick2"><div class="slick2" id="recently-slick-instance">' + itemsHtml + '</div></div>' +
+        '  <div class="wrap-slick2"><div class="slick2" id="recently-slick-instance">' + itemsHtml + '</div>' +
+        '    <button class="arrow-slick2 prev-slick2" aria-label="Previous"><i class="fa fa-angle-left" aria-hidden="true"></i></button>' +
+        '    <button class="arrow-slick2 next-slick2" aria-label="Next"><i class="fa fa-angle-right" aria-hidden="true"></i></button>' +
+        '  </div>' +
         '</div>' +
         '</div>';
 
     $container.html(ribbonHtml);
-    
-    // Initialize Slick
-    if ($.fn.slick) {
-        var $slickInstance = $('#recently-slick-instance');
-        $slickInstance.slick({
-            slidesToShow: 5,
-            slidesToScroll: 1,
-            infinite: false,
-            autoplay: false,
-            arrows: true,
-            appendArrows: $container.find('.wrap-slick2'),
-            prevArrow:'<button class="arrow-slick2 prev-slick2"><i class="fa fa-angle-left" aria-hidden="true"></i></button>',
-            nextArrow:'<button class="arrow-slick2 next-slick2"><i class="fa fa-angle-right" aria-hidden="true"></i></button>',  
-            responsive: [
-                { breakpoint: 1400, settings: { slidesToShow: 4 } },
-                { breakpoint: 992, settings: { slidesToShow: 3 } },
-                { breakpoint: 768, settings: { slidesToShow: 2 } },
-                { breakpoint: 576, settings: { slidesToShow: 1 } }
-            ]
-        });
-    }
+    // .slick2 rows are native free-scroll carousels site-wide; initialising Slick here collapsed the cards
+    gsBindScrollerArrows($container.find('.wrap-slick2'));
 }
 
 // Feature 6 & 7: Stock Scarcity Badges & Delivery Calculator
@@ -4909,7 +4968,7 @@ function initDynamicRelatedProducts() {
     var $relateSection = $('.sec-relate-product .container');
     if (!$relateSection.length) return;
     
-    var currentName = $('.js-name-detail').text().trim();
+    var currentName = gsPdpName();
     
     // Catalog of varied dummy products for recommendations
     var catalog = [
@@ -4956,30 +5015,13 @@ function initDynamicRelatedProducts() {
     });
 
     var premiumHtml = '<div class="p-b-45"><h3 class="ltext-106 cl5 txt-center">Related Products</h3></div>' +
-        '<div class="wrap-slick2"><div class="slick2" id="related-slick-instance">' + itemsHtml + '</div></div>';
+        '<div class="wrap-slick2"><div class="slick2" id="related-slick-instance">' + itemsHtml + '</div>' +
+        '  <button class="arrow-slick2 prev-slick2" aria-label="Previous"><i class="fa fa-angle-left" aria-hidden="true"></i></button>' +
+        '  <button class="arrow-slick2 next-slick2" aria-label="Next"><i class="fa fa-angle-right" aria-hidden="true"></i></button>' +
+        '</div>';
         
     $relateSection.html(premiumHtml);
-
-    // Initialize Slick on the dynamically injected HTML
-    if ($.fn.slick) {
-        var $slickInstance = $('#related-slick-instance');
-        $slickInstance.slick({
-            slidesToShow: 5,
-            slidesToScroll: 1,
-            infinite: true,
-            autoplay: false,
-            arrows: true,
-            appendArrows: $relateSection.find('.wrap-slick2'),
-            prevArrow:'<button class="arrow-slick2 prev-slick2"><i class="fa fa-angle-left" aria-hidden="true"></i></button>',
-            nextArrow:'<button class="arrow-slick2 next-slick2"><i class="fa fa-angle-right" aria-hidden="true"></i></button>',  
-            responsive: [
-                { breakpoint: 1400, settings: { slidesToShow: 4 } },
-                { breakpoint: 992, settings: { slidesToShow: 3 } },
-                { breakpoint: 768, settings: { slidesToShow: 2 } },
-                { breakpoint: 576, settings: { slidesToShow: 1 } }
-            ]
-        });
-    }
+    gsBindScrollerArrows($relateSection.find('.wrap-slick2'));
 }
 // Feature 8: Scroll Progress Ring & Back-to-Top Button
 function initScrollProgressRing() {
