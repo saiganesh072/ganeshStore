@@ -18,16 +18,27 @@ const assert = require('assert');
 
 let passed = 0;
 let total = 0;
+const pendingTests = [];
 
 function test(name, fn) {
   total++;
-  try {
-    fn();
+  const pass = () => {
     console.log(`  ✅ [PASS] ${name}`);
     passed++;
-  } catch (err) {
+  };
+  const fail = err => {
     console.error(`  ❌ [FAIL] ${name}`);
     console.error(`     Error: ${err.message}`);
+  };
+  try {
+    const result = fn();
+    if (result && typeof result.then === 'function') {
+      pendingTests.push(result.then(pass, fail));
+    } else {
+      pass();
+    }
+  } catch (err) {
+    fail(err);
   }
 }
 
@@ -184,16 +195,27 @@ test('Floating label text (.auth-float-label) is implemented', () => {
   assert(html.includes('class="auth-float-label"'), 'Labels must use .auth-float-label class');
 });
 
-test('Card entrance animation (cardFadeIn) is declared', () => {
-  assert(html.includes('cardFadeIn'), 'Must declare cardFadeIn keyframe animation');
+const accountCss = fs.readFileSync(path.join(__dirname, 'css', 'account.css'), 'utf8');
+
+test('Account stylesheet is linked from signin.html', () => {
+  assert(/href=["']css\/account\.css(\?[^"']*)?["']/.test(html), 'signin.html must link css/account.css');
+});
+
+test('Account entrance animation (gsAcctUp) is declared', () => {
+  assert(accountCss.includes('@keyframes gsAcctUp'), 'Must declare gsAcctUp keyframe animation');
 });
 
 test('Error feedback micro-animation (bannerShake) is declared', () => {
-  assert(html.includes('bannerShake'), 'Must declare bannerShake keyframe animation');
+  assert(accountCss.includes('@keyframes bannerShake'), 'Must declare bannerShake keyframe animation');
 });
 
 test('Accessibility support for prefers-reduced-motion is declared', () => {
-  assert(html.includes('prefers-reduced-motion: reduce') || html.includes('prefers-reduced-motion'), 'Must support prefers-reduced-motion');
+  assert(accountCss.includes('prefers-reduced-motion: reduce'), 'Must support prefers-reduced-motion');
+});
+
+test('Account tabs use the sliding segmented control instead of a scrolling tab strip', () => {
+  assert(/class=["']account-nav-tabs gs-seg["']/.test(html), 'Account tabs must use .gs-seg');
+  assert(!/\.account-nav-tabs\s*\{[^}]*overflow-x:\s*auto/.test(accountCss), 'Account tabs must not scroll horizontally');
 });
 
 // TEST GROUP 5: Authentication JS Engine Functions
@@ -219,10 +241,67 @@ test('switchAccountTab() helper function is defined', () => {
   assert(html.includes('function switchAccountTab('), 'switchAccountTab helper must be defined');
 });
 
-console.log('\n========================================================================');
-console.log(`AUTH SUITE SUMMARY: ${passed}/${total} Passed, ${total - passed} Failed`);
-console.log('========================================================================\n');
+// TEST GROUP 6: Customer ID Account Registry
+console.log('\n--- TEST GROUP 6: Customer ID Account Registry ---');
 
-if (passed !== total) {
-  process.exit(1);
+function loadBackendWithUsers(users) {
+  const vm = require('vm');
+  const store = new Map();
+  if (users) store.set('ganeshStore_registered_users', JSON.stringify(users));
+  const localStorage = {
+    getItem: key => (store.has(key) ? store.get(key) : null),
+    setItem: (key, value) => store.set(key, String(value)),
+    removeItem: key => store.delete(key)
+  };
+  const context = {
+    console: { log() {}, warn() {}, error() {} },
+    crypto: { randomUUID: () => `uuid-${store.size}-${Math.random()}` },
+    document: { cookie: '' },
+    localStorage,
+    $: () => ({ each() {}, trigger() {} })
+  };
+  context.window = context;
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, 'js', 'backend-service.js'), 'utf8'), context);
+  return { auth: context.BackendService.auth, store };
 }
+
+test('Seeded accounts receive unique sequential five-digit customer IDs', () => {
+  const { store } = loadBackendWithUsers();
+  const users = JSON.parse(store.get('ganeshStore_registered_users'));
+  assert.deepStrictEqual(users.map(u => u.customerId), ['GS-10001', 'GS-10002', 'GS-10003']);
+});
+
+test('Sign-up assigns the next ID and sign-in lookup accepts email or customer ID', () => {
+  const { auth } = loadBackendWithUsers();
+  const account = auth.createCustomerAccount({ name: 'Ganesh', email: 'Ganesh@Gmail.com', password: 'secret123' });
+  assert.strictEqual(account.customerId, 'GS-10004');
+  assert.strictEqual(auth.findAccount('ganesh@gmail.com').id, account.id);
+  assert.strictEqual(auth.findAccount('gs10004').id, account.id);
+  assert.throws(() => auth.createCustomerAccount({ email: 'GANESH@gmail.com', password: 'secret123' }), /already exists/);
+});
+
+test('Legacy accounts keep unique IDs and duplicate legacy IDs are reassigned', () => {
+  const { store } = loadBackendWithUsers([
+    { uid: 'GS-54321', name: 'Legacy One', email: 'one@example.com', password: 'secret123' },
+    { uid: 'GS-54321', name: 'Legacy Two', email: 'two@example.com', password: 'secret123' },
+    { name: 'Legacy Three', email: 'three@example.com', password: 'secret123' }
+  ]);
+  const users = JSON.parse(store.get('ganeshStore_registered_users'));
+  assert.deepStrictEqual(users.map(u => u.customerId), ['GS-54321', 'GS-10001', 'GS-10002']);
+  assert(users.every(u => u.id), 'Every migrated account needs an internal ID for 2FA/profile updates');
+});
+
+test('Backend login rejects wrong passwords for known customers', async () => {
+  const { auth } = loadBackendWithUsers();
+  await assert.rejects(() => auth.login('GS-10001', 'wrong-password'), /Invalid email\/customer ID or password/);
+});
+
+Promise.all(pendingTests).then(() => {
+  console.log('\n========================================================================');
+  console.log(`AUTH SUITE SUMMARY: ${passed}/${total} Passed, ${total - passed} Failed`);
+  console.log('========================================================================\n');
+
+  if (passed !== total) {
+    process.exit(1);
+  }
+});

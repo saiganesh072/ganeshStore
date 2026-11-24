@@ -26,21 +26,26 @@
     // Master Catalog Data
     var MASTER_CATALOG = [
         { id: 'GS001', name: 'Esprit Ruffle Shirt', price: '$16.64', priceNum: 16.64, category: 'Women', tag: '.women', img: 'images/product-01.jpg', url: 'p-Esprit-Ruffle-Shirt.html', rating: 4.9, reviewsCount: 28 },
-        { id: 'GS002', name: 'Herschel supply', price: '$35.31', priceNum: 35.31, category: 'Women', tag: '.women', img: 'images/product-02.jpg', url: 'p-Herschel-supply.html', rating: 4.8, reviewsCount: 19 },
-        { id: 'GS003', name: 'Only Check Trouser', price: '$25.50', priceNum: 25.50, category: 'Men', tag: '.men', img: 'images/product-03.jpg', url: 'p-Only-Check-Trouser.html', rating: 4.85, reviewsCount: 24 },
-        { id: 'GS004', name: 'Classic Trench Coat', price: '$75.00', priceNum: 75.00, category: 'Women', tag: '.women', img: 'images/product-04.jpg', url: 'p-Classic-Trench-Coat.html', rating: 5.0, reviewsCount: 42 },
-        { id: 'GS005', name: 'Front Pocket Jumper', price: '$34.75', priceNum: 34.75, category: 'Women', tag: '.women', img: 'images/product-05.jpg', url: 'p-Front-Pocket-Jumper.html', rating: 4.75, reviewsCount: 15 },
-        { id: 'GS006', name: 'Vintage Inspired Classic', price: '$93.20', priceNum: 93.20, category: 'Watches', tag: '.watches', img: 'images/product-06.jpg', url: 'p-Vintage-Inspired-Classic.html', rating: 4.95, reviewsCount: 36 },
-        { id: 'GS007', name: 'Shirt in Stretch Cotton', price: '$52.66', priceNum: 52.66, category: 'Women', tag: '.women', img: 'images/product-07.jpg', url: 'p-Shirt-in-Stretch-Cotton.html', rating: 4.7, reviewsCount: 11 },
-        { id: 'GS008', name: 'Pieces Metallic Printed', price: '$18.96', priceNum: 18.96, category: 'Women', tag: '.women', img: 'images/product-08.jpg', url: 'p-Pieces-Metallic-Printed.html', rating: 4.65, reviewsCount: 8 },
-        { id: 'GS009', name: 'Converse All Star Hi Plimsolls', price: '$75.00', priceNum: 75.00, category: 'Shoes', tag: '.shoes', img: 'images/product-09.jpg', url: 'p-Converse-All-Star-Hi-Plimsolls.html', rating: 4.9, reviewsCount: 53 },
-        { id: 'GS010', name: 'Femme T-Shirt In Stripe', price: '$25.85', priceNum: 25.85, category: 'Women', tag: '.women', img: 'images/product-10.jpg', url: 'p-Femme-T-Shirt-In-Stripe.html', rating: 4.8, reviewsCount: 14 },
-        { id: 'GS011', name: 'Herschel supply men', price: '$63.16', priceNum: 63.16, category: 'Men', tag: '.men', img: 'images/product-11.jpg', url: 'p-Herschel-supply-men.html', rating: 4.88, reviewsCount: 22 },
-        { id: 'GS012', name: 'Herschel supply watch', price: '$63.15', priceNum: 63.15, category: 'Watches', tag: '.watches', img: 'images/product-12.jpg', url: 'p-Herschel-supply-watch.html', rating: 4.75, reviewsCount: 17 },
-        { id: 'GS013', name: 'T-Shirt with Sleeve', price: '$18.49', priceNum: 18.49, category: 'Women', tag: '.women', img: 'images/product-13.jpg', url: 'p-T-Shirt-with-Sleeve.html', rating: 4.6, reviewsCount: 9 },
-        { id: 'GS014', name: 'Pretty Little Thing', price: '$54.79', priceNum: 54.79, category: 'Women', tag: '.women', img: 'images/product-14.jpg', url: 'p-Pretty-Little-Thing.html', rating: 4.82, reviewsCount: 31 },
-        { id: 'GS015', name: 'Mini Silver Mesh Watch', price: '$86.85', priceNum: 86.85, category: 'Watches', tag: '.watches', img: 'images/product-15.jpg', url: 'p-Mini-Silver-Mesh-Watch.html', rating: 4.92, reviewsCount: 29 },
-        { id: 'GS016', name: 'Square Neck Back', price: '$29.64', priceNum: 29.64, category: 'Women', tag: '.women', img: 'images/product-16.jpg', url: 'p-Square-Neck-Back.html', rating: 4.78, reviewsCount: 16 }
+        { id: 'GS002', name: 'Herschel supply', price: '$35.31', priceNum: 35.31, category: 'Women', tag: '.women', img: 'images/product-02.jpg', url: 'p-Herschel-supply.html', rating: 4.9, reviewsCount: 28 },
+        { id: 'GS003', name: 'Only Check Trouser', price: '$25.50', priceNum: 25.50, category: 'Men', tag: '.men', img: 'images/product-03.jpg', url: 'p-Only-Check-Trouser.html', rating: 4.9, reviewsCount: 28 },
+        { id: 'GS004', name: 'Classic Trench Coat', price: '$75.00', priceNum: 75.00, compareAt: 93.75, category: 'Women', tag: '.women', img: 'images/product-04.jpg', url: 'p-Classic-Trench-Coat.html', rating: 4.9, reviewsCount: 28 },
+        { id: 'GS005', name: 'Front Pocket Jumper', price: '$34.75', priceNum: 34.75, category: 'Women', tag: '.women', img: 'images/product-05.jpg', url: 'p-Front-Pocket-Jumper.html', rating: 4.9, reviewsCount: 28 },
+        { id: 'GS006', name: 'Vintage Inspired Classic', price: '$93.20', priceNum: 93.20, compareAt: 116.50, category: 'Watches', tag: '.watches', img: 'images/product-06.jpg', url: 'p-Vintage-Inspired-Classic.html', rating: 4.9, reviewsCount: 28 },
+        { id: 'GS007', name: 'Shirt in Stretch Cotton', price: '$52.66', priceNum: 52.66, category: 'Women', tag: '.women', img: 'images/product-07.jpg', url: 'p-Shirt-in-Stretch-Cotton.html', rating: 4.9, reviewsCount: 28 },
+        { id: 'GS008', name: 'Pieces Metallic Printed', price: '$18.96', priceNum: 18.96, category: 'Women', tag: '.women', img: 'images/product-08.jpg', url: 'p-Pieces-Metallic-Printed.html', rating: 4.9, reviewsCount: 28 },
+        { id: 'GS009', name: 'Converse All Star Hi Plimsolls', price: '$75.00', priceNum: 75.00, category: 'Shoes', tag: '.shoes', img: 'images/product-09.jpg', url: 'p-Converse-All-Star-Hi-Plimsolls.html', rating: 4.9, reviewsCount: 28 },
+        { id: 'GS010', name: 'Femme T-Shirt In Stripe', price: '$25.85', priceNum: 25.85, category: 'Women', tag: '.women', img: 'images/product-10.jpg', url: 'p-Femme-T-Shirt-In-Stripe.html', rating: 4.9, reviewsCount: 28 },
+        { id: 'GS011', name: 'Herschel supply men', price: '$63.16', priceNum: 63.16, compareAt: 78.95, category: 'Men', tag: '.men', img: 'images/product-11.jpg', url: 'p-Herschel-supply-men.html', rating: 4.9, reviewsCount: 28 },
+        { id: 'GS012', name: 'Herschel supply watch', price: '$63.15', priceNum: 63.15, category: 'Watches', tag: '.watches', img: 'images/product-12.jpg', url: 'p-Herschel-supply-watch.html', rating: 4.9, reviewsCount: 28 },
+        { id: 'GS013', name: 'T-Shirt with Sleeve', price: '$18.49', priceNum: 18.49, category: 'Women', tag: '.women', img: 'images/product-13.jpg', url: 'p-T-Shirt-with-Sleeve.html', rating: 4.9, reviewsCount: 28 },
+        { id: 'GS014', name: 'Pretty Little Thing', price: '$54.79', priceNum: 54.79, compareAt: 68.49, category: 'Women', tag: '.women', img: 'images/product-14.jpg', url: 'p-Pretty-Little-Thing.html', rating: 4.9, reviewsCount: 28 },
+        { id: 'GS015', name: 'Mini Silver Mesh Watch', price: '$86.85', priceNum: 86.85, category: 'Watches', tag: '.watches', img: 'images/product-15.jpg', url: 'p-Mini-Silver-Mesh-Watch.html', rating: 4.9, reviewsCount: 28 },
+        { id: 'GS016', name: 'Square Neck Back', price: '$29.64', priceNum: 29.64, category: 'Women', tag: '.women', img: 'images/product-16.jpg', url: 'p-Square-Neck-Back.html', rating: 4.9, reviewsCount: 28 },
+        { id: 'GS017', name: 'Roll-Top Canvas Backpack', price: '$68.00', priceNum: 68.00, isNew: true, category: 'Bags', tag: '.bag', img: 'images/product-68.jpg', url: 'p-Roll-Top-Canvas-Backpack.html', rating: 4.9, reviewsCount: 28 },
+        { id: 'GS018', name: 'Olive City Backpack', price: '$54.50', priceNum: 54.50, isNew: true, category: 'Bags', tag: '.bag', img: 'images/product-69.jpg', url: 'p-Olive-City-Backpack.html', rating: 4.9, reviewsCount: 28 },
+        { id: 'GS019', name: 'Leather Platform Ankle Boots', price: '$89.00', priceNum: 89.00, isNew: true, category: 'Shoes', tag: '.shoes', img: 'images/product-70.jpg', url: 'p-Leather-Platform-Ankle-Boots.html', rating: 4.9, reviewsCount: 28 },
+        { id: 'GS020', name: 'Windowpane Wool Blazer', price: '$98.00', priceNum: 98.00, isNew: true, category: 'Men', tag: '.men', img: 'images/product-71.jpg', url: 'p-Windowpane-Wool-Blazer.html', rating: 4.9, reviewsCount: 28 },
+        { id: 'GS021', name: 'Sherpa-Lined Denim Jacket', price: '$84.00', priceNum: 84.00, isNew: true, category: 'Men', tag: '.men', img: 'images/product-72.jpg', url: 'p-Sherpa-Lined-Denim-Jacket.html', rating: 4.9, reviewsCount: 28 }
     ];
 
     // Coupons Catalog
@@ -75,6 +80,174 @@
             } catch (e) {}
         }
     };
+
+    // =================================================================
+    // CUSTOMER ACCOUNT REGISTRY (EMAIL + UNIQUE CUSTOMER ID)
+    // =================================================================
+    var USERS_KEY = 'ganeshStore_registered_users';
+    var CUSTOMER_ID_SEQ_KEY = 'ganeshStore_customer_id_seq';
+    var CUSTOMER_ID_MIN = 10001;
+    var CUSTOMER_ID_MAX = 99999;
+    var EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    var CustomerAccounts = {
+        normalizeEmail: function (email) {
+            return String(email || '').trim().toLowerCase();
+        },
+
+        isEmail: function (value) {
+            return EMAIL_PATTERN.test(this.normalizeEmail(value));
+        },
+
+        normalizeCustomerId: function (value) {
+            var match = String(value || '').trim().toUpperCase().replace(/\s+/g, '').match(/^GS-?(\d{5})$/);
+            return match ? 'GS-' + match[1] : '';
+        },
+
+        _customerNumber: function (customerId) {
+            var normalized = this.normalizeCustomerId(customerId);
+            return normalized ? parseInt(normalized.slice(3), 10) : 0;
+        },
+
+        _newInternalId: function () {
+            return (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : 'usr_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+        },
+
+        _allocateCustomerId: function (usedNumbers) {
+            var lastAllocated = parseInt(Storage.get(CUSTOMER_ID_SEQ_KEY, CUSTOMER_ID_MIN - 1), 10) || (CUSTOMER_ID_MIN - 1);
+            var next = Math.max(CUSTOMER_ID_MIN, lastAllocated + 1);
+            while (usedNumbers[next] && next <= CUSTOMER_ID_MAX) next++;
+            if (next > CUSTOMER_ID_MAX) throw new Error('Customer ID capacity reached. Please contact support.');
+            usedNumbers[next] = true;
+            Storage.set(CUSTOMER_ID_SEQ_KEY, next);
+            return 'GS-' + next;
+        },
+
+        ensureUsers: function () {
+            var self = this;
+            var users = Storage.get(USERS_KEY, []);
+            if (!Array.isArray(users)) users = [];
+            var usedNumbers = {};
+            var changed = false;
+
+            users = users.filter(function (user) { return user && typeof user === 'object'; });
+            users.forEach(function (user) {
+                var email = self.normalizeEmail(user.email);
+                if (email && user.email !== email) {
+                    user.email = email;
+                    changed = true;
+                }
+                if (!user.id) {
+                    user.id = user.uid || self._newInternalId();
+                    changed = true;
+                }
+
+                var customerId = self.normalizeCustomerId(user.customerId || user.customer_id || user.uid);
+                var customerNumber = self._customerNumber(customerId);
+                if (customerNumber && !usedNumbers[customerNumber]) {
+                    usedNumbers[customerNumber] = true;
+                    if (user.customerId !== customerId) {
+                        user.customerId = customerId;
+                        changed = true;
+                    }
+                } else if (user.customerId) {
+                    delete user.customerId;
+                    changed = true;
+                }
+            });
+
+            users.forEach(function (user) {
+                if (!user.customerId) {
+                    user.customerId = self._allocateCustomerId(usedNumbers);
+                    changed = true;
+                }
+            });
+
+            if (changed || !Array.isArray(Storage.get(USERS_KEY, null))) {
+                Storage.set(USERS_KEY, users);
+            }
+            return users;
+        },
+
+        saveUsers: function (users) {
+            Storage.set(USERS_KEY, users);
+        },
+
+        findByIdentifier: function (identifier, users) {
+            var list = users || this.ensureUsers();
+            var customerId = this.normalizeCustomerId(identifier);
+            if (customerId) {
+                return list.find(function (user) { return user.customerId === customerId; }) || null;
+            }
+            var email = this.normalizeEmail(identifier);
+            if (!this.isEmail(email)) return null;
+            return list.find(function (user) { return user.email === email; }) || null;
+        },
+
+        create: function (accountData) {
+            var users = this.ensureUsers();
+            var email = this.normalizeEmail(accountData.email);
+            if (!this.isEmail(email)) throw new Error('Enter a valid email address.');
+            if (users.some(function (user) { return user.email === email; })) {
+                throw new Error('An account with this email already exists. Please sign in instead.');
+            }
+
+            var phone = String(accountData.phone || '').trim();
+            if (phone && users.some(function (user) { return user.phone === phone || user.phone_number === phone; })) {
+                throw new Error('An account with this phone number already exists.');
+            }
+
+            var usedNumbers = {};
+            var self = this;
+            users.forEach(function (user) {
+                var number = self._customerNumber(user.customerId);
+                if (number) usedNumbers[number] = true;
+            });
+
+            var name = String(accountData.name || email.split('@')[0]).trim();
+            var account = {
+                id: accountData.id || this._newInternalId(),
+                customerId: this._allocateCustomerId(usedNumbers),
+                name: name,
+                full_name: name,
+                email: email,
+                phone: phone,
+                phone_number: phone,
+                password: accountData.password || null,
+                authProvider: accountData.authProvider || 'password',
+                loyaltyTier: accountData.loyaltyTier || 'Bronze',
+                loyaltyPoints: accountData.loyaltyPoints || 100,
+                two_factor_enabled: false,
+                two_factor_secret: null,
+                created_at: new Date().toISOString()
+            };
+
+            users.push(account);
+            this.saveUsers(users);
+            return account;
+        },
+
+        getOrCreate: function (accountData) {
+            var existing = this.findByIdentifier(accountData.email);
+            if (existing) return existing;
+            return this.create(accountData);
+        },
+
+        attachToProfile: function (profile) {
+            if (!profile || typeof profile !== 'object') return profile;
+            var account = this.findByIdentifier(profile.customerId || profile.email);
+            if (!account && profile.id) {
+                account = this.ensureUsers().find(function (user) { return user.id === profile.id; }) || null;
+            }
+            return account ? Object.assign({}, profile, { customerId: account.customerId, customer_id: account.customerId }) : profile;
+        }
+    };
+
+    function setCustomerSessionCookies(user) {
+        var name = user.name || user.full_name || user.displayName || (user.email ? user.email.split('@')[0] : 'Customer');
+        document.cookie = "CustomerName=" + encodeURIComponent(name) + "; path=/;";
+        document.cookie = "CustomerNumber=" + encodeURIComponent(user.customerId || '') + "; path=/;";
+    }
 
     // =================================================================
     // RFC 6238 TOTP / GOOGLE AUTHENTICATOR HELPER ENGINE
@@ -252,12 +425,50 @@
                 ];
                 Storage.set('ganeshStore_registered_users', users);
             }
+            CustomerAccounts.ensureUsers();
+
+            var currentProfile = Storage.get('userProfile', null);
+            var profileWithCustomerId = CustomerAccounts.attachToProfile(currentProfile);
+            if (profileWithCustomerId && profileWithCustomerId !== currentProfile) {
+                Storage.set('userProfile', profileWithCustomerId);
+            }
+
+            var mockUser = Storage.get('ganeshStore_user_mock', null);
+            var mockAccount = mockUser ? CustomerAccounts.findByIdentifier(mockUser.customerId || mockUser.email) : null;
+            if (mockAccount && mockUser.customerId !== mockAccount.customerId) {
+                mockUser.customerId = mockAccount.customerId;
+                Storage.set('ganeshStore_user_mock', mockUser);
+            }
         },
 
         // =================================================================
         // AUTHENTICATION & PROFILES SUBSYSTEM (WITH GOOGLE AUTHENTICATOR 2FA)
         // =================================================================
         auth: {
+            normalizeCustomerId: function (value) {
+                return CustomerAccounts.normalizeCustomerId(value);
+            },
+
+            isEmail: function (value) {
+                return CustomerAccounts.isEmail(value);
+            },
+
+            findAccount: function (identifier) {
+                return CustomerAccounts.findByIdentifier(identifier);
+            },
+
+            createCustomerAccount: function (accountData) {
+                return CustomerAccounts.create(accountData);
+            },
+
+            getOrCreateCustomerAccount: function (accountData) {
+                return CustomerAccounts.getOrCreate(accountData);
+            },
+
+            attachCustomerId: function (profile) {
+                return CustomerAccounts.attachToProfile(profile);
+            },
+
             // Generate a new 2FA Secret Key and QR Code URL
             generate2FASecret: function (email) {
                 var secret = TOTP.generateSecret(16);
@@ -326,8 +537,8 @@
 
             // Verify 2FA token during login flow
             verifyLogin2FA: async function (userId, token) {
-                var users = Storage.get('ganeshStore_registered_users', []);
-                var user = users.find(function (u) { return u.id === userId; });
+                var users = CustomerAccounts.ensureUsers();
+                var user = users.find(function (u) { return u.id === userId || u.customerId === userId; });
                 if (!user) throw new Error('User session not found.');
                 if (!user.two_factor_secret) throw new Error('2FA is not configured for this account.');
 
@@ -338,9 +549,15 @@
 
                 // Complete login
                 Storage.set('userProfile', user);
+                Storage.set('ganeshStore_user_mock', {
+                    uid: user.id,
+                    customerId: user.customerId,
+                    email: user.email,
+                    displayName: user.name || user.full_name,
+                    photoURL: null
+                });
                 Storage.set('user', 'loggedin');
-                document.cookie = "CustomerName=" + encodeURIComponent(user.name || user.full_name) + "; path=/;";
-                document.cookie = "CustomerNumber=" + encodeURIComponent(user.phone || user.phone_number || '') + "; path=/;";
+                setCustomerSessionCookies(user);
 
                 await BackendService.cart.fetchCartFromCloud(user.id);
                 await BackendService.wishlist.fetchWishlistFromCloud(user.id);
@@ -354,45 +571,26 @@
 
             // Register a new user
             register: async function (userData) {
-                var email = (userData.email || '').trim().toLowerCase();
-                var name = (userData.name || email.split('@')[0]).trim();
-                var phone = (userData.phone || '9999999999').trim();
-                var password = userData.password || 'password123';
-
-                var users = Storage.get('ganeshStore_registered_users', []);
-                var existing = users.find(function (u) { return u.email === email || (phone && u.phone === phone); });
-
-                if (existing) {
-                    throw new Error('An account with this email or phone number already exists.');
+                var password = userData.password || '';
+                if (password.length < 6) {
+                    throw new Error('Password must be at least 6 characters long.');
                 }
 
-                var newId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : 'usr_' + Date.now();
-                var newUser = {
-                    id: newId,
-                    name: name,
-                    full_name: name,
-                    email: email,
-                    phone: phone,
-                    phone_number: phone,
-                    password: password,
-                    loyaltyTier: 'Bronze',
-                    loyaltyPoints: 100,
-                    two_factor_enabled: false,
-                    two_factor_secret: null,
-                    created_at: new Date().toISOString()
-                };
-
-                users.push(newUser);
-                Storage.set('ganeshStore_registered_users', users);
+                var newUser = CustomerAccounts.create({
+                    name: userData.name,
+                    email: userData.email,
+                    phone: userData.phone,
+                    password: password
+                });
 
                 // Cloud Supabase Sync
                 if (BackendService._isCloudAvailable && BackendService._client) {
                     try {
                         await BackendService._client.from('profiles').insert({
-                            id: newId,
-                            full_name: name,
-                            email: email,
-                            phone_number: phone,
+                            id: newUser.id,
+                            full_name: newUser.name,
+                            email: newUser.email,
+                            phone_number: newUser.phone,
                             loyalty_tier: 'Bronze',
                             loyalty_points: 100,
                             two_factor_enabled: false
@@ -405,8 +603,7 @@
                 // Set active session
                 Storage.set('userProfile', newUser);
                 Storage.set('user', 'loggedin');
-                document.cookie = "CustomerName=" + encodeURIComponent(name) + "; path=/;";
-                document.cookie = "CustomerNumber=" + encodeURIComponent(phone) + "; path=/;";
+                setCustomerSessionCookies(newUser);
 
                 // Telemetry
                 if (window.trackACDLUserLogin) {
@@ -416,38 +613,45 @@
                 return newUser;
             },
 
-            // Login with email and password (with 2FA interceptor)
-            login: async function (email, password) {
-                var cleanEmail = (email || '').trim().toLowerCase();
-                var users = Storage.get('ganeshStore_registered_users', []);
-                var user = users.find(function (u) { return u.email === cleanEmail; });
+            // Login with email or customer ID and password (with 2FA interceptor)
+            login: async function (identifier, password) {
+                var cleanIdentifier = (identifier || '').trim();
+                var isCustomerId = !!CustomerAccounts.normalizeCustomerId(cleanIdentifier);
+                if (!isCustomerId && !CustomerAccounts.isEmail(cleanIdentifier)) {
+                    throw new Error('Enter a valid email address or customer ID (for example, GS-10001).');
+                }
+                if (!password) {
+                    throw new Error('Password is required.');
+                }
 
-                if (!user || user.password !== password) {
-                    // Check cloud database if available
-                    if (BackendService._isCloudAvailable && BackendService._client) {
-                        try {
-                            var res = await BackendService._client.from('profiles').select('*').eq('email', cleanEmail).limit(1);
-                            if (res.data && res.data.length > 0) {
-                                var p = res.data[0];
-                                user = {
-                                    id: p.id,
-                                    name: p.full_name,
-                                    full_name: p.full_name,
-                                    email: p.email,
-                                    phone: p.phone_number,
-                                    phone_number: p.phone_number,
-                                    loyaltyTier: p.loyalty_tier || 'Bronze',
-                                    loyaltyPoints: p.loyalty_points || 100,
-                                    two_factor_enabled: !!p.two_factor_enabled,
-                                    two_factor_secret: p.two_factor_secret
-                                };
-                            }
-                        } catch (e) {}
-                    }
+                var user = CustomerAccounts.findByIdentifier(cleanIdentifier);
+                if (user && user.password !== password) {
+                    throw new Error('Invalid email/customer ID or password. Please try again.');
+                }
+
+                if (!user && !isCustomerId && BackendService._isCloudAvailable && BackendService._client) {
+                    var cleanEmail = CustomerAccounts.normalizeEmail(cleanIdentifier);
+                    try {
+                        var res = await BackendService._client.from('profiles').select('*').eq('email', cleanEmail).limit(1);
+                        if (res.data && res.data.length > 0) {
+                            var p = res.data[0];
+                            user = CustomerAccounts.getOrCreate({
+                                id: p.id,
+                                name: p.full_name,
+                                email: p.email || cleanEmail,
+                                phone: p.phone_number,
+                                password: password,
+                                loyaltyTier: p.loyalty_tier || 'Bronze',
+                                loyaltyPoints: p.loyalty_points || 100
+                            });
+                            user.two_factor_enabled = !!p.two_factor_enabled;
+                            user.two_factor_secret = p.two_factor_secret || null;
+                        }
+                    } catch (e) {}
                 }
 
                 if (!user) {
-                    throw new Error('Invalid email or password. Please try again.');
+                    throw new Error('Invalid email/customer ID or password. Please try again.');
                 }
 
                 // Check if Google Authenticator 2FA is required for this account
@@ -456,14 +660,14 @@
                         requires2FA: true,
                         userId: user.id,
                         email: user.email,
+                        customerId: user.customerId,
                         message: '2-Factor Authentication required.'
                     };
                 }
 
                 Storage.set('userProfile', user);
                 Storage.set('user', 'loggedin');
-                document.cookie = "CustomerName=" + encodeURIComponent(user.name || user.full_name) + "; path=/;";
-                document.cookie = "CustomerNumber=" + encodeURIComponent(user.phone || user.phone_number || '') + "; path=/;";
+                setCustomerSessionCookies(user);
 
                 // Merge and sync cloud cart/wishlist
                 await BackendService.cart.fetchCartFromCloud(user.id);
@@ -481,8 +685,8 @@
                 var cleanPhone = (phone || '').trim();
                 var cleanName = (name || 'Guest User').trim();
 
-                var users = Storage.get('ganeshStore_registered_users', []);
-                var user = users.find(function (u) { return u.phone === cleanPhone; });
+                var users = CustomerAccounts.ensureUsers();
+                var user = users.find(function (u) { return u.phone === cleanPhone || u.phone_number === cleanPhone; });
 
                 if (!user) {
                     return await this.register({
@@ -498,14 +702,14 @@
                         requires2FA: true,
                         userId: user.id,
                         email: user.email,
+                        customerId: user.customerId,
                         message: '2-Factor Authentication required.'
                     };
                 }
 
                 Storage.set('userProfile', user);
                 Storage.set('user', 'loggedin');
-                document.cookie = "CustomerName=" + encodeURIComponent(user.name || user.full_name) + "; path=/;";
-                document.cookie = "CustomerNumber=" + encodeURIComponent(user.phone || user.phone_number || '') + "; path=/;";
+                setCustomerSessionCookies(user);
 
                 await BackendService.cart.fetchCartFromCloud(user.id);
                 await BackendService.wishlist.fetchWishlistFromCloud(user.id);
@@ -536,11 +740,13 @@
                 Storage.set('userProfile', updated);
 
                 // Update users list
-                var users = Storage.get('ganeshStore_registered_users', []);
-                var idx = users.findIndex(function (u) { return u.id === currentUser.id; });
+                var users = CustomerAccounts.ensureUsers();
+                var idx = users.findIndex(function (u) {
+                    return u.id === currentUser.id || (currentUser.customerId && u.customerId === currentUser.customerId);
+                });
                 if (idx > -1) {
-                    users[idx] = updated;
-                    Storage.set('ganeshStore_registered_users', users);
+                    users[idx] = Object.assign({}, users[idx], profileUpdates);
+                    CustomerAccounts.saveUsers(users);
                 }
 
                 if (BackendService._isCloudAvailable && BackendService._client) {

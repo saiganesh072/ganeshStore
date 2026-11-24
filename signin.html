@@ -77,752 +77,7 @@
       async
     ></script>
     <script src="js/backend-service.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <style>
-      :root {
-        --primary-color: #222222;
-        --accent-color: #717fe0;
-        --accent-hover: #5b69c5;
-        --glass-bg: rgba(255, 255, 255, 0.9);
-        --glass-border: rgba(0, 0, 0, 0.05);
-        --text-muted: #888888;
-      }
-
-      /* 3A. Page Background */
-      .auth-page-bg {
-        min-height: calc(100vh - 84px);
-        background: linear-gradient(160deg, #f8f9fd 0%, #eef0f7 50%, #f5f0fa 100%);
-        display: flex;
-        align-items: flex-start;
-        justify-content: center;
-        padding: 60px 20px 80px;
-      }
-
-      /* 3B. Auth Card Container */
-      .auth-card {
-        width: 100%;
-        max-width: 480px;
-        background: #ffffff;
-        border-radius: 20px;
-        padding: 44px 40px;
-        box-shadow:
-          0 4px 6px rgba(0, 0, 0, 0.02),
-          0 14px 32px rgba(113, 127, 224, 0.09),
-          0 0 0 1px rgba(0, 0, 0, 0.03);
-        border: none;
-        animation: cardFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-      }
-
-      @keyframes cardFadeIn {
-        from { opacity: 0; transform: translateY(16px) scale(0.98); }
-        to { opacity: 1; transform: translateY(0) scale(1); }
-      }
-
-      @media (max-width: 576px) {
-        .auth-card {
-          padding: 32px 24px;
-          border-radius: 16px;
-          max-width: 100%;
-        }
-      }
-
-      .Loginmain, .Logoutmain {
-        font-family: 'Inter', sans-serif;
-        background: transparent;
-        border-radius: 0;
-        padding: 0;
-        transition: all 0.3s ease;
-      }
-
-      /* 3C. Logo + Title at Top of Card */
-      .auth-card-header {
-        text-align: center;
-        margin-bottom: 28px;
-      }
-
-      .auth-card-logo {
-        height: 32px;
-        width: auto;
-        margin-bottom: 12px;
-        opacity: 0.85;
-      }
-
-      .auth-card-subtitle {
-        font-family: 'Inter', sans-serif;
-        font-size: 14px;
-        color: #999;
-        font-weight: 400;
-        letter-spacing: 0.3px;
-        margin: 0;
-      }
-
-      /* 3E. Pill-Style Tab Toggles */
-      .auth-tabs {
-        display: flex;
-        background: #f3f4f8;
-        border-radius: 12px;
-        padding: 4px;
-        margin-bottom: 28px;
-        position: relative;
-        border-bottom: none;
-      }
-
-      .auth-tab-btn {
-        flex: 1;
-        text-align: center;
-        padding: 11px 16px;
-        font-size: 14px;
-        font-weight: 600;
-        color: #777;
-        cursor: pointer;
-        border: none;
-        background: none;
-        border-radius: 10px;
-        transition: all 0.3s ease;
-        position: relative;
-        z-index: 2;
-        outline: none;
-      }
-
-      .auth-tab-btn:hover {
-        color: #222;
-      }
-
-      .auth-tab-btn.active {
-        color: #222;
-        background: #ffffff;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-      }
-
-      /* 3D. Floating Label Inputs */
-      .auth-float-group {
-        position: relative;
-        margin-bottom: 22px;
-      }
-
-      .auth-float-group .auth-input-field {
-        width: 100%;
-        padding: 18px 16px 8px;
-        border: 1.5px solid #e2e4ea;
-        border-radius: 12px;
-        font-size: 15px;
-        font-family: 'Inter', sans-serif;
-        color: #222;
-        background: #fafbfc;
-        outline: none;
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-      }
-
-      .auth-float-label {
-        position: absolute;
-        top: 50%;
-        left: 16px;
-        transform: translateY(-50%);
-        font-size: 14px;
-        color: #aaa;
-        pointer-events: none;
-        transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
-        background: transparent;
-        padding: 0 4px;
-        margin: 0;
-      }
-
-      /* When focused or has content, float label up */
-      .auth-float-group .auth-input-field:focus,
-      .auth-float-group .auth-input-field:not(:placeholder-shown) {
-        border-color: #717fe0;
-        background: #fff;
-        box-shadow: 0 0 0 4px rgba(113, 127, 224, 0.1);
-      }
-
-      .auth-float-group .auth-input-field:focus + .auth-float-label,
-      .auth-float-group .auth-input-field:not(:placeholder-shown) + .auth-float-label {
-        top: 2px;
-        transform: translateY(0);
-        font-size: 10.5px;
-        font-weight: 700;
-        color: #717fe0;
-        background: #fff;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-      }
-
-      .auth-password-toggle {
-        position: absolute;
-        right: 16px;
-        top: 18px;
-        cursor: pointer;
-        color: var(--text-muted);
-        transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
-        z-index: 3;
-      }
-
-      .auth-password-toggle:hover {
-        color: var(--accent-color);
-        transform: scale(1.2);
-      }
-
-      .auth-options {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 13px;
-        margin-bottom: 25px;
-      }
-
-      .auth-remember {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
-      }
-
-      .auth-remember input[type="checkbox"] {
-        width: 16px;
-        height: 16px;
-        accent-color: var(--accent-color);
-        cursor: pointer;
-        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-        margin: 0;
-      }
-
-      .auth-remember:hover input[type="checkbox"] {
-        transform: scale(1.2);
-      }
-
-      .auth-remember input[type="checkbox"]:active {
-        transform: scale(0.9);
-      }
-
-      .auth-forgot-link {
-        color: var(--accent-color);
-        text-decoration: none;
-        font-weight: 500;
-        transition: color 0.2s ease;
-      }
-
-      .auth-forgot-link:hover {
-        text-decoration: underline;
-        color: var(--accent-hover);
-      }
-
-      #contact-signin-section, #contact-signup-section {
-        transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-      }
-
-      /* 3F. Primary CTA Button */
-      .btn-auth-submit {
-        width: 100%;
-        padding: 15px;
-        border: none;
-        border-radius: 12px;
-        background: #222;
-        color: #fff;
-        font-size: 15px;
-        font-weight: 600;
-        font-family: 'Inter', sans-serif;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
-        position: relative;
-        overflow: hidden;
-      }
-
-      /* Shimmer sweep effect on hover */
-      .btn-auth-submit::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -150%;
-        width: 50%;
-        height: 100%;
-        background: linear-gradient(
-          to right,
-          rgba(255, 255, 255, 0) 0%,
-          rgba(255, 255, 255, 0.25) 50%,
-          rgba(255, 255, 255, 0) 100%
-        );
-        transform: skewX(-25deg);
-        transition: left 0.6s ease;
-      }
-
-      .btn-auth-submit:hover::after {
-        left: 150%;
-      }
-
-      .btn-auth-submit:hover {
-        background: #333;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
-      }
-
-      .btn-auth-submit:active {
-        transform: scale(0.97) translateY(0);
-        transition: transform 0.1s ease;
-      }
-
-      .btn-auth-submit:hover i.zmdi-arrow-right {
-        transform: translateX(5px);
-      }
-
-      .btn-auth-submit:hover i.zmdi-assignment-account {
-        transform: scale(1.2);
-      }
-
-      .btn-auth-submit i {
-        transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        display: inline-block;
-      }
-
-      .auth-divider {
-        display: flex;
-        align-items: center;
-        text-align: center;
-        color: var(--text-muted);
-        font-size: 12px;
-        margin-top: 25px;
-        margin-bottom: 20px;
-      }
-
-      .auth-divider::before,
-      .auth-divider::after {
-        content: '';
-        flex: 1;
-        border-bottom: 1px solid #eeeeee;
-      }
-
-      .auth-divider:not(:empty)::before {
-        margin-right: .5em;
-      }
-
-      .auth-divider:not(:empty)::after {
-        margin-left: .5em;
-      }
-
-      /* 3H. Google Button */
-      .btn-google-login {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        width: 100%;
-        padding: 13px;
-        border: 1.5px solid #e2e4ea;
-        border-radius: 12px;
-        background: #fff;
-        color: #333;
-        font-size: 14px;
-        font-weight: 600;
-        font-family: 'Inter', sans-serif;
-        cursor: pointer;
-        transition: all 0.25s ease;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .btn-google-login:hover {
-        border-color: #ccc;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        transform: translateY(-1px);
-      }
-
-      .btn-google-login:active {
-        transform: scale(0.98);
-      }
-
-      /* 3G. Demo Accounts Box */
-      .demo-accounts-box {
-        background: #f9fafe;
-        border: 1px dashed #d8dce8;
-        border-radius: 12px;
-        padding: 14px 16px;
-        margin-top: 24px;
-        margin-bottom: 0;
-      }
-
-      .demo-accounts-title {
-        font-size: 12px;
-        font-weight: 700;
-        color: #555;
-        margin-bottom: 8px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      .demo-account-pill {
-        display: inline-block;
-        padding: 4px 10px;
-        background: #ffffff;
-        border: 1px solid #e0e0e0;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 600;
-        color: #444;
-        cursor: pointer;
-        margin: 2px 4px 2px 0;
-        transition: all 0.2s ease;
-      }
-
-      .demo-account-pill:hover {
-        background: var(--accent-color);
-        color: #ffffff;
-        border-color: var(--accent-color);
-        transform: translateY(-1px);
-      }
-
-      /* Dashboard / Account Styles */
-      .account-header-card {
-        background: linear-gradient(135deg, #1f2438 0%, #0f121d 100%);
-        border-radius: 14px;
-        padding: 24px 20px;
-        color: #ffffff;
-        margin-bottom: 25px;
-        display: flex;
-        align-items: center;
-        gap: 18px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
-        position: relative;
-        overflow: hidden;
-      }
-
-      .account-avatar {
-        width: 64px;
-        height: 64px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #717fe0 0%, #ec38bc 100%);
-        color: #ffffff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        font-weight: 700;
-        text-transform: uppercase;
-        flex-shrink: 0;
-        box-shadow: 0 4px 14px rgba(113, 127, 224, 0.4);
-      }
-
-      .account-meta {
-        flex-grow: 1;
-      }
-
-      .account-name-title {
-        font-size: 20px;
-        font-weight: 700;
-        color: #ffffff;
-        margin-bottom: 4px;
-      }
-
-      .account-email-sub {
-        font-size: 13px;
-        color: #b0b8d0;
-        margin-bottom: 8px;
-      }
-
-      .account-tier-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        background: rgba(255, 255, 255, 0.15);
-        color: #ffd700;
-        border: 1px solid rgba(255, 215, 0, 0.3);
-      }
-
-      .account-nav-tabs {
-        display: flex;
-        border-bottom: 2px solid #f0f0f0;
-        margin-bottom: 25px;
-        gap: 6px;
-        overflow-x: auto;
-      }
-
-      .account-nav-btn {
-        padding: 10px 16px;
-        font-size: 14px;
-        font-weight: 600;
-        color: #777;
-        background: none;
-        border: none;
-        border-bottom: 2px solid transparent;
-        margin-bottom: -2px;
-        cursor: pointer;
-        transition: all 0.25s ease;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        white-space: nowrap;
-      }
-
-      .account-nav-btn:hover {
-        color: #222;
-      }
-
-      .account-nav-btn.active {
-        color: #717fe0;
-        border-bottom-color: #717fe0;
-      }
-
-      .account-order-card {
-        border: 1px solid #eef0f5;
-        border-radius: 12px;
-        padding: 18px;
-        margin-bottom: 16px;
-        background: #fdfdfd;
-        transition: all 0.25s ease;
-      }
-
-      .account-order-card:hover {
-        border-color: #717fe0;
-        box-shadow: 0 6px 18px rgba(113, 127, 224, 0.08);
-      }
-
-      .order-card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-bottom: 12px;
-        border-bottom: 1px solid #f0f0f0;
-        margin-bottom: 12px;
-      }
-
-      .order-id-num {
-        font-weight: 700;
-        font-size: 15px;
-        color: #222;
-      }
-
-      .order-status-pill {
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        padding: 4px 10px;
-        border-radius: 20px;
-        background: #e8f5e9;
-        color: #2e7d32;
-      }
-
-      .order-status-pill.processing {
-        background: #fff3e0;
-        color: #e65100;
-      }
-
-      .order-status-pill.shipped {
-        background: #e3f2fd;
-        color: #0d47a1;
-      }
-
-      .order-items-preview {
-        font-size: 13px;
-        color: #666;
-        margin-bottom: 14px;
-        line-height: 1.4;
-      }
-
-      .order-footer-meta {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .order-total-price {
-        font-weight: 700;
-        font-size: 16px;
-        color: #222;
-      }
-
-      .btn-track-order {
-        padding: 6px 14px;
-        font-size: 12px;
-        font-weight: 600;
-        border-radius: 6px;
-        background: #717fe0;
-        color: #fff;
-        border: none;
-        cursor: pointer;
-        transition: all 0.2s ease;
-      }
-
-      .btn-track-order:hover {
-        background: #5b69c5;
-        transform: translateY(-1px);
-      }
-
-      /* Tracking Modal */
-      .tracking-modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 10000;
-        backdrop-filter: blur(4px);
-      }
-
-      .tracking-modal-content {
-        background: #fff;
-        border-radius: 16px;
-        width: 90%;
-        max-width: 520px;
-        padding: 30px;
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-        animation: cardFadeIn 0.3s ease;
-      }
-
-      .tracking-timeline {
-        position: relative;
-        padding-left: 30px;
-        margin: 20px 0;
-      }
-
-      .tracking-timeline::before {
-        content: '';
-        position: absolute;
-        left: 9px;
-        top: 6px;
-        bottom: 6px;
-        width: 2px;
-        background: #e0e0e0;
-      }
-
-      .timeline-step {
-        position: relative;
-        padding-bottom: 20px;
-      }
-
-      .timeline-step:last-child {
-        padding-bottom: 0;
-      }
-
-      .timeline-step-dot {
-        position: absolute;
-        left: -30px;
-        top: 2px;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: #e0e0e0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 10px;
-        color: #fff;
-      }
-
-      .timeline-step.completed .timeline-step-dot {
-        background: #2e7d32;
-      }
-
-      .timeline-step.active .timeline-step-dot {
-        background: #717fe0;
-        box-shadow: 0 0 0 4px rgba(113, 127, 224, 0.2);
-        animation: pulseTimeline 2s infinite;
-      }
-
-      @keyframes pulseTimeline {
-        0% { box-shadow: 0 0 0 2px #717fe0; }
-        50% { box-shadow: 0 0 0 6px rgba(113, 127, 224, 0.3); }
-        100% { box-shadow: 0 0 0 2px #717fe0; }
-      }
-
-      .timeline-step-title {
-        font-weight: 600;
-        font-size: 14px;
-        color: #222;
-      }
-
-      .timeline-step-time {
-        font-size: 12px;
-        color: #888;
-      }
-
-      button.CLogout {
-        color: #ffffff;
-        font-weight: 600;
-        font-size: 14px;
-        text-transform: uppercase;
-        width: 100%;
-        height: 44px;
-        background-color: #222222;
-        border-radius: 10px;
-        border: none;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        margin-top: 25px;
-      }
-
-      button.CLogout:hover {
-        background-color: #d32f2f;
-        transform: translateY(-1px);
-      }
-
-      .auth-alert-banner {
-        padding: 12px 16px;
-        border-radius: 8px;
-        font-size: 13px;
-        margin-bottom: 12px;
-        display: none;
-        align-items: center;
-        gap: 10px;
-        animation: authFadeIn 0.3s ease;
-      }
-
-      .auth-alert-banner.success {
-        background-color: #e6f6ee;
-        color: #178a53;
-        border: 1px solid #b8ebcd;
-        display: flex;
-      }
-
-      .auth-alert-banner.error {
-        background-color: #fdeded;
-        color: #c92c2c;
-        border: 1px solid #f9c7c7;
-        display: flex;
-      }
-
-      @keyframes authFadeIn {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-
-      @keyframes bannerShake {
-        0%, 100% { transform: translateX(0); }
-        20%, 60% { transform: translateX(-4px); }
-        40%, 80% { transform: translateX(4px); }
-      }
-
-      .auth-alert-banner.shake {
-        animation: bannerShake 0.4s ease-in-out;
-      }
-
-      @media (prefers-reduced-motion: reduce) {
-        *, *::before, *::after {
-          animation-duration: 0.01ms !important;
-          animation-iteration-count: 1 !important;
-          transition-duration: 0.01ms !important;
-        }
-      }
-    </style>
+    <link rel="stylesheet" type="text/css" href="css/account.css?v=1" />
     <style>
       input::-webkit-outer-spin-button,
       input::-webkit-inner-spin-button {
@@ -1116,325 +371,386 @@
     </div>
 
     <!-- Content page -->
-    <section class="auth-page-bg">
+    <section class="auth-page-bg gs-acct" aria-label="Account">
+      <div class="gs-acct-aurora" aria-hidden="true"></div>
       <div class="auth-card">
         <!-- Logged-in dashboard: hidden by default -->
         <div id="auth-loggedin-view" style="display: none;">
           <div class="Logoutmain">
-            <!-- Header Summary Card -->
-            <div class="account-header-card">
-              <div class="account-avatar js-logout-avatar">SG</div>
-              <div class="account-meta">
-                <div class="account-name-title AccountName">Sai Ganesh</div>
-                <div class="account-email-sub AccountEmail">sai@ganeshstore.com</div>
-                <div class="account-tier-badge js-account-tier">
-                  <i class="zmdi zmdi-star"></i> Platinum VIP &bull; 2,450 Points
-                </div>
-              </div>
-            </div>
-
-            <!-- Account Navigation Tabs -->
-            <div class="account-nav-tabs">
-              <button type="button" class="account-nav-btn active" onclick="switchAccountTab('orders', this)">
-                <i class="zmdi zmdi-dropbox"></i> My Orders
-              </button>
-              <button type="button" class="account-nav-btn" onclick="switchAccountTab('profile', this)">
-                <i class="zmdi zmdi-account"></i> Profile & Address
-              </button>
-              <button type="button" class="account-nav-btn" onclick="switchAccountTab('wishlist', this)">
-                <i class="zmdi zmdi-favorite"></i> Wishlist
-              </button>
-              <button type="button" class="account-nav-btn" onclick="switchAccountTab('rewards', this)">
-                <i class="zmdi zmdi-card-giftcard"></i> VIP Rewards
-              </button>
-              <button type="button" class="account-nav-btn" onclick="switchAccountTab('security', this)">
-                <i class="zmdi zmdi-shield-security"></i> Security & 2FA
-              </button>
-            </div>
-
-            <!-- TAB 1: Order History & Tracking -->
-            <div id="acc-tab-orders" class="account-tab-content">
-              <div id="account-orders-list">
-                <!-- Dynamically populated via JS -->
-              </div>
-            </div>
-
-            <!-- TAB 2: Profile & Shipping Address -->
-            <div id="acc-tab-profile" class="account-tab-content" style="display: none;">
-              <form onsubmit="handleProfileUpdate(event)">
-                <div class="auth-float-group">
-                  <input class="auth-input-field" type="text" id="acc-edit-name" required placeholder=" " />
-                  <label class="auth-float-label" for="acc-edit-name">Full Name</label>
-                </div>
-                <div class="auth-float-group">
-                  <input class="auth-input-field" type="tel" id="acc-edit-phone" required placeholder=" " />
-                  <label class="auth-float-label" for="acc-edit-phone">Phone Number</label>
-                </div>
-                <div class="auth-float-group">
-                  <input class="auth-input-field" type="text" id="acc-edit-address" placeholder=" " />
-                  <label class="auth-float-label" for="acc-edit-address">Default Shipping Address</label>
-                </div>
-                <button type="submit" class="btn-auth-submit" style="margin-top: 10px;">
-                  <i class="zmdi zmdi-check"></i> Save Changes
+            <div class="gs-dash">
+              <section class="gs-dash-hero gs-glass" aria-labelledby="gsAccountName">
+                <button type="button" class="CLogout gs-btn-ghost" aria-label="Sign out">
+                  <i class="zmdi zmdi-power"></i><span>Sign out</span>
                 </button>
-              </form>
-            </div>
 
-            <!-- TAB 3: Wishlist Summary -->
-            <div id="acc-tab-wishlist" class="account-tab-content" style="display: none;">
-              <div id="account-wishlist-list">
-                <!-- Dynamically populated via JS -->
-              </div>
-            </div>
-
-            <!-- TAB 4: VIP Rewards -->
-            <div id="acc-tab-rewards" class="account-tab-content" style="display: none;">
-              <div class="demo-accounts-box" style="background: #fff8e1; border-color: #ffe082; margin-top: 0;">
-                <div class="demo-accounts-title" style="color: #f57f17;">
-                  <i class="zmdi zmdi-crown"></i> VIP Loyalty Benefits
+                <div class="gs-dash-who">
+                  <div class="account-avatar js-logout-avatar" aria-hidden="true">GS</div>
+                  <div class="account-meta">
+                    <span class="gs-eyebrow" id="gsGreeting">Welcome back</span>
+                    <h2 class="account-name-title AccountName" id="gsAccountName">Member</h2>
+                    <p class="account-email-sub AccountEmail"></p>
+                    <div class="account-customer-id">
+                      <span>Customer ID</span>
+                      <strong class="AccountNumber" id="account-customer-id">Pending</strong>
+                      <button type="button" class="gs-copy-btn" id="gsCopyCustomerId" onclick="copyCustomerId()" aria-label="Copy customer ID" title="Copy customer ID">
+                        <i class="zmdi zmdi-copy"></i>
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <p style="font-size: 13px; color: #666; margin-bottom: 12px;" id="acc-rewards-desc">
-                  Enjoy 2x points on all purchases, automatic Free Express Shipping, and access to VIP exclusive drops.
-                </p>
-                <div style="font-size: 12px; font-weight: 700; color: #444; margin-bottom: 6px;">Available Promo Codes:</div>
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                  <span class="demo-account-pill" style="background: #fff; border-color: #ffd54f; font-weight: 700; color: #e65100;">GANESH20 ($20 OFF)</span>
-                  <span class="demo-account-pill" style="background: #fff; border-color: #ffd54f; font-weight: 700; color: #e65100;">SAVE10 (10% OFF)</span>
-                  <span class="demo-account-pill" style="background: #fff; border-color: #ffd54f; font-weight: 700; color: #e65100;">FREESHIP (FREE SHIPPING)</span>
-                </div>
-              </div>
-            </div>
 
-            <!-- TAB 5: Security & Google Authenticator 2FA -->
-            <div id="acc-tab-security" class="account-tab-content" style="display: none;">
-              <div style="background: #fdfdfd; border: 1px solid #eef0f5; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <div class="gs-tier-card" aria-label="Membership tier">
+                  <div class="gs-tier-top">
+                    <span>GaneshStore Membership</span>
+                    <i class="zmdi zmdi-star"></i>
+                  </div>
+                  <span class="account-tier-badge js-account-tier">Bronze</span>
+                  <span class="gs-tier-points"><strong id="gsTierPoints">0</strong> reward points</span>
+                  <div class="gs-tier-bar" role="progressbar" aria-label="Progress to next tier" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="gsTierBar">
+                    <span id="gsTierFill"></span>
+                  </div>
+                  <p class="gs-tier-next" id="gsTierNext">Earn points with every order.</p>
+                </div>
+              </section>
+
+              <div class="gs-dash-stats">
+                <button type="button" class="gs-stat gs-glass" data-account-tab="orders">
+                  <span class="gs-stat-icon"><i class="zmdi zmdi-shopping-basket"></i></span>
+                  <span class="gs-stat-text"><span class="gs-stat-num" id="gsStatOrders">0</span><span class="gs-stat-label">Orders</span></span>
+                </button>
+                <button type="button" class="gs-stat gs-glass" data-account-tab="wishlist">
+                  <span class="gs-stat-icon"><i class="zmdi zmdi-favorite"></i></span>
+                  <span class="gs-stat-text"><span class="gs-stat-num" id="gsStatWishlist">0</span><span class="gs-stat-label">Saved</span></span>
+                </button>
+                <button type="button" class="gs-stat gs-glass" data-account-tab="rewards">
+                  <span class="gs-stat-icon"><i class="zmdi zmdi-card-giftcard"></i></span>
+                  <span class="gs-stat-text"><span class="gs-stat-num" id="gsStatPoints">0</span><span class="gs-stat-label">Points</span></span>
+                </button>
+              </div>
+
+              <nav class="account-nav-tabs gs-seg" role="tablist" aria-label="Account sections">
+                <span class="gs-seg-thumb" aria-hidden="true"></span>
+                <button type="button" class="account-nav-btn active" role="tab" aria-selected="true" aria-controls="acc-tab-orders" data-account-tab="orders"><i class="zmdi zmdi-shopping-basket"></i><span>Orders</span></button>
+                <button type="button" class="account-nav-btn" role="tab" aria-selected="false" aria-controls="acc-tab-profile" data-account-tab="profile"><i class="zmdi zmdi-account-circle"></i><span>Profile</span></button>
+                <button type="button" class="account-nav-btn" role="tab" aria-selected="false" aria-controls="acc-tab-wishlist" data-account-tab="wishlist"><i class="zmdi zmdi-favorite-outline"></i><span>Saved</span></button>
+                <button type="button" class="account-nav-btn" role="tab" aria-selected="false" aria-controls="acc-tab-rewards" data-account-tab="rewards"><i class="zmdi zmdi-card-giftcard"></i><span>Rewards</span></button>
+                <button type="button" class="account-nav-btn" role="tab" aria-selected="false" aria-controls="acc-tab-security" data-account-tab="security"><i class="zmdi zmdi-shield-check"></i><span>Security</span></button>
+              </nav>
+
+              <section id="acc-tab-orders" class="account-tab-content gs-panel gs-glass" role="tabpanel" aria-label="Orders">
+                <header class="gs-panel-head">
                   <div>
-                    <h5 style="font-weight: 700; color: #222; margin: 0 0 4px 0;"><i class="zmdi zmdi-shield-check" style="color: #717fe0;"></i> Google Authenticator (2FA)</h5>
-                    <p style="font-size: 13px; color: #777; margin: 0;">Protect your account with Time-based One-Time Passwords (TOTP).</p>
+                    <h3>Your orders</h3>
+                    <p>Track deliveries and revisit receipts.</p>
                   </div>
-                  <span id="twofa-status-pill" style="padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; background: #eee; color: #666;">
-                    Disabled
-                  </span>
-                </div>
+                  <a href="product.html" class="gs-link">Continue shopping <i class="zmdi zmdi-arrow-right"></i></a>
+                </header>
+                <div id="account-orders-list" class="gs-orders"></div>
+              </section>
 
-                <!-- 2FA Setup Flow (Shown when Disabled) -->
-                <div id="twofa-setup-section" style="display: none; border-top: 1px solid #f0f0f0; padding-top: 15px; margin-top: 15px;">
-                  <p style="font-size: 13px; color: #444; margin-bottom: 15px;"><strong>Step 1:</strong> Scan this QR code with <strong>Google Authenticator</strong> (or Authy / 1Password):</p>
-                  <div style="text-align: center; margin-bottom: 15px;">
-                    <img id="twofa-qr-image" src="" alt="2FA QR Code" style="width: 180px; height: 180px; border-radius: 10px; border: 1px solid #ddd; padding: 5px; background: #fff;" />
+              <section id="acc-tab-profile" class="account-tab-content gs-panel gs-glass" role="tabpanel" aria-label="Profile" style="display: none;">
+                <header class="gs-panel-head">
+                  <div>
+                    <h3>Profile &amp; delivery</h3>
+                    <p>Used to speed up checkout. Your email and customer ID can't be changed.</p>
                   </div>
-                  <div style="background: #f5f7fa; padding: 10px 14px; border-radius: 8px; font-size: 12px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
-                    <span>Secret Key: <strong id="twofa-secret-text" style="letter-spacing: 1px; color: #222;">...</strong></span>
-                    <button type="button" onclick="copySecretKey()" style="background: none; border: 1px solid #ccc; padding: 2px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">Copy</button>
+                </header>
+                <form id="gsProfileForm" onsubmit="handleProfileUpdate(event)">
+                  <div class="gs-form-grid">
+                    <div class="auth-float-group">
+                      <input class="auth-input-field" type="text" id="acc-edit-name" autocomplete="name" required placeholder=" " />
+                      <label class="auth-float-label" for="acc-edit-name">Full name</label>
+                    </div>
+                    <div class="auth-float-group">
+                      <input class="auth-input-field" type="tel" id="acc-edit-phone" autocomplete="tel" required placeholder=" " />
+                      <label class="auth-float-label" for="acc-edit-phone">Phone number</label>
+                    </div>
+                    <div class="auth-float-group gs-span-2">
+                      <input class="auth-input-field" type="text" id="acc-edit-address" autocomplete="street-address" placeholder=" " />
+                      <label class="auth-float-label" for="acc-edit-address">Default shipping address</label>
+                    </div>
+                    <div class="auth-float-group">
+                      <input class="auth-input-field" type="email" id="gsProfileEmail" readonly placeholder=" " />
+                      <label class="auth-float-label" for="gsProfileEmail">Email</label>
+                    </div>
+                    <div class="auth-float-group">
+                      <input class="auth-input-field" type="text" id="gsProfileCustomerId" readonly placeholder=" " />
+                      <label class="auth-float-label" for="gsProfileCustomerId">Customer ID</label>
+                    </div>
                   </div>
-
-                  <p style="font-size: 13px; color: #444; margin-bottom: 8px;"><strong>Step 2:</strong> Enter the 6-digit verification code generated by your app:</p>
-                  <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <input type="text" id="twofa-verify-input" class="auth-input-field" placeholder="000000" maxlength="6" style="text-align: center; font-size: 18px; letter-spacing: 4px; font-weight: 700; width: 160px;" />
-                    <button type="button" class="btn-auth-submit" style="width: auto; padding: 0 20px;" onclick="handleEnable2FA()">
-                      Activate 2FA
+                  <div class="gs-form-foot">
+                    <button type="submit" class="btn-auth-submit gs-btn-inline">
+                      <span>Save changes</span>
                     </button>
+                    <span class="gs-inline-status" id="gsProfileStatus" role="status" aria-live="polite"><i class="zmdi zmdi-check-circle"></i> Saved</span>
+                  </div>
+                </form>
+              </section>
+
+              <section id="acc-tab-wishlist" class="account-tab-content gs-panel gs-glass" role="tabpanel" aria-label="Saved items" style="display: none;">
+                <header class="gs-panel-head">
+                  <div>
+                    <h3>Saved for later</h3>
+                    <p>Pieces you've hearted, ready when you are.</p>
+                  </div>
+                  <a href="wishlist.html" class="gs-link">Open wishlist <i class="zmdi zmdi-arrow-right"></i></a>
+                </header>
+                <div id="account-wishlist-list"></div>
+              </section>
+
+              <section id="acc-tab-rewards" class="account-tab-content gs-panel gs-glass" role="tabpanel" aria-label="Rewards" style="display: none;">
+                <header class="gs-panel-head">
+                  <div>
+                    <h3>Rewards</h3>
+                    <p id="acc-rewards-desc">Earn 10 points for every $1 you spend.</p>
+                  </div>
+                </header>
+                <div class="gs-rewards-grid">
+                  <ul class="gs-perks" id="gsTierPerks"></ul>
+                  <div class="gs-coupons">
+                    <div class="gs-coupon">
+                      <span class="gs-coupon-code">GANESH20</span>
+                      <span class="gs-coupon-desc">$20 off orders over $50</span>
+                      <button type="button" class="gs-copy-btn" data-copy-code="GANESH20" aria-label="Copy code GANESH20"><i class="zmdi zmdi-copy"></i></button>
+                    </div>
+                    <div class="gs-coupon">
+                      <span class="gs-coupon-code">SAVE10</span>
+                      <span class="gs-coupon-desc">10% off your entire order</span>
+                      <button type="button" class="gs-copy-btn" data-copy-code="SAVE10" aria-label="Copy code SAVE10"><i class="zmdi zmdi-copy"></i></button>
+                    </div>
+                    <div class="gs-coupon">
+                      <span class="gs-coupon-code">FREESHIP</span>
+                      <span class="gs-coupon-desc">Free standard shipping</span>
+                      <button type="button" class="gs-copy-btn" data-copy-code="FREESHIP" aria-label="Copy code FREESHIP"><i class="zmdi zmdi-copy"></i></button>
+                    </div>
                   </div>
                 </div>
+              </section>
 
-                <!-- 2FA Active Management (Shown when Enabled) -->
-                <div id="twofa-active-section" style="display: none; border-top: 1px solid #f0f0f0; padding-top: 15px; margin-top: 15px;">
-                  <p style="font-size: 13px; color: #2e7d32; margin-bottom: 15px;">
-                    <i class="zmdi zmdi-check-circle"></i> Two-Factor Authentication is currently protecting your account.
-                  </p>
-                  <button type="button" style="background: #fff; border: 1px solid #d32f2f; color: #d32f2f; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;" onclick="handleDisable2FA()">
-                    Disable 2FA
-                  </button>
+              <section id="acc-tab-security" class="account-tab-content gs-panel gs-glass" role="tabpanel" aria-label="Security" style="display: none;">
+                <header class="gs-panel-head">
+                  <div>
+                    <h3>Security</h3>
+                    <p>Add a second step to keep your account yours.</p>
+                  </div>
+                </header>
+                <div class="gs-security">
+                  <div class="gs-security-head">
+                    <div>
+                      <h4><i class="zmdi zmdi-shield-check"></i> Two-step verification</h4>
+                      <p>Use Google Authenticator, Authy or 1Password to generate sign-in codes.</p>
+                    </div>
+                    <span id="twofa-status-pill" class="gs-pill-status">Off</span>
+                  </div>
+
+                  <div id="twofa-setup-section" class="gs-security-body" style="display: none;">
+                    <p class="gs-step-label"><strong>1.</strong> Scan this code with your authenticator app.</p>
+                    <img id="twofa-qr-image" class="gs-qr" src="" alt="Two-step verification QR code" />
+                    <div class="gs-secret">
+                      <span>Setup key <strong id="twofa-secret-text">...</strong></span>
+                      <button type="button" class="gs-copy-btn" onclick="copySecretKey(this)" aria-label="Copy setup key"><i class="zmdi zmdi-copy"></i></button>
+                    </div>
+                    <p class="gs-step-label"><strong>2.</strong> Enter the 6-digit code from the app.</p>
+                    <div class="gs-verify-row">
+                      <input type="text" id="twofa-verify-input" class="gs-otp-input" inputmode="numeric" autocomplete="one-time-code" placeholder="000000" maxlength="6" aria-label="6-digit verification code" />
+                      <button type="button" class="btn-auth-submit gs-btn-inline" onclick="handleEnable2FA()"><span>Turn on</span></button>
+                    </div>
+                  </div>
+
+                  <div id="twofa-active-section" class="gs-security-body" style="display: none;">
+                    <p class="gs-security-on"><i class="zmdi zmdi-check-circle"></i> Two-step verification is protecting your account.</p>
+                    <button type="button" class="gs-btn-ghost gs-btn-danger" onclick="handleDisable2FA()">Turn off</button>
+                  </div>
                 </div>
-              </div>
+              </section>
             </div>
-
-            <!-- Logout Action -->
-            <button class="CLogout flex-c-m" onclick="logoutUser(event)">
-              <i class="zmdi zmdi-power"></i> Sign Out
-            </button>
           </div>
         </div>
 
-        <!-- Logged-out login form: shown by default -->
+        <!-- Logged-out sign-in / create account: shown by default -->
         <div id="auth-loggedout-view" style="display: block;">
           <div class="Loginmain">
-            <!-- Header with Logo and Welcome -->
-            <div class="auth-card-header">
-              <img src="images/icons/logo-01.png" alt="GaneshStore" class="auth-card-logo" />
-              <p class="auth-card-subtitle">Welcome to GaneshStore</p>
-            </div>
-
-            <!-- Tab Toggles (Pill style) -->
-            <div class="auth-tabs">
-              <button type="button" class="auth-tab-btn active" id="btn-tab-signin" onclick="switchContactTab('signin')">Sign In</button>
-              <button type="button" class="auth-tab-btn" id="btn-tab-signup" onclick="switchContactTab('signup')">Create Account</button>
-            </div>
-
-            <!-- Inline Alert Feedback Banner -->
-            <div class="auth-alert-banner" id="contact-auth-banner">
-              <i class="zmdi zmdi-info-outline" id="c-banner-icon"></i>
-              <span id="c-banner-text">Welcome back!</span>
-            </div>
-
-            <!-- ================= Sign In Mode ================= -->
-            <div id="contact-signin-section">
-              <form id="contact-login-form" onsubmit="handleEmailLogin(event)">
-                <div class="auth-float-group">
-                  <input class="auth-input-field auth-email-input" type="email" id="c-login-email" required placeholder=" " />
-                  <label class="auth-float-label" for="c-login-email">Email Address</label>
+            <div class="gs-auth-layout gs-glass">
+              <aside class="gs-auth-story" aria-label="GaneshStore membership">
+                <img src="images/about-02.jpg" alt="" class="gs-auth-story-img" />
+                <div class="gs-auth-story-shade"></div>
+                <div class="gs-member-pass" aria-hidden="true">
+                  <div class="gs-member-pass-top"><span>Member pass</span><span class="gs-member-pass-chip"></span></div>
+                  <div class="gs-member-pass-id">GS-•••••</div>
+                  <div class="gs-member-pass-foot"><span>Your customer ID</span><span>GaneshStore</span></div>
                 </div>
-
-                <div class="auth-float-group">
-                  <input class="auth-input-field auth-password-input" type="password" id="c-login-password" required placeholder=" " />
-                  <label class="auth-float-label" for="c-login-password">Password</label>
-                  <i class="zmdi zmdi-eye auth-password-toggle" onclick="toggleContactPassword('c-login-password', this)"></i>
+                <div class="gs-auth-story-body">
+                  <span class="gs-eyebrow gs-eyebrow-light"><i class="zmdi zmdi-star"></i> GaneshStore Members</span>
+                  <h2>Your wardrobe,<br />remembered.</h2>
+                  <p>One account for orders, saved pieces and rewards, on every device.</p>
+                  <ul class="gs-auth-perks">
+                    <li><i class="zmdi zmdi-truck"></i><span><strong>Free shipping</strong> over $100</span></li>
+                    <li><i class="zmdi zmdi-star-circle"></i><span><strong>10 points</strong> per $1</span></li>
+                    <li class="gs-perk-extra"><i class="zmdi zmdi-flash"></i><span><strong>Early access</strong> to new drops</span></li>
+                  </ul>
                 </div>
+              </aside>
 
-                <div class="auth-options">
-                  <label class="auth-remember">
-                    <input type="checkbox" id="c-login-remember" checked />
-                    <span>Remember me</span>
-                  </label>
-                  <a href="#" class="auth-forgot-link" onclick="handleForgotPassword(event)">Forgot Password?</a>
+              <div class="gs-auth-panel">
+                <div class="gs-auth-panel-inner">
+                  <header class="gs-auth-head">
+                    <img src="images/icons/logo-01.png" alt="GaneshStore" class="auth-card-logo" />
+                    <h2 class="gs-auth-title" id="gsAuthTitle">Welcome back</h2>
+                    <p class="auth-card-subtitle" id="gsAuthSubtitle">Sign in with your email or customer ID.</p>
+                  </header>
+
+                  <div class="auth-tabs gs-seg" role="tablist" aria-label="Sign in or create account">
+                    <span class="gs-seg-thumb" aria-hidden="true"></span>
+                    <button type="button" class="auth-tab-btn active" id="btn-tab-signin" role="tab" aria-selected="true" aria-controls="contact-signin-section" onclick="switchContactTab('signin')">Sign in</button>
+                    <button type="button" class="auth-tab-btn" id="btn-tab-signup" role="tab" aria-selected="false" aria-controls="contact-signup-section" onclick="switchContactTab('signup')">Create account</button>
+                  </div>
+
+                  <div>
+                    <div class="auth-alert-banner" id="contact-auth-banner" role="status" aria-live="polite">
+                      <i class="zmdi zmdi-info-outline" id="c-banner-icon"></i>
+                      <span id="c-banner-text"></span>
+                    </div>
+
+                    <div id="contact-signin-section" role="tabpanel" aria-labelledby="btn-tab-signin">
+                      <form id="contact-login-form" onsubmit="handleEmailLogin(event)" novalidate>
+                        <div class="auth-float-group">
+                          <input class="auth-input-field auth-email-input" type="text" id="c-login-email" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required placeholder=" " aria-describedby="c-login-identifier-hint" />
+                          <label class="auth-float-label" for="c-login-email">Email or customer ID</label>
+                        </div>
+                        <p class="auth-field-hint" id="c-login-identifier-hint">For example, you@gmail.com or GS-10001.</p>
+
+                        <div class="auth-float-group">
+                          <input class="auth-input-field auth-password-input" type="password" id="c-login-password" name="password" autocomplete="current-password" required placeholder=" " />
+                          <label class="auth-float-label" for="c-login-password">Password</label>
+                          <button type="button" class="auth-password-toggle" aria-label="Show password" onclick="toggleContactPassword('c-login-password', this)"><i class="zmdi zmdi-eye"></i></button>
+                        </div>
+
+                        <div class="auth-options">
+                          <label class="auth-remember">
+                            <input type="checkbox" id="c-login-remember" checked />
+                            <span>Keep me signed in</span>
+                          </label>
+                          <a href="#" class="auth-forgot-link" onclick="handleForgotPassword(event)">Forgot password?</a>
+                        </div>
+
+                        <button type="submit" class="btn-auth-submit btn-auth-submit-action">
+                          <span>Sign in</span>
+                          <i class="zmdi zmdi-arrow-right"></i>
+                        </button>
+                      </form>
+                    </div>
+
+                    <div id="contact-signup-section" role="tabpanel" aria-labelledby="btn-tab-signup" style="display: none;">
+                      <form id="contact-register-form" onsubmit="handleEmailSignUp(event)">
+                        <div class="auth-float-group">
+                          <input class="auth-input-field" type="text" id="c-signup-name" name="name" autocomplete="name" required placeholder=" " />
+                          <label class="auth-float-label" for="c-signup-name">Full name</label>
+                        </div>
+
+                        <div class="auth-float-group">
+                          <input class="auth-input-field" type="email" id="c-signup-email" name="email" autocomplete="email" required placeholder=" " aria-describedby="c-signup-customer-id-hint" />
+                          <label class="auth-float-label" for="c-signup-email">Email address</label>
+                        </div>
+                        <p class="auth-field-hint" id="c-signup-customer-id-hint">You'll get your own customer ID right after sign-up.</p>
+
+                        <div class="auth-float-group">
+                          <input class="auth-input-field" type="password" id="c-signup-password" name="new-password" autocomplete="new-password" required placeholder=" " minlength="6" aria-describedby="gsPwHint" />
+                          <label class="auth-float-label" for="c-signup-password">Create password</label>
+                          <button type="button" class="auth-password-toggle" aria-label="Show password" onclick="toggleContactPassword('c-signup-password', this)"><i class="zmdi zmdi-eye"></i></button>
+                        </div>
+                        <div class="gs-strength" id="gsPwStrength" data-score="0" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+                        <p class="auth-field-hint" id="gsPwHint">At least 6 characters. Mix letters, numbers and symbols for a stronger password.</p>
+
+                        <div class="auth-options">
+                          <label class="auth-remember">
+                            <input type="checkbox" id="c-signup-agree" required />
+                            <span>I agree to the Terms of Service &amp; Privacy Policy</span>
+                          </label>
+                        </div>
+
+                        <button type="submit" class="btn-auth-submit">
+                          <span>Create account</span>
+                          <i class="zmdi zmdi-arrow-right"></i>
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+
+                  <div class="auth-divider">or</div>
+
+                  <button type="button" class="btn-google-login" onclick="handleGoogleSignIn()">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20" height="20" aria-hidden="true">
+                      <path fill="#EA4335" d="M24 9.5c3.3 0 6.3 1.2 8.7 3.2l6.5-6.5C34.5 2.5 29.8 0 24 0 14.7 0 6.8 5.6 3.1 13.8l7.5 5.8C12.5 12.8 17.7 9.5 24 9.5z"/>
+                      <path fill="#4285F4" d="M46.9 24.5c0-1.6-.1-3.2-.4-4.7H24v9.4h12.9c-.6 3.1-2.3 5.7-4.9 7.4l7.7 6c4.5-4.2 7.2-10.4 7.2-18.1z"/>
+                      <path fill="#FBBC05" d="M10.6 28.5c-1-3-1-6.3 0-9.4l-7.5-5.8c-2.7 5.4-2.7 11.8 0 17.2l7.5-5.8z"/>
+                      <path fill="#34A853" d="M24 48c6.5 0 11.9-2.2 15.9-5.9l-7.7-6c-2.2 1.5-5 2.3-8.2 2.3-6.3 0-11.5-4.2-13.4-10.1l-7.5 5.8C6.8 42.4 14.7 48 24 48z"/>
+                    </svg>
+                    <span>Continue with Google</span>
+                  </button>
+
+                  <div class="demo-accounts-box">
+                    <div class="demo-accounts-title"><i class="zmdi zmdi-flash"></i> Try a demo account</div>
+                    <div class="gs-demo-list">
+                      <button type="button" class="demo-account-pill" onclick="quickLoginDemo('sai@ganeshstore.com', 'password123')">
+                        <span class="gs-demo-avatar is-platinum">SG</span> Sai <span class="gs-demo-tier">Platinum</span>
+                      </button>
+                      <button type="button" class="demo-account-pill" onclick="quickLoginDemo('olivia@vance.net', 'password123')">
+                        <span class="gs-demo-avatar is-gold">OV</span> Olivia <span class="gs-demo-tier">Gold</span>
+                      </button>
+                      <button type="button" class="demo-account-pill" onclick="quickLoginDemo('demo@ganeshstore.com', 'password123')">
+                        <span class="gs-demo-avatar is-silver">DC</span> Demo <span class="gs-demo-tier">Silver</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <p class="gs-auth-trust"><i class="zmdi zmdi-lock"></i> Encrypted sign-in with optional two-step verification</p>
                 </div>
-
-                <button type="submit" class="btn-auth-submit btn-auth-submit-action">
-                  <span>Sign In</span>
-                  <i class="zmdi zmdi-arrow-right"></i>
-                </button>
-              </form>
-            </div>
-
-            <!-- ================= Sign Up Mode ================= -->
-            <div id="contact-signup-section" style="display: none;">
-              <form id="contact-register-form" onsubmit="handleEmailSignUp(event)">
-                <div class="auth-float-group">
-                  <input class="auth-input-field" type="text" id="c-signup-name" required placeholder=" " />
-                  <label class="auth-float-label" for="c-signup-name">Full Name</label>
-                </div>
-
-                <div class="auth-float-group">
-                  <input class="auth-input-field" type="email" id="c-signup-email" required placeholder=" " />
-                  <label class="auth-float-label" for="c-signup-email">Email Address</label>
-                </div>
-
-                <div class="auth-float-group">
-                  <input class="auth-input-field" type="password" id="c-signup-password" required placeholder=" " minlength="6" />
-                  <label class="auth-float-label" for="c-signup-password">Password</label>
-                  <i class="zmdi zmdi-eye auth-password-toggle" onclick="toggleContactPassword('c-signup-password', this)"></i>
-                </div>
-
-                <div class="auth-options">
-                  <label class="auth-remember" style="font-size: 12px; line-height: 1.4;">
-                    <input type="checkbox" id="c-signup-agree" required />
-                    <span>I agree to the Terms of Service & Privacy Policy</span>
-                  </label>
-                </div>
-
-                <button type="submit" class="btn-auth-submit">
-                  <span>Create Account</span>
-                  <i class="zmdi zmdi-assignment-account"></i>
-                </button>
-              </form>
-            </div>
-
-            <div class="auth-divider">or continue with</div>
-
-            <!-- Google Authentication Trigger -->
-            <button type="button" class="btn-google-login" onclick="handleGoogleSignIn()">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20px" height="20px">
-                <path fill="#EA4335" d="M24 9.5c3.3 0 6.3 1.2 8.7 3.2l6.5-6.5C34.5 2.5 29.8 0 24 0 14.7 0 6.8 5.6 3.1 13.8l7.5 5.8C12.5 12.8 17.7 9.5 24 9.5z"/>
-                <path fill="#4285F4" d="M46.9 24.5c0-1.6-.1-3.2-.4-4.7H24v9.4h12.9c-.6 3.1-2.3 5.7-4.9 7.4l7.7 6c4.5-4.2 7.2-10.4 7.2-18.1z"/>
-                <path fill="#FBBC05" d="M10.6 28.5c-1-3-1-6.3 0-9.4l-7.5-5.8c-2.7 5.4-2.7 11.8 0 17.2l7.5-5.8z"/>
-                <path fill="#34A853" d="M24 48c6.5 0 11.9-2.2 15.9-5.9l-7.7-6c-2.2 1.5-5 2.3-8.2 2.3-6.3 0-11.5-4.2-13.4-10.1l-7.5 5.8C6.8 42.4 14.7 48 24 48z"/>
-              </svg>
-              <span>Continue with Google</span>
-            </button>
-
-            <!-- Quick Demo Accounts Switcher (Moved below forms) -->
-            <div class="demo-accounts-box">
-              <div class="demo-accounts-title">
-                <i class="zmdi zmdi-flash"></i> Quick Test Demo Accounts (1-Click Login)
               </div>
-              <span class="demo-account-pill" onclick="quickLoginDemo('sai@ganeshstore.com', 'password123')">
-                👑 Sai Ganesh (Platinum)
-              </span>
-              <span class="demo-account-pill" onclick="quickLoginDemo('olivia@vance.net', 'password123')">
-                ⭐ Olivia Vance (Gold)
-              </span>
-              <span class="demo-account-pill" onclick="quickLoginDemo('demo@ganeshstore.com', 'password123')">
-                ✨ Demo Customer (Silver)
-              </span>
             </div>
           </div>
         </div>
       </div>
-    </section>
 
-    <!-- Interactive Live Order Tracking Modal -->
-    <div class="tracking-modal-overlay" id="orderTrackingModal">
+    <!-- Order tracking sheet -->
+    <div class="tracking-modal-overlay" id="orderTrackingModal" role="dialog" aria-modal="true" aria-labelledby="gsTrackTitle">
       <div class="tracking-modal-content">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-          <h4 style="font-weight: 700; font-size: 18px; color: #222; margin: 0;">
-            <i class="zmdi zmdi-truck" style="color: #717fe0; margin-right: 6px;"></i> Live Shipment Tracker
-          </h4>
-          <span style="font-size: 26px; cursor: pointer; color: #888;" onclick="closeTrackingModal()">&times;</span>
-        </div>
-
-        <div style="background: #f8f9fa; padding: 14px; border-radius: 10px; font-size: 13px; margin-bottom: 15px;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-            <span style="color: #666;">Tracking Number:</span>
-            <strong style="color: #222;" id="trk-number">GS-TRK-892147</strong>
+        <div class="gs-sheet-head">
+          <div>
+            <span class="gs-eyebrow" id="trk-status-text">In progress</span>
+            <h4 id="gsTrackTitle">Track your order</h4>
           </div>
-          <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-            <span style="color: #666;">Carrier:</span>
-            <strong style="color: #717fe0;">GaneshStore Express Priority</strong>
-          </div>
-          <div style="display: flex; justify-content: space-between;">
-            <span style="color: #666;">Estimated Delivery:</span>
-            <strong style="color: #2e7d32;" id="trk-est-delivery">Aug 26, 2026</strong>
-          </div>
+          <button type="button" class="gs-sheet-close" onclick="closeTrackingModal()" aria-label="Close tracker"><i class="zmdi zmdi-close"></i></button>
         </div>
-
-        <!-- 5-Step Timeline -->
-        <div class="tracking-timeline" id="trk-timeline-container">
-          <!-- Populated dynamically via JS -->
-        </div>
-
-        <button type="button" class="btn-auth-submit" style="margin-top: 15px; height: 42px;" onclick="closeTrackingModal()">
-          Close Tracker
-        </button>
+        <dl class="gs-sheet-meta">
+          <div><dt>Order</dt><dd class="is-mono" id="trk-order-id">—</dd></div>
+          <div><dt>Tracking number</dt><dd class="is-mono" id="trk-number">—</dd></div>
+          <div><dt>Carrier</dt><dd>GaneshStore Express</dd></div>
+          <div><dt>Estimated delivery</dt><dd id="trk-est-delivery">—</dd></div>
+        </dl>
+        <ol class="gs-timeline" id="trk-timeline-container"></ol>
+        <button type="button" class="btn-auth-submit" onclick="closeTrackingModal()"><span>Done</span></button>
       </div>
     </div>
 
-    <!-- Interactive 2-Step Google Authenticator Login Verification Modal -->
-    <div class="tracking-modal-overlay" id="twoFactorModal" style="display: none;">
-      <div class="tracking-modal-content" style="max-width: 420px; text-align: center;">
-        <div style="width: 56px; height: 56px; border-radius: 50%; background: #e8eaf6; color: #717fe0; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 15px auto;">
-          <i class="zmdi zmdi-shield-security"></i>
-        </div>
-        <h4 style="font-weight: 700; font-size: 18px; color: #222; margin-bottom: 6px;">2-Step Verification</h4>
-        <p style="font-size: 13px; color: #666; margin-bottom: 18px;">
-          Enter the 6-digit code from your <strong>Google Authenticator</strong> app for <span id="twofa-login-email-display" style="font-weight: 600; color: #222;">...</span>
-        </p>
+    <!-- Two-step verification sheet -->
+    <div class="tracking-modal-overlay" id="twoFactorModal" role="dialog" aria-modal="true" aria-labelledby="gs2faTitle">
+      <div class="tracking-modal-content gs-2fa" style="max-width: 420px;">
+        <div class="gs-2fa-icon"><i class="zmdi zmdi-shield-security"></i></div>
+        <h4 id="gs2faTitle">Two-step verification</h4>
+        <p>Enter the 6-digit code from your authenticator app for <span id="twofa-login-email-display">your account</span>.</p>
 
-        <div id="twofa-modal-alert" class="auth-alert-banner error" style="display: none; margin-bottom: 15px;">
+        <div id="twofa-modal-alert" class="auth-alert-banner error" style="display: none;">
           <i class="zmdi zmdi-alert-circle-o"></i>
           <span id="twofa-modal-alert-text">Invalid code</span>
         </div>
 
-        <input type="text" id="twofa-login-code-input" class="auth-input-field" placeholder="000000" maxlength="6" style="text-align: center; font-size: 24px; letter-spacing: 6px; font-weight: 700; margin-bottom: 15px;" />
+        <input type="text" id="twofa-login-code-input" class="gs-otp-input" inputmode="numeric" autocomplete="one-time-code" placeholder="000000" maxlength="6" aria-label="6-digit verification code" />
 
-        <button type="button" class="btn-auth-submit" onclick="submit2FALoginCode()" style="margin-bottom: 10px;">
-          Verify & Sign In
-        </button>
-        <button type="button" style="background: none; border: none; color: #888; font-size: 13px; cursor: pointer;" onclick="close2FAModal()">
-          Cancel
-        </button>
+        <button type="button" class="btn-auth-submit" onclick="submit2FALoginCode()"><span>Verify &amp; sign in</span></button>
+        <button type="button" class="gs-text-btn" onclick="close2FAModal()">Cancel</button>
       </div>
     </div>
+    </section>
 
     <!-- Footer -->
     <footer class="bg3 p-t-75 p-b-32">
@@ -1512,48 +828,280 @@
     <script src="vendor/perfect-scrollbar/perfect-scrollbar.min.js"></script>
     <script src="js/main.js?v=2.1.0"></script>
 
-    <!-- Account Dashboard & Google Authenticator Dynamic Engine -->
+    <!-- Account experience: sign-in UI, member dashboard and two-step verification -->
     <script>
       var currentGeneratedSecret = null;
       var pendingLoginUserId = null;
 
-      function syncAuthView() {
+      var GS_ACCOUNT_TABS = ['orders', 'profile', 'wishlist', 'rewards', 'security'];
+      var GS_TIERS = [
+        { name: 'Bronze', min: 0, next: 500 },
+        { name: 'Silver', min: 500, next: 1000 },
+        { name: 'Gold', min: 1000, next: 2000 },
+        { name: 'Platinum', min: 2000, next: null }
+      ];
+      var GS_TIER_PERKS = {
+        Bronze: ['Free standard shipping on orders over $100', '10 points for every $1 you spend', 'Member-only promo codes'],
+        Silver: ['Everything in Bronze', '1.5x points on every order', 'A birthday voucher every year'],
+        Gold: ['Everything in Silver', '2x points and free express shipping', 'Early access to sales'],
+        Platinum: ['Everything in Gold', '3x points on every order', 'Personal concierge and instant free shipping']
+      };
+
+      function gsEscape(value) {
+        return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+        });
+      }
+
+      function gsReadJson(key, fallback) {
+        try {
+          var value = JSON.parse(localStorage.getItem(key));
+          return value == null ? fallback : value;
+        } catch (e) {
+          return fallback;
+        }
+      }
+
+      function gsMoney(value) {
+        var num = parseFloat(String(value == null ? 0 : value).replace(/[^\d.-]/g, '')) || 0;
+        return '$' + num.toFixed(2);
+      }
+
+      function gsCurrentUser() {
         var user = null;
-        if (window.BackendService && typeof window.BackendService.auth.getCurrentUser === 'function') {
+        if (window.BackendService && window.BackendService.auth && typeof window.BackendService.auth.getCurrentUser === 'function') {
           user = window.BackendService.auth.getCurrentUser();
         }
-        if (!user) {
-          try {
-            user = JSON.parse(localStorage.getItem('ganeshStore_user_mock'));
-          } catch(e){}
+        return user || gsReadJson('ganeshStore_user_mock', null);
+      }
+
+      function gsAccountRecord(user) {
+        var auth = window.BackendService && window.BackendService.auth;
+        if (!user || !auth || typeof auth.findAccount !== 'function') return null;
+        return auth.findAccount(user.customerId || user.customer_id || user.email) || (user.email ? auth.findAccount(user.email) : null);
+      }
+
+      function gsToast(message, isError) {
+        var toast = document.getElementById('gsAccountToast');
+        if (!toast) {
+          toast = document.createElement('div');
+          toast.id = 'gsAccountToast';
+          toast.className = 'gs-acct-toast';
+          toast.setAttribute('role', 'status');
+          toast.setAttribute('aria-live', 'polite');
+          document.body.appendChild(toast);
         }
+        toast.innerHTML = '<i class="zmdi ' + (isError ? 'zmdi-alert-circle-o' : 'zmdi-check-circle') + '"></i><span>' + gsEscape(message) + '</span>';
+        toast.querySelector('i').style.color = isError ? '#fca5a5' : '';
+        toast.classList.add('is-visible');
+        clearTimeout(toast._hideTimer);
+        toast._hideTimer = setTimeout(function() { toast.classList.remove('is-visible'); }, 2600);
+      }
+
+      function gsCopy(text, button, message) {
+        if (!text) return;
+        var done = function() {
+          if (button) {
+            var icon = button.querySelector('i');
+            button.classList.add('is-copied');
+            if (icon) icon.className = 'zmdi zmdi-check';
+            setTimeout(function() {
+              button.classList.remove('is-copied');
+              if (icon) icon.className = 'zmdi zmdi-copy';
+            }, 1600);
+          }
+          gsToast(message || 'Copied');
+        };
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(text).then(done, done);
+          return;
+        }
+        var input = document.createElement('textarea');
+        input.value = text;
+        input.setAttribute('readonly', '');
+        input.style.position = 'fixed';
+        input.style.opacity = '0';
+        document.body.appendChild(input);
+        input.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        input.remove();
+        done();
+      }
+
+      function copyCustomerId() {
+        var customerId = $('#account-customer-id').text().trim();
+        if (/^GS-\d{5}$/.test(customerId)) {
+          gsCopy(customerId, document.getElementById('gsCopyCustomerId'), 'Customer ID ' + customerId + ' copied');
+        }
+      }
+
+      function gsTierFor(points) {
+        var tier = GS_TIERS[0];
+        GS_TIERS.forEach(function(t) { if (points >= t.min) tier = t; });
+        return tier;
+      }
+
+      function gsGreeting() {
+        var hour = new Date().getHours();
+        if (hour < 12) return 'Good morning';
+        if (hour < 17) return 'Good afternoon';
+        return 'Good evening';
+      }
+
+      function gsOrderStatus(order) {
+        var info = null;
+        if (window.BackendService && window.BackendService.orders && typeof window.BackendService.orders.trackOrder === 'function') {
+          info = window.BackendService.orders.trackOrder(order.order_id);
+        }
+        var step = info && info.found ? info.currentStep : 2;
+        var label = step >= 5 ? 'Delivered' : step === 4 ? 'Out for delivery' : step === 3 ? 'In transit' : 'Processing';
+        var cls = step >= 5 ? 'is-delivered' : step >= 3 ? 'is-transit' : '';
+        return { step: step, label: label, cls: cls, text: info && info.found ? info.statusText : 'Preparing your order', info: info };
+      }
+
+      function gsUserOrders(user, account) {
+        var all = gsReadJson('order_history', []);
+        if (!Array.isArray(all)) return [];
+        var email = String(user.email || '').toLowerCase();
+        var ids = [user.id, user.uid, user.customerId, account && account.id, account && account.customerId].filter(Boolean);
+        var seen = {};
+        return all.filter(function(order) {
+          if (!order || !order.order_id || seen[order.order_id]) return false;
+          var mine = (email && String(order.email || '').toLowerCase() === email) ||
+            (order.user_id && ids.indexOf(order.user_id) > -1) ||
+            (order.customer_id && ids.indexOf(order.customer_id) > -1);
+          if (mine) seen[order.order_id] = true;
+          return mine;
+        }).sort(function(a, b) {
+          return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+        });
+      }
+
+      function gsEmptyState(icon, title, text, href, cta) {
+        return '<div class="gs-empty">' +
+          '<div class="gs-empty-icon"><i class="zmdi ' + icon + '"></i></div>' +
+          '<h4>' + title + '</h4><p>' + text + '</p>' +
+          '<a class="btn-auth-submit gs-btn-inline" href="' + href + '"><span>' + cta + '</span><i class="zmdi zmdi-arrow-right"></i></a>' +
+          '</div>';
+      }
+
+      function gsRenderOrders(orders) {
+        var list = document.getElementById('account-orders-list');
+        if (!list) return;
+        if (!orders.length) {
+          list.innerHTML = gsEmptyState('zmdi-shopping-basket', 'No orders yet', "When you place an order, you'll be able to follow it here.", 'product.html', 'Start shopping');
+          return;
+        }
+        list.innerHTML = orders.map(function(order) {
+          var items = Array.isArray(order.items) ? order.items : [];
+          var count = items.reduce(function(sum, item) { return sum + (parseInt(item.quantity, 10) || 1); }, 0);
+          var status = gsOrderStatus(order);
+          var thumbs = items.slice(0, 3).map(function(item) {
+            var img = item.image || item.img;
+            return img ? '<img src="' + gsEscape(img) + '" alt="" loading="lazy" />' : '<span><i class="zmdi zmdi-label"></i></span>';
+          }).join('') + (items.length > 3 ? '<span>+' + (items.length - 3) + '</span>' : '');
+          var names = items.map(function(item) { return item.name; }).filter(Boolean).join(', ');
+          var placed = order.created_at ? new Date(order.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+          var id = gsEscape(order.order_id);
+          return '<article class="gs-order">' +
+            '<div class="gs-order-head"><div><span class="gs-order-id">' + id + '</span>' +
+            '<span class="gs-order-date">' + (placed ? 'Placed ' + gsEscape(placed) + ' · ' : '') + count + (count === 1 ? ' item' : ' items') + '</span></div>' +
+            '<span class="gs-status ' + status.cls + '">' + status.label + '</span></div>' +
+            '<div class="gs-order-body"><div class="gs-thumbs">' + thumbs + '</div>' +
+            '<div class="gs-order-info"><p class="gs-order-items">' + gsEscape(names || 'Your items') + '</p>' +
+            '<div class="gs-order-progress"><span style="width: ' + Math.round(status.step / 5 * 100) + '%"></span></div>' +
+            '<span class="gs-order-stage">' + gsEscape(status.text) + '</span></div>' +
+            '<div class="gs-order-total"><small>Total</small><strong>' + gsMoney(order.total) + '</strong></div></div>' +
+            '<div class="gs-order-actions">' +
+            '<button type="button" class="gs-btn-ghost" data-track-order="' + id + '"><i class="zmdi zmdi-truck"></i> Track</button>' +
+            '<a class="gs-btn-ghost" href="order-confirmation.html?orderId=' + encodeURIComponent(order.order_id) + '"><i class="zmdi zmdi-receipt"></i> Receipt</a>' +
+            '</div></article>';
+        }).join('');
+      }
+
+      function gsRenderWishlist(items) {
+        var list = document.getElementById('account-wishlist-list');
+        if (!list) return;
+        if (!items.length) {
+          list.innerHTML = gsEmptyState('zmdi-favorite-outline', 'Nothing saved yet', 'Tap the heart on any product to keep it here for later.', 'product.html', 'Explore the shop');
+          return;
+        }
+        list.innerHTML = '<div class="gs-wish-grid">' + items.map(function(item) {
+          var img = item.image || item.img;
+          return '<a class="gs-wish" href="' + gsEscape(item.link || 'product.html') + '">' +
+            '<div class="gs-wish-img">' + (img ? '<img src="' + gsEscape(img) + '" alt="" loading="lazy" />' : '') + '</div>' +
+            '<div class="gs-wish-info"><span class="gs-wish-name">' + gsEscape(item.name || 'Saved item') + '</span>' +
+            '<span class="gs-wish-price">' + gsEscape(item.price || '') + '</span></div></a>';
+        }).join('') + '</div>';
+      }
+
+      function renderAccountDashboard(user) {
+        var account = gsAccountRecord(user) || {};
+        var name = user.displayName || user.name || user.full_name || account.name || (user.email ? user.email.split('@')[0] : 'Member');
+        var email = user.email || account.email || '';
+        var customerId = user.customerId || user.customer_id || account.customerId || '';
+        var initials = name.split(/\s+/).map(function(part) { return part.charAt(0); }).join('').toUpperCase().substring(0, 2) || 'GS';
+
+        $('.AccountName').text(name);
+        $('.AccountEmail').text(email);
+        $('.AccountNumber').text(customerId || 'Pending');
+        $('.js-logout-avatar').text(initials);
+        $('#gsGreeting').text(gsGreeting());
+
+        var points = parseInt(account.loyaltyPoints || user.loyaltyPoints || user.loyalty_points || 100, 10) || 0;
+        var tier = gsTierFor(points);
+        var progress = tier.next ? Math.min(100, Math.round((points - tier.min) / (tier.next - tier.min) * 100)) : 100;
+        var nextTier = tier.next ? GS_TIERS[GS_TIERS.indexOf(tier) + 1].name : '';
+        $('.js-account-tier').text(tier.name + ' member');
+        $('#gsTierPoints').text(points.toLocaleString('en-US'));
+        $('#gsStatPoints').text(points.toLocaleString('en-US'));
+        $('#gsTierNext').text(tier.next ? (tier.next - points).toLocaleString('en-US') + ' points to ' + nextTier : 'Top tier unlocked. Enjoy every perk.');
+        $('#gsTierBar').attr('aria-valuenow', progress);
+        requestAnimationFrame(function() { $('#gsTierFill').css('width', progress + '%'); });
+        $('#gsTierPerks').html(GS_TIER_PERKS[tier.name].map(function(perk) {
+          return '<li><i class="zmdi zmdi-check-circle"></i><span>' + gsEscape(perk) + '</span></li>';
+        }).join(''));
+        $('#acc-rewards-desc').text("You're a " + tier.name + ' member. Earn 10 points for every $1 you spend.');
+
+        var orders = gsUserOrders(user, account);
+        var wishlist = gsReadJson('wishlist', []);
+        if (!Array.isArray(wishlist)) wishlist = [];
+        $('#gsStatOrders').text(orders.length);
+        $('#gsStatWishlist').text(wishlist.length);
+        gsRenderOrders(orders);
+        gsRenderWishlist(wishlist);
+
+        $('#acc-edit-name').val(name);
+        $('#acc-edit-phone').val(account.phone || user.phone || user.phone_number || '');
+        $('#acc-edit-address').val(account.address || user.address || (typeof account.defaultAddress === 'string' ? account.defaultAddress : ''));
+        $('#gsProfileEmail').val(email);
+        $('#gsProfileCustomerId').val(customerId);
+      }
+
+      function syncAuthView() {
+        var user = gsCurrentUser();
         var loggedIn = !!user;
         var loggedInView = document.getElementById('auth-loggedin-view');
         var loggedOutView = document.getElementById('auth-loggedout-view');
         if (loggedInView) loggedInView.style.display = loggedIn ? 'block' : 'none';
         if (loggedOutView) loggedOutView.style.display = loggedIn ? 'none' : 'block';
-
-        if (loggedIn && user) {
-          var name = user.displayName || user.name || (user.email ? user.email.split('@')[0] : 'Member');
-          var email = user.email || '';
-          $('.AccountName').text(name);
-          $('.AccountEmail').text(email);
-          var initials = name.split(' ').map(function(n) { return n[0]; }).join('').toUpperCase().substring(0, 2) || 'GS';
-          $('.js-logout-avatar').text(initials);
-          $('#acc-edit-name').val(name);
-        }
+        if (!loggedIn) return;
+        renderAccountDashboard(user);
+        var hashTab = (location.hash || '').replace('#', '');
+        switchAccountTab(GS_ACCOUNT_TABS.indexOf(hashTab) > -1 ? hashTab : 'orders', null, true);
       }
 
       // Password visibility toggle
       function toggleContactPassword(id, el) {
         var input = document.getElementById(id);
         if (!input) return;
-        if (input.type === 'password') {
-          input.type = 'text';
-          if (el) { el.classList.remove('zmdi-eye'); el.classList.add('zmdi-eye-off'); }
-        } else {
-          input.type = 'password';
-          if (el) { el.classList.remove('zmdi-eye-off'); el.classList.add('zmdi-eye'); }
+        var show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        if (el) {
+          var icon = el.querySelector('i') || el;
+          icon.classList.toggle('zmdi-eye', !show);
+          icon.classList.toggle('zmdi-eye-off', show);
+          el.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
         }
       }
 
@@ -1565,60 +1113,104 @@
         if (!banner || !text) return;
         banner.className = 'auth-alert-banner ' + type;
         text.textContent = msg;
-        if (icon) {
-          icon.className = type === 'success' ? 'zmdi zmdi-check-circle' : 'zmdi zmdi-alert-circle-o';
-        }
-        banner.style.display = 'flex';
-        banner.classList.remove('shake');
+        if (icon) icon.className = type === 'success' ? 'zmdi zmdi-check-circle' : 'zmdi zmdi-alert-circle-o';
+        banner.style.display = '';
         if (type === 'error') {
           void banner.offsetWidth;
           banner.classList.add('shake');
+        }
+        $('.gs-auth-panel .btn-auth-submit').removeClass('is-loading');
+        if (type === 'success') {
+          $('#contact-signin-section:visible, #contact-signup-section:visible').find('.btn-auth-submit').addClass('is-loading');
         }
       }
 
       // Switch Sign In / Sign Up tabs
       function switchContactTab(tab) {
-        const loginTab = document.getElementById('btn-tab-signin');
-        const signupTab = document.getElementById('btn-tab-signup');
-        const loginSec = document.getElementById('contact-signin-section');
-        const signupSec = document.getElementById('contact-signup-section');
-        const banner = document.getElementById('contact-auth-banner');
+        var isSignup = tab === 'signup';
+        var seg = document.querySelector('.auth-tabs');
+        var loginTab = document.getElementById('btn-tab-signin');
+        var signupTab = document.getElementById('btn-tab-signup');
+        var loginSec = document.getElementById('contact-signin-section');
+        var signupSec = document.getElementById('contact-signup-section');
+        var banner = document.getElementById('contact-auth-banner');
+        var showSec = isSignup ? signupSec : loginSec;
 
-        if (banner) banner.style.display = 'none';
-
-        if (tab === 'signin') {
-          if (loginTab) loginTab.classList.add('active');
-          if (signupTab) signupTab.classList.remove('active');
-          if (signupSec) signupSec.style.display = 'none';
-          if (loginSec) loginSec.style.display = 'block';
-        } else {
-          if (loginTab) loginTab.classList.remove('active');
-          if (signupTab) signupTab.classList.add('active');
-          if (loginSec) loginSec.style.display = 'none';
-          if (signupSec) signupSec.style.display = 'block';
+        if (seg) seg.style.setProperty('--i', isSignup ? 1 : 0);
+        if (loginTab) { loginTab.classList.toggle('active', !isSignup); loginTab.setAttribute('aria-selected', String(!isSignup)); }
+        if (signupTab) { signupTab.classList.toggle('active', isSignup); signupTab.setAttribute('aria-selected', String(isSignup)); }
+        if (banner) banner.className = 'auth-alert-banner';
+        $('.gs-auth-panel .btn-auth-submit').removeClass('is-loading');
+        if (loginSec) loginSec.style.display = isSignup ? 'none' : 'block';
+        if (signupSec) signupSec.style.display = isSignup ? 'block' : 'none';
+        if (showSec) {
+          showSec.classList.remove('is-entering');
+          void showSec.offsetWidth;
+          showSec.classList.add('is-entering');
         }
+        $('#gsAuthTitle').text(isSignup ? 'Create your account' : 'Welcome back');
+        $('#gsAuthSubtitle').text(isSignup ? 'Join in seconds and get your customer ID instantly.' : 'Sign in with your email or customer ID.');
+        if (window.matchMedia && window.matchMedia('(pointer: fine)').matches) {
+          var first = document.getElementById(isSignup ? 'c-signup-name' : 'c-login-email');
+          if (first) first.focus({ preventScroll: true });
+        }
+      }
+
+      function gsUpdatePasswordStrength() {
+        var input = document.getElementById('c-signup-password');
+        var meter = document.getElementById('gsPwStrength');
+        var hint = document.getElementById('gsPwHint');
+        if (!input || !meter || !hint) return;
+        var value = input.value;
+        var score = 0;
+        if (value.length) {
+          score = value.length >= 6 ? 1 : 0;
+          if (value.length >= 10) score++;
+          if (/\d/.test(value) || (/[a-z]/.test(value) && /[A-Z]/.test(value))) score++;
+          if (/[^A-Za-z0-9]/.test(value)) score++;
+          score = Math.max(1, Math.min(4, score));
+        }
+        meter.setAttribute('data-score', score);
+        hint.textContent = !value.length ? 'At least 6 characters. Mix letters, numbers and symbols for a stronger password.' :
+          value.length < 6 ? 'Too short. Use at least 6 characters.' :
+          ['', 'Fair. Add numbers or symbols to make it stronger.', 'Good password.', 'Strong password.', 'Excellent password.'][score];
       }
 
       // Quick 1-click Demo Login
       function quickLoginDemo(email, pass) {
+        switchContactTab('signin');
         document.getElementById('c-login-email').value = email;
         document.getElementById('c-login-password').value = pass;
-        $('#c-login-email, #c-login-password').trigger('input').trigger('change');
-        if (typeof window.handleEmailLogin === 'function') {
-          window.handleEmailLogin();
-        }
+        if (typeof window.handleEmailLogin === 'function') window.handleEmailLogin();
       }
 
       // Account Center Tab Switcher
-      function switchAccountTab(tabName, btnElement) {
-        $('.account-nav-btn').removeClass('active');
-        $(btnElement).addClass('active');
-        $('.account-tab-content').hide();
-        $('#acc-tab-' + tabName).fadeIn(200);
-
+      function switchAccountTab(tabName, btnElement, silent) {
+        var index = GS_ACCOUNT_TABS.indexOf(tabName);
+        if (index < 0) { index = 0; tabName = 'orders'; }
+        var nav = document.querySelector('.account-nav-tabs');
+        if (nav) nav.style.setProperty('--i', index);
+        $('.account-nav-btn').each(function() {
+          var active = this.getAttribute('data-account-tab') === tabName;
+          $(this).toggleClass('active', active).attr({ 'aria-selected': String(active), tabindex: active ? '0' : '-1' });
+        });
+        $('.account-tab-content').hide().removeClass('is-entering');
+        var panel = document.getElementById('acc-tab-' + tabName);
+        if (panel) {
+          panel.style.display = 'block';
+          void panel.offsetWidth;
+          panel.classList.add('is-entering');
+        }
         if (tabName === 'security') {
-          var user = window.BackendService ? window.BackendService.auth.getCurrentUser() : null;
+          var user = gsCurrentUser();
           if (user) init2FAPanel(user);
+        }
+        if (!silent && history.replaceState) {
+          try { history.replaceState(null, '', '#' + tabName); } catch (e) {}
+        }
+        if (!silent && panel && btnElement && btnElement.classList.contains('gs-stat')) {
+          var top = panel.getBoundingClientRect().top;
+          if (top > window.innerHeight * 0.6) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       }
 
@@ -1626,93 +1218,141 @@
         if (event) event.preventDefault();
         var name = document.getElementById('acc-edit-name').value.trim();
         var phone = document.getElementById('acc-edit-phone').value.trim();
-        var addr = document.getElementById('acc-edit-address').value.trim();
-        
-        var user = null;
-        try {
-          user = JSON.parse(localStorage.getItem('ganeshStore_user_mock')) || {};
-        } catch(e) { user = {}; }
-        
-        user.displayName = name;
-        user.name = name;
-        user.phone = phone;
-        user.address = addr;
-        localStorage.setItem('ganeshStore_user_mock', JSON.stringify(user));
-        
-        $('.AccountName').text(name);
-        alert('Profile updated successfully!');
+        var address = document.getElementById('acc-edit-address').value.trim();
+        if (!name) {
+          gsToast('Please enter your name.', true);
+          return;
+        }
+        var updates = { name: name, full_name: name, displayName: name, phone: phone, phone_number: phone, address: address, defaultAddress: address };
+        var mock = gsReadJson('ganeshStore_user_mock', null);
+        if (mock) {
+          mock.displayName = name;
+          localStorage.setItem('ganeshStore_user_mock', JSON.stringify(mock));
+        }
+        var finish = function() {
+          var user = gsCurrentUser();
+          if (user) renderAccountDashboard(user);
+          if (typeof updateHeaderUI === 'function' && mock) updateHeaderUI(mock);
+          var status = document.getElementById('gsProfileStatus');
+          if (status) {
+            status.classList.add('is-visible');
+            clearTimeout(status._timer);
+            status._timer = setTimeout(function() { status.classList.remove('is-visible'); }, 2400);
+          }
+        };
+        var auth = window.BackendService && window.BackendService.auth;
+        if (auth && auth.getCurrentUser()) {
+          auth.updateProfile(updates).then(finish, function(err) { gsToast(err.message, true); });
+        } else {
+          finish();
+        }
       }
 
-      function logoutUser(event) {
-        if (event) event.preventDefault();
-        localStorage.removeItem('ganeshStore_user_mock');
-        if (window.BackendService && window.BackendService.auth && typeof window.BackendService.auth.logout === 'function') {
-          window.BackendService.auth.logout();
+      function gsOpenSheet(id) {
+        var sheet = document.getElementById(id);
+        if (!sheet) return;
+        sheet._returnFocus = document.activeElement;
+        sheet.classList.add('is-open');
+        var focusTarget = sheet.querySelector('.gs-sheet-close, input, button');
+        if (focusTarget) setTimeout(function() { focusTarget.focus(); }, 60);
+      }
+
+      function gsCloseSheet(id) {
+        var sheet = document.getElementById(id);
+        if (!sheet) return;
+        sheet.classList.remove('is-open');
+        sheet.style.display = '';
+        if (sheet._returnFocus && sheet._returnFocus.focus) sheet._returnFocus.focus();
+      }
+
+      function gsOpenTracking(orderId) {
+        var service = window.BackendService && window.BackendService.orders;
+        var info = service ? service.trackOrder(orderId) : null;
+        if (!info || !info.found) {
+          gsToast("We couldn't find tracking for this order yet.", true);
+          return;
         }
-        syncAuthView();
-        window.location.reload();
+        var order = info.order;
+        var eta = order.estimated_delivery;
+        if (!eta) {
+          var etaDate = new Date(order.created_at || Date.now());
+          etaDate.setDate(etaDate.getDate() + (/express/i.test(order.shipping_method || '') ? 2 : 4));
+          eta = etaDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+        }
+        $('#trk-status-text').text(info.statusText);
+        $('#trk-order-id').text(order.order_id);
+        $('#trk-number').text(order.tracking_number || 'Assigned at dispatch');
+        $('#trk-est-delivery').text(eta);
+        $('#trk-timeline-container').html(info.milestones.map(function(m) {
+          var current = !m.done && m.step === info.currentStep + 1;
+          var icon = m.done ? 'zmdi-check' : current ? 'zmdi-truck' : '';
+          return '<li class="' + (m.done ? 'is-done' : current ? 'is-current' : '') + '">' +
+            '<span class="gs-timeline-dot">' + (icon ? '<i class="zmdi ' + icon + '"></i>' : '') + '</span>' +
+            '<div><strong>' + gsEscape(m.title) + '</strong><span>' + gsEscape(m.time) + '</span></div></li>';
+        }).join(''));
+        gsOpenSheet('orderTrackingModal');
+      }
+
+      function closeTrackingModal() {
+        gsCloseSheet('orderTrackingModal');
       }
 
       // Initialize 2FA Security Panel
       function init2FAPanel(user) {
-        if (user.two_factor_enabled) {
-          $('#twofa-status-pill').text('Active').css({ background: '#e8f5e9', color: '#2e7d32' });
-          $('#twofa-setup-section').hide();
-          $('#twofa-active-section').show();
-        } else {
-          $('#twofa-status-pill').text('Disabled').css({ background: '#eee', color: '#666' });
-          $('#twofa-active-section').hide();
-          $('#twofa-setup-section').show();
-
-          // Generate a new secret and QR
-          if (window.BackendService) {
-            var setup = window.BackendService.auth.generate2FASecret(user.email);
-            currentGeneratedSecret = setup.secret;
-            $('#twofa-qr-image').attr('src', setup.qrCodeUrl);
-            $('#twofa-secret-text').text(setup.secret);
-          }
+        var account = gsAccountRecord(user) || {};
+        var enabled = !!(user.two_factor_enabled || account.two_factor_enabled);
+        $('#twofa-status-pill').text(enabled ? 'On' : 'Off').toggleClass('is-on', enabled);
+        $('#twofa-setup-section').toggle(!enabled);
+        $('#twofa-active-section').toggle(enabled);
+        if (!enabled && !currentGeneratedSecret && window.BackendService) {
+          var setup = window.BackendService.auth.generate2FASecret(user.email);
+          currentGeneratedSecret = setup.secret;
+          $('#twofa-qr-image').attr('src', setup.qrCodeUrl);
+          $('#twofa-secret-text').text(setup.secret);
         }
       }
 
-      function copySecretKey() {
-        if (currentGeneratedSecret) {
-          navigator.clipboard.writeText(currentGeneratedSecret).then(function() {
-            alert('Secret key copied to clipboard! Paste it into Google Authenticator.');
-          });
-        }
+      function copySecretKey(button) {
+        gsCopy(currentGeneratedSecret, button, 'Setup key copied');
       }
 
       // Enable Google Authenticator
       function handleEnable2FA() {
         var token = $('#twofa-verify-input').val().trim();
-        if (!token || token.length !== 6) {
-          alert('Please enter the 6-digit code from Google Authenticator.');
+        if (!/^\d{6}$/.test(token)) {
+          gsToast('Enter the 6-digit code from your authenticator app.', true);
           return;
         }
-
         if (window.BackendService && currentGeneratedSecret) {
-          window.BackendService.auth.enable2FA(currentGeneratedSecret, token).then(function(res) {
-            alert(res.message);
-            var user = window.BackendService.auth.getCurrentUser();
-            init2FAPanel(user);
+          window.BackendService.auth.enable2FA(currentGeneratedSecret, token).then(function() {
+            currentGeneratedSecret = null;
+            gsToast('Two-step verification is on');
+            init2FAPanel(window.BackendService.auth.getCurrentUser());
           }).catch(function(err) {
-            alert(err.message);
+            gsToast(err.message, true);
           });
         }
       }
 
-      // Disable 2FA
+      // Disable 2FA (second tap confirms, replacing the native confirm dialog)
       function handleDisable2FA() {
-        var confirmDisable = confirm('Are you sure you want to disable 2-Factor Authentication?');
-        if (!confirmDisable) return;
-
+        var button = document.querySelector('#twofa-active-section .gs-btn-danger');
+        if (button && !button.classList.contains('is-confirming')) {
+          button.classList.add('is-confirming');
+          button.textContent = 'Tap again to turn off';
+          setTimeout(function() {
+            button.classList.remove('is-confirming');
+            button.textContent = 'Turn off';
+          }, 4000);
+          return;
+        }
         if (window.BackendService) {
-          window.BackendService.auth.disable2FA().then(function(res) {
-            alert(res.message);
-            var user = window.BackendService.auth.getCurrentUser();
-            init2FAPanel(user);
+          window.BackendService.auth.disable2FA().then(function() {
+            if (button) { button.classList.remove('is-confirming'); button.textContent = 'Turn off'; }
+            gsToast('Two-step verification is off');
+            init2FAPanel(window.BackendService.auth.getCurrentUser());
           }).catch(function(err) {
-            alert(err.message);
+            gsToast(err.message, true);
           });
         }
       }
@@ -1720,16 +1360,15 @@
       // Submit 2FA Code on Login
       function submit2FALoginCode() {
         var code = $('#twofa-login-code-input').val().trim();
-        if (!code || code.length !== 6) {
+        if (!/^\d{6}$/.test(code)) {
           $('#twofa-modal-alert-text').text('Please enter a 6-digit code.');
           $('#twofa-modal-alert').show();
           return;
         }
-
-        if (window.BackendService && pendingLoginUserId) {
-          window.BackendService.auth.verifyLogin2FA(pendingLoginUserId, code).then(function(user) {
+        var userId = window.pendingLoginUserId || pendingLoginUserId;
+        if (window.BackendService && userId) {
+          window.BackendService.auth.verifyLogin2FA(userId, code).then(function() {
             $('#twoFactorModal').hide();
-            syncAuthView();
             window.location.reload();
           }).catch(function(err) {
             $('#twofa-modal-alert-text').text(err.message);
@@ -1740,12 +1379,43 @@
 
       function close2FAModal() {
         $('#twoFactorModal').hide();
-        pendingLoginUserId = null;
+        window.pendingLoginUserId = null;
       }
 
-      function closeTrackingModal() {
-        $('#orderTrackingModal').hide();
-      }
+      $(document).on('click', '[data-account-tab]', function() {
+        switchAccountTab(this.getAttribute('data-account-tab'), this);
+      });
+
+      $(document).on('keydown', '.account-nav-tabs [role="tab"]', function(e) {
+        if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+        var index = GS_ACCOUNT_TABS.indexOf(this.getAttribute('data-account-tab'));
+        var next = GS_ACCOUNT_TABS[(index + (e.key === 'ArrowRight' ? 1 : GS_ACCOUNT_TABS.length - 1)) % GS_ACCOUNT_TABS.length];
+        switchAccountTab(next, null);
+        $('.account-nav-tabs [data-account-tab="' + next + '"]').trigger('focus');
+        e.preventDefault();
+      });
+
+      $(document).on('click', '[data-track-order]', function() {
+        gsOpenTracking(this.getAttribute('data-track-order'));
+      });
+
+      $(document).on('click', '[data-copy-code]', function() {
+        var code = this.getAttribute('data-copy-code');
+        gsCopy(code, this, 'Code ' + code + ' copied. Apply it at checkout.');
+      });
+
+      $(document).on('click', '.tracking-modal-overlay', function(e) {
+        if (e.target !== this) return;
+        if (this.id === 'twoFactorModal') close2FAModal(); else closeTrackingModal();
+      });
+
+      $(document).on('keydown', function(e) {
+        if (e.key !== 'Escape') return;
+        if ($('#orderTrackingModal').hasClass('is-open')) closeTrackingModal();
+        if ($('#twoFactorModal').is(':visible')) close2FAModal();
+      });
+
+      $(document).on('input', '#c-signup-password', gsUpdatePasswordStrength);
 
       $(document).ready(function() {
         syncAuthView();

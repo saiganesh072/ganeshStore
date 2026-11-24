@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
 /*------------------------------------------------------------------
 Project:  
 Version:  
@@ -4278,7 +4280,7 @@ input.size-116, textarea.size-120, input.size-117, input.size-111 {
 
 /*==================================================================
 [ Premium Storefront-Wide Visual Design Upgrades ]*/
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+/* Outfit is imported at the top of this file; @import is ignored after other rules. */
 
 body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtext-101, .ltext-101, .stext-102, .mtext-102, .ltext-102 {
   font-family: 'Outfit', sans-serif !important;
@@ -5548,6 +5550,18 @@ body, h1, h2, h3, h4, h5, h6, input, select, textarea, button, .stext-101, .mtex
   font-size: 11px;
   color: #888888;
   display: block;
+}
+
+.header-account-dropdown-greeting .user-customer-id {
+  display: inline-flex;
+  margin-top: 6px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(113, 127, 224, 0.1);
+  color: #5363d6;
+  font-family: Poppins-Medium;
+  font-size: 10px;
+  letter-spacing: 0.04em;
 }
 
 .header-account-dropdown-links a {

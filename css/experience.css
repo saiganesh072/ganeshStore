@@ -1287,3 +1287,67 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ==================================================================
+   Catalog badges + sale pricing (cards, related products, PDP)
+   ================================================================== */
+.block2-pic.label-new::after,
+.block2-pic.label-sale::after {
+  top: 12px;
+  left: 12px;
+  min-width: 0;
+  height: 26px;
+  padding: 0 11px;
+  border-radius: 999px;
+  font: 600 11px/1 'Outfit', sans-serif;
+  letter-spacing: 0.06em;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  backdrop-filter: blur(12px) saturate(160%);
+}
+
+.block2-pic.label-new::after {
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  color: var(--gs-ink);
+}
+
+.block2-pic.label-sale::after {
+  background: rgba(225, 29, 72, 0.92);
+  color: #fff;
+}
+
+.gs-price-line {
+  display: inline-flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+}
+
+.gs-price-line .stext-105 { color: #e11d48; font-weight: 600; }
+
+.gs-price-line .old-price,
+.gs-was-price {
+  color: #9ca3af;
+  text-decoration: line-through;
+  font-size: 0.92em;
+}
+
+.gs-was-price {
+  margin-left: 10px;
+  font-size: 17px;
+  vertical-align: middle;
+}
+
+.gs-save-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  margin-left: 8px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(225, 29, 72, 0.1);
+  color: #e11d48;
+  font: 600 12px/1 'Outfit', sans-serif;
+  vertical-align: middle;
+}

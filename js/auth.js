@@ -91,7 +91,16 @@ function getCookieValue(name) {
 }
 
 // Syncs user profile with Supabase to make cart/wishlist features fully operational
-function syncUserProfileWithSupabase(uid, name, email) {
+function syncUserProfileWithSupabase(uid, name, email, customerId) {
+  return syncSupabaseProfile(uid, name, email).then(profile => {
+    if (!customerId || !profile) return profile;
+    const profileWithCustomerId = Object.assign({}, profile, { customerId, customer_id: customerId });
+    localStorage.setItem('userProfile', JSON.stringify(profileWithCustomerId));
+    return profileWithCustomerId;
+  });
+}
+
+function syncSupabaseProfile(uid, name, email) {
   if (window.supabaseClient) {
     console.log("🔄 Syncing user profile with Supabase...", email);
     return window.supabaseClient
@@ -206,13 +215,13 @@ document.addEventListener("DOMContentLoaded", () => {
 // Update the header UI element (Account Icon -> personalized avatar badge + dropdown)
 function updateHeaderUI(user) {
   const accountLinks = findMyAccountLinks();
+  const customerId = user ? resolveCustomerId(user) : "";
   
   if (user) {
     const displayName = user.displayName || user.email.split('@')[0];
-    const userUid = user.uid || "mock-uid-123";
     
     document.cookie = "CustomerName=" + encodeURIComponent(displayName) + "; path=/";
-    document.cookie = "CustomerNumber=" + encodeURIComponent(userUid) + "; path=/";
+    document.cookie = "CustomerNumber=" + encodeURIComponent(customerId) + "; path=/";
     localStorage.setItem("user", "loggedin");
   }
   
@@ -226,11 +235,12 @@ function updateHeaderUI(user) {
 
       // Replace inner content with dynamic initials avatar and dynamic dropdown
       link.innerHTML = `
-        <span class="user-avatar-badge">${initials}</span>
+        <span class="user-avatar-badge">${escapeAuthHtml(initials)}</span>
         <div class="header-account-dropdown">
           <div class="header-account-dropdown-greeting">
             <span class="user-welcome">Welcome back,</span>
-            <span class="user-name">${displayName}</span>
+            <span class="user-name">${escapeAuthHtml(displayName)}</span>
+            ${customerId ? `<span class="user-customer-id">Customer ID: ${escapeAuthHtml(customerId)}</span>` : ''}
           </div>
           <div class="header-account-dropdown-links">
             <a href="wishlist.html"><i class="zmdi zmdi-favorite-outline"></i> My Wishlist</a>
@@ -257,10 +267,9 @@ function updateHeaderUI(user) {
     
     if (user) {
       const displayName = user.displayName || user.email.split('@')[0];
-      const userUid = user.uid || "mock-uid-123";
       
       if (accountNameEl) accountNameEl.textContent = displayName;
-      if (accountNumberEl) accountNumberEl.textContent = userUid;
+      if (accountNumberEl) accountNumberEl.textContent = customerId || "Pending";
       if (logoutAvatarEl) logoutAvatarEl.textContent = displayName.substring(0, 2).toUpperCase();
       
       if (loginMain) loginMain.style.display = "none";
@@ -356,29 +365,76 @@ function logoutUser(e) {
   }
 }
 
-function generateCustomerId(email) {
-  let hash = 0;
-  for (let i = 0; i < email.length; i++) {
-    hash = email.charCodeAt(i) + ((hash << 5) - hash);
+function getCustomerAccountApi() {
+  const auth = window.BackendService && window.BackendService.auth;
+  if (!auth || typeof auth.findAccount !== "function" || typeof auth.createCustomerAccount !== "function") {
+    throw new Error("Account service is unavailable. Please refresh and try again.");
   }
-  const id = Math.abs(hash % 90000) + 10000;
-  return `GS-${id}`;
+  return auth;
+}
+
+function escapeAuthHtml(value) {
+  return String(value == null ? "" : value).replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+function normalizeCustomerIdValue(value) {
+  const match = String(value || "").trim().toUpperCase().replace(/\s+/g, "").match(/^GS-?(\d{5})$/);
+  return match ? `GS-${match[1]}` : "";
+}
+
+function isEmailValue(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
 }
 
 function getRegisteredUsers() {
-  const users = localStorage.getItem('ganeshStore_registered_users');
-  return users ? JSON.parse(users) : [];
+  try {
+    const users = JSON.parse(localStorage.getItem('ganeshStore_registered_users') || '[]');
+    return Array.isArray(users) ? users : [];
+  } catch (e) {
+    return [];
+  }
 }
 
-function saveRegisteredUser(user) {
-  const users = getRegisteredUsers();
-  users.push(user);
-  localStorage.setItem('ganeshStore_registered_users', JSON.stringify(users));
+function resolveCustomerId(user) {
+  const directId = normalizeCustomerIdValue(user && (user.customerId || user.customer_id));
+  if (directId) return directId;
+  const email = String((user && user.email) || "").trim().toLowerCase();
+  const account = getRegisteredUsers().find(u => String(u.email || "").toLowerCase() === email);
+  return normalizeCustomerIdValue(account && account.customerId);
 }
 
 function getMockUser() {
   const user = localStorage.getItem('ganeshStore_user_mock');
   return user ? JSON.parse(user) : null;
+}
+
+function buildSessionUser(account) {
+  return {
+    uid: account.id,
+    customerId: account.customerId,
+    email: account.email,
+    displayName: account.name || account.full_name || account.email.split('@')[0],
+    photoURL: null
+  };
+}
+
+function completeCustomerSession(account, message, delay) {
+  const sessionUser = buildSessionUser(account);
+  localStorage.setItem('ganeshStore_user_mock', JSON.stringify(sessionUser));
+  triggerDisplayMessage('success', message);
+  return syncUserProfileWithSupabase(account.id, sessionUser.displayName, account.email, account.customerId).then(() => {
+    setTimeout(() => { window.location.reload(); }, delay || 1200);
+  });
+}
+
+function getCustomerIdentifierInput() {
+  return document.getElementById('c-login-email') || document.getElementById('login-email');
 }
 
 // Helper to display warning/success alerts dynamically on both interfaces
@@ -403,10 +459,11 @@ window.handleGoogleSignIn = function() {
       .then((result) => {
         const user = result.user;
         const name = user.displayName || user.email.split('@')[0];
+        const account = getCustomerAccountApi().getOrCreateCustomerAccount({ id: user.uid, name, email: user.email, authProvider: 'google' });
         
-        triggerDisplayMessage('success', 'Google Sign-In successful! Syncing profile...');
+        triggerDisplayMessage('success', `Google Sign-In successful! Customer ID: ${account.customerId}`);
         
-        syncUserProfileWithSupabase(user.uid, name, user.email).then(() => {
+        syncUserProfileWithSupabase(user.uid, name, user.email, account.customerId).then(() => {
           setTimeout(() => { window.location.reload(); }, 1200);
         });
       })
@@ -414,44 +471,64 @@ window.handleGoogleSignIn = function() {
         triggerDisplayMessage('error', error.message);
       });
   } else {
-    // Mock Google Sign In with dynamic user generation
-    const randomSuffix = Math.floor(100 + Math.random() * 900);
-    const name = `Google User ${randomSuffix}`;
-    const email = `google.user.${randomSuffix}@gmail.com`;
-    const uid = generateCustomerId(email);
-    
-    const mockUser = { uid, email, displayName: name, photoURL: null };
-    localStorage.setItem('ganeshStore_user_mock', JSON.stringify(mockUser));
-    
-    triggerDisplayMessage('success', 'Google Sign-In simulated! Syncing profile...');
-    
-    syncUserProfileWithSupabase(uid, name, email).then(() => {
-      setTimeout(() => { window.location.reload(); }, 1200);
-    });
+    try {
+      // Mock Google Sign In with dynamic user generation
+      const randomSuffix = Math.floor(100 + Math.random() * 900);
+      const name = `Google User ${randomSuffix}`;
+      const email = `google.user.${randomSuffix}@gmail.com`;
+      const account = getCustomerAccountApi().getOrCreateCustomerAccount({ name, email, authProvider: 'google' });
+      completeCustomerSession(account, `Google Sign-In simulated! Customer ID: ${account.customerId}`);
+    } catch (error) {
+      triggerDisplayMessage('error', error.message);
+    }
   }
 };
 
 window.handleEmailLogin = function(event) {
   if (event) event.preventDefault();
   
-  // Dynamic lookup of inputs to support both prefixed and flat IDs
-  const emailInput = document.getElementById('c-login-email') || document.getElementById('login-email');
+  const identifierInput = getCustomerIdentifierInput();
   const passInput = document.getElementById('c-login-password') || document.getElementById('login-password');
   
-  if (!emailInput || !passInput) return;
+  if (!identifierInput || !passInput) return;
   
-  const email = emailInput.value.trim();
+  const identifier = identifierInput.value.trim();
+  const customerId = normalizeCustomerIdValue(identifier);
+  const email = customerId ? "" : identifier.toLowerCase();
   const pass = passInput.value;
 
+  if (!customerId && !isEmailValue(email)) {
+    triggerDisplayMessage('error', 'Enter your email address or customer ID (for example, GS-10001).');
+    return;
+  }
+
+  if (!pass) {
+    triggerDisplayMessage('error', 'Password is required.');
+    return;
+  }
+
   if (hasRealFirebaseConfig) {
-    firebase.auth().signInWithEmailAndPassword(email, pass)
+    let account = null;
+    try {
+      account = getCustomerAccountApi().findAccount(identifier);
+    } catch (error) {
+      triggerDisplayMessage('error', error.message);
+      return;
+    }
+    if (customerId && !account) {
+      triggerDisplayMessage('error', 'No account found with this customer ID.');
+      return;
+    }
+
+    firebase.auth().signInWithEmailAndPassword(account ? account.email : email, pass)
       .then((userCredential) => {
         const user = userCredential.user;
         const name = user.displayName || user.email.split('@')[0];
+        const linkedAccount = account || getCustomerAccountApi().getOrCreateCustomerAccount({ id: user.uid, name, email: user.email, authProvider: 'password' });
         
-        triggerDisplayMessage('success', 'Login successful! Syncing profile...');
+        triggerDisplayMessage('success', `Login successful! Customer ID: ${linkedAccount.customerId}`);
         
-        syncUserProfileWithSupabase(user.uid, name, user.email).then(() => {
+        syncUserProfileWithSupabase(user.uid, name, user.email, linkedAccount.customerId).then(() => {
           setTimeout(() => { window.location.reload(); }, 1200);
         });
       })
@@ -459,7 +536,6 @@ window.handleEmailLogin = function(event) {
         triggerDisplayMessage('error', error.message);
       });
   } else {
-    // Mock Login with strict database check
     if (pass.length < 6) {
       triggerDisplayMessage('error', 'Password must be at least 6 characters long.');
       return;
@@ -467,7 +543,14 @@ window.handleEmailLogin = function(event) {
     
     const checkUserAndLogin = (existingUser) => {
       if (!existingUser) {
-        triggerDisplayMessage('error', 'No account found with this email. Please Sign Up to create an account first.');
+        triggerDisplayMessage('error', customerId
+          ? 'No account found with this customer ID.'
+          : 'No account found with this email. Please create an account first.');
+        return;
+      }
+
+      if (!existingUser.password && existingUser.authProvider === 'google') {
+        triggerDisplayMessage('error', 'This account uses Google sign-in. Please continue with Google.');
         return;
       }
       
@@ -475,36 +558,39 @@ window.handleEmailLogin = function(event) {
         triggerDisplayMessage('error', 'Incorrect password. Please try again.');
         return;
       }
-      
-      const name = existingUser.name || email.split('@')[0];
-      const uid = existingUser.id || existingUser.uid || generateCustomerId(email);
+
+      if (!existingUser.password) {
+        const users = getRegisteredUsers();
+        const index = users.findIndex(u => u.customerId === existingUser.customerId);
+        if (index > -1) {
+          users[index].password = pass;
+          localStorage.setItem('ganeshStore_registered_users', JSON.stringify(users));
+        }
+      }
       
       // Google Authenticator 2FA Check
       if (existingUser.two_factor_enabled && existingUser.two_factor_secret) {
-        window.pendingLoginUserId = uid;
-        $('#twofa-login-email-display').text(email);
+        window.pendingLoginUserId = existingUser.id;
+        $('#twofa-login-email-display').text(`${existingUser.email} (${existingUser.customerId})`);
         $('#twoFactorModal').css('display', 'flex');
         $('#twofa-login-code-input').val('').focus();
         return;
       }
-      
-      const mockUser = { uid, email, displayName: name, photoURL: null };
-      localStorage.setItem('ganeshStore_user_mock', JSON.stringify(mockUser));
-      
-      triggerDisplayMessage('success', 'Welcome back! Syncing profile...');
-      
-      syncUserProfileWithSupabase(uid, name, email).then(() => {
-        setTimeout(() => { window.location.reload(); }, 1200);
-      });
+
+      completeCustomerSession(existingUser, `Welcome back! Customer ID: ${existingUser.customerId}`);
     };
 
-    const users = getRegisteredUsers();
-    const localUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    let localUser = null;
+    try {
+      localUser = getCustomerAccountApi().findAccount(identifier);
+    } catch (error) {
+      triggerDisplayMessage('error', error.message);
+      return;
+    }
     
     if (localUser) {
       checkUserAndLogin(localUser);
-    } else if (window.supabaseClient) {
-      // Check database (Supabase profiles table)
+    } else if (!customerId && window.supabaseClient) {
       window.supabaseClient
         .from('profiles')
         .select('*')
@@ -512,17 +598,20 @@ window.handleEmailLogin = function(event) {
         .then(response => {
           const profile = response.data && response.data[0];
           if (profile) {
-            const uid = profile.id;
-            const name = profile.full_name;
-            const newUser = { name, email, password: pass, uid };
-            saveRegisteredUser(newUser);
-            checkUserAndLogin(newUser);
+            const account = getCustomerAccountApi().getOrCreateCustomerAccount({
+              id: profile.id,
+              name: profile.full_name,
+              email,
+              phone: profile.phone_number,
+              password: pass
+            });
+            checkUserAndLogin(account);
           } else {
             checkUserAndLogin(null);
           }
         })
         .catch(err => {
-          console.error("❌ Supabase login check failed:", err);
+          console.error("? Supabase login check failed:", err);
           checkUserAndLogin(null);
         });
     } else {
@@ -541,8 +630,13 @@ window.handleEmailSignUp = function(event) {
   if (!nameInput || !emailInput || !passInput) return;
   
   const name = nameInput.value.trim();
-  const email = emailInput.value.trim();
+  const email = emailInput.value.trim().toLowerCase();
   const pass = passInput.value;
+
+  if (!isEmailValue(email)) {
+    triggerDisplayMessage('error', 'Enter a valid email address.');
+    return;
+  }
 
   if (pass.length < 6) {
     triggerDisplayMessage('error', 'Password must be at least 6 characters long.');
@@ -550,16 +644,27 @@ window.handleEmailSignUp = function(event) {
   }
 
   if (hasRealFirebaseConfig) {
+    try {
+      if (getCustomerAccountApi().findAccount(email)) {
+        triggerDisplayMessage('error', 'An account with this email already exists. Please sign in instead.');
+        return;
+      }
+    } catch (error) {
+      triggerDisplayMessage('error', error.message);
+      return;
+    }
+
     firebase.auth().createUserWithEmailAndPassword(email, pass)
       .then((userCredential) => {
         const user = userCredential.user;
+        const account = getCustomerAccountApi().createCustomerAccount({ id: user.uid, name, email: user.email, authProvider: 'password' });
         return user.updateProfile({ displayName: name }).then(() => {
           user.sendEmailVerification().catch(e => console.error(e));
           
-          triggerDisplayMessage('success', 'Account created! Syncing profile...');
+          triggerDisplayMessage('success', `Account created! Your customer ID is ${account.customerId}.`);
           
-          syncUserProfileWithSupabase(user.uid, name, user.email).then(() => {
-            setTimeout(() => { window.location.reload(); }, 1500);
+          syncUserProfileWithSupabase(user.uid, name, user.email, account.customerId).then(() => {
+            setTimeout(() => { window.location.reload(); }, 2600);
           });
         });
       })
@@ -567,40 +672,44 @@ window.handleEmailSignUp = function(event) {
         triggerDisplayMessage('error', error.message);
       });
   } else {
-    // Mock Sign Up with database creation check
-    const users = getRegisteredUsers();
-    const existingUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-    
-    if (existingUser) {
-      triggerDisplayMessage('error', 'An account with this email already exists. Please Sign In instead.');
-      return;
+    try {
+      const account = getCustomerAccountApi().createCustomerAccount({ name, email, password: pass, authProvider: 'password' });
+      completeCustomerSession(account, `Account created! Your customer ID is ${account.customerId}.`, 2600);
+    } catch (error) {
+      triggerDisplayMessage('error', error.message);
     }
-    
-    const uid = generateCustomerId(email);
-    const mockUser = { uid, email, displayName: name, photoURL: null };
-    
-    // Save new user profile locally (in localStorage)
-    saveRegisteredUser({ name, email, password: pass, uid });
-    
-    localStorage.setItem('ganeshStore_user_mock', JSON.stringify(mockUser));
-    triggerDisplayMessage('success', 'Account created successfully! Syncing profile...');
-    
-    syncUserProfileWithSupabase(uid, name, email).then(() => {
-      setTimeout(() => { window.location.reload(); }, 1200);
-    });
   }
 };
 
 window.handleForgotPassword = function(event) {
   if (event) event.preventDefault();
   
-  const emailInput = document.getElementById('c-login-email') || document.getElementById('login-email');
-  if (!emailInput || !emailInput.value) {
-    triggerDisplayMessage('error', 'Please enter your email address in the Sign In form first.');
+  const identifierInput = getCustomerIdentifierInput();
+  if (!identifierInput || !identifierInput.value.trim()) {
+    triggerDisplayMessage('error', 'Enter your email address or customer ID first.');
     return;
   }
   
-  const email = emailInput.value.trim();
+  const identifier = identifierInput.value.trim();
+  const customerId = normalizeCustomerIdValue(identifier);
+  let email = identifier.toLowerCase();
+  if (customerId) {
+    let account = null;
+    try {
+      account = getCustomerAccountApi().findAccount(customerId);
+    } catch (error) {
+      triggerDisplayMessage('error', error.message);
+      return;
+    }
+    if (!account) {
+      triggerDisplayMessage('error', 'No account found with this customer ID.');
+      return;
+    }
+    email = account.email;
+  } else if (!isEmailValue(email)) {
+    triggerDisplayMessage('error', 'Enter a valid email address or customer ID.');
+    return;
+  }
 
   if (hasRealFirebaseConfig) {
     firebase.auth().sendPasswordResetEmail(email)

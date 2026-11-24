@@ -324,7 +324,7 @@ test('Coupons Subsystem: Promo Code Verification & Thresholds', () => {
 
 test('Products Catalog API: ID & Name Lookup', () => {
     const catalog = BS.products.getCatalog();
-    assert.strictEqual(catalog.length, 16);
+    assert.strictEqual(catalog.length, 21);
 
     const p1 = BS.products.getProductById('GS001');
     assert.strictEqual(p1.name, 'Esprit Ruffle Shirt');
@@ -332,6 +332,10 @@ test('Products Catalog API: ID & Name Lookup', () => {
     const p2 = BS.products.getProductByName('Classic Trench Coat');
     assert.strictEqual(p2.id, 'GS004');
     assert.strictEqual(p2.priceNum, 75.00);
+
+    const p3 = BS.products.getProductById('GS017');
+    assert.strictEqual(p3.tag, '.bag');
+    assert.strictEqual(p3.url, 'p-Roll-Top-Canvas-Backpack.html');
 });
 
 
@@ -344,7 +348,7 @@ const signinHtml = fs.readFileSync(path.join(__dirname, 'signin.html'), 'utf8');
 const mainJs = fs.readFileSync(path.join(__dirname, 'js/main.js'), 'utf8');
 
 test('signin.html contains luxury Account Center with tabs and tracking modal', () => {
-    assert(signinHtml.includes('account-header-card'), 'Must contain account header card');
+    assert(signinHtml.includes('gs-dash-hero'), 'Must contain account summary hero');
     assert(signinHtml.includes('switchAccountTab'), 'Must contain tab switching');
     assert(signinHtml.includes('orderTrackingModal'), 'Must contain order tracking modal');
     assert(signinHtml.includes('quickLoginDemo'), 'Must contain 1-click quick demo accounts');

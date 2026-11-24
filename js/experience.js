@@ -317,7 +317,7 @@
 
       var update = function () {
         var val = $select.val();
-        var chosen = val && val !== 'Choose an option' ? $select.find('option:selected').text().replace(/size\s*/i, '').trim() : '';
+        var chosen = val && val !== 'Choose an option' ? $select.find('option:selected').text().replace(/^size\s*/i, '').trim() : '';
         $value.text(chosen ? '\u00b7 ' + chosen : '');
         $row.find('.size-pill-item, .color-swatch-item').each(function () {
           this.setAttribute('aria-checked', $(this).hasClass('active') ? 'true' : 'false');

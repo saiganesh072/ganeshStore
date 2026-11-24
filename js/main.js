@@ -30,14 +30,14 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
     if (!document.querySelector('link[data-gs-experience]')) {
         var link = document.createElement('link');
         link.rel = 'stylesheet';
-        link.href = base + 'css/experience.css?' + ver + '&x=2';
+        link.href = base + 'css/experience.css?' + ver + '&x=3';
         link.setAttribute('data-gs-experience', '');
         document.head.appendChild(link);
     }
     if (!document.querySelector('script[data-gs-experience]')) {
         var load = function () {
             var s = document.createElement('script');
-            s.src = base + 'js/experience.js?' + ver + '&x=2';
+            s.src = base + 'js/experience.js?' + ver + '&x=3';
             s.setAttribute('data-gs-experience', '');
             document.body.appendChild(s);
         };
@@ -153,8 +153,6 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 '  <li><a href="product.html?category=bag">Bags</a></li>' +
                 '  <li><a href="product.html?category=shoes">Shoes</a></li>' +
                 '  <li><a href="product.html?category=watches">Watches</a></li>' +
-                '  <li><a href="product.html?category=accessories">Accessories</a></li>' +
-                '  <li><a href="product.html?category=activewear">Activewear</a></li>' +
                 '</ul>'
             );
         }
@@ -190,8 +188,6 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 '  <li><a href="product.html?category=bag">Bags</a></li>' +
                 '  <li><a href="product.html?category=shoes">Shoes</a></li>' +
                 '  <li><a href="product.html?category=watches">Watches</a></li>' +
-                '  <li><a href="product.html?category=accessories">Accessories</a></li>' +
-                '  <li><a href="product.html?category=activewear">Activewear</a></li>' +
                 '</ul>' +
                 '<span class="arrow-main-menu-m">' +
                 '  <i class="fa fa-angle-right" aria-hidden="true"></i>' +
@@ -3154,7 +3150,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 
                 var $pillContainer = $('<div class="size-pill-container premium-swatch-container"></div>');
                 options.forEach(function(opt) {
-                    var display = opt.text.replace(/size\s*/i, '').trim();
+                    var display = opt.text.replace(/^size\s*/i, '').trim();
                     var $pill = $('<div class="size-pill-item" data-val="' + opt.val + '">' + display + '</div>');
                     
                     $pill.on('click', function() {
@@ -3173,6 +3169,8 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 });
                 
                 $originalContainer.after($pillContainer);
+                // Single-size items (bags, watches) need no choice from the shopper
+                if (options.length === 1) $pillContainer.find('.size-pill-item').first().trigger('click');
             } else if (isColor) {
                 // Build color circles swatches
                 $originalContainer.hide(); // Hide select2
@@ -3187,6 +3185,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                     'grey': '#8e9aaf',
                     'gray': '#8e9aaf',
                     'black': '#1a1a1a',
+                    'brown': '#6b4226',
                     'green': '#0f766e'
                 };
                 
@@ -3217,6 +3216,7 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
                 });
                 
                 $originalContainer.after($colorContainer);
+                if (options.length === 1) $colorContainer.find('.color-swatch-item').first().trigger('click');
             }
         });
 
@@ -4946,7 +4946,9 @@ function initPDPExtras() {
                 '<span class="stock-scarcity-badge">⚡ Only ' + ((hash % 4) + 2) + ' left in stock - order soon</span>' +
                 '<span class="popularity-badge">🔥 ' + ((hash % 20) + 12) + ' viewed in last hour</span>' +
                 '</div>';
-            $priceContainer.after(scarcityHtml);
+            // Keep the sale "was" price and save chip attached to the price
+            var $priceAnchor = $priceContainer.nextAll('.gs-save-chip').first();
+            ($priceAnchor.length ? $priceAnchor : $priceContainer).after(scarcityHtml);
         }
     }
 
@@ -4974,38 +4976,46 @@ function initDynamicRelatedProducts() {
     
     var currentName = gsPdpName();
     
-    // Catalog of varied dummy products for recommendations
-    var catalog = [
-        { name: "Esprit Ruffle Shirt", price: "$16.64", img: "images/product-01.jpg", url: "p-Esprit-Ruffle-Shirt.html" },
-        { name: "Herschel supply men", price: "$35.31", img: "images/product-02.jpg", url: "p-Herschel-supply-men.html" },
-        { name: "Only Check Trouser", price: "$25.50", img: "images/product-03.jpg", url: "p-Only-Check-Trouser.html" },
-        { name: "Classic Trench Coat", price: "$75.00", img: "images/product-04.jpg", url: "p-Classic-Trench-Coat.html" },
-        { name: "Front Pocket Jumper", price: "$34.75", img: "images/product-05.jpg", url: "p-Front-Pocket-Jumper.html" },
-        { name: "Vintage Inspired Classic", price: "$93.20", img: "images/product-06.jpg", url: "p-Vintage-Inspired-Classic.html" },
-        { name: "Shirt in Stretch Cotton", price: "$52.66", img: "images/product-07.jpg", url: "p-Shirt-in-Stretch-Cotton.html" },
-        { name: "Pieces Metallic Printed", price: "$18.96", img: "images/product-08.jpg", url: "p-Pieces-Metallic-Printed.html" }
-    ];
-    
-    // Filter out the exact product we are viewing
-    var related = catalog.filter(function(item) {
-        return item.name.toLowerCase() !== currentName.toLowerCase();
-    });
-    
-    // Ensure we have at least 6 products
-    related = related.slice(0, 6);
-    
+    var catalog = (typeof GANESH_STORE_CATALOG !== 'undefined') ? GANESH_STORE_CATALOG : [];
+    var current = catalog.filter(function(item) {
+        return item.name.toLowerCase() === currentName.toLowerCase();
+    })[0];
+    var others = catalog.filter(function(item) { return item !== current; });
+
+    // Same category first, then new arrivals and sale picks, then everything else
+    var score = function(item) {
+        var s = 0;
+        if (current && item.tag === current.tag) s += 4;
+        if (item.isNew) s += 2;
+        if (item.was) s += 1;
+        return s;
+    };
+    var related = others.map(function(item, i) { return { item: item, i: i }; })
+        .sort(function(x, y) { return score(y.item) - score(x.item) || x.i - y.i; })
+        .slice(0, 8)
+        .map(function(x) {
+            var item = x.item;
+            return {
+                name: item.name,
+                url: item.url,
+                img: item.img,
+                price: item.was ? '<span class="gs-price-line"><span class="stext-105 cl3">' + item.price + '</span><span class="old-price">' + item.was + '</span></span>' : '<span class="stext-105 cl3">' + item.price + '</span>',
+                badge: item.was ? ' label-sale" data-label="Sale' : (item.isNew ? ' label-new" data-label="New' : '')
+            };
+        });
+
     var itemsHtml = '';
     related.forEach(function(item) {
         itemsHtml += '<div class="item-slick2 p-l-15 p-r-15 p-t-15 p-b-15">' +
             '<div class="block2">' +
-            '  <div class="block2-pic hov-img0">' +
-            '    <a href="' + item.url + '"><img src="' + item.img + '" alt="IMG-PRODUCT"></a>' +
+            '  <div class="block2-pic hov-img0' + item.badge + '">' +
+            '    <a href="' + item.url + '"><img src="' + item.img + '" alt="' + item.name + '" loading="lazy"></a>' +
             '    <a href="#" class="block2-btn flex-c-m stext-103 cl2 size-102 bg0 bor2 hov-btn1 p-lr-15 trans-04 js-show-modal1">Quick View</a>' +
             '  </div>' +
             '  <div class="block2-txt flex-w flex-t p-t-14">' +
             '    <div class="block2-txt-child1 flex-col-l">' +
             '      <a href="' + item.url + '" class="stext-104 cl4 hov-cl1 trans-04 js-name-b2 p-b-6">' + item.name + '</a>' +
-            '      <span class="stext-105 cl3">' + item.price + '</span>' +
+            '      ' + item.price +
             '    </div>' +
             '    <div class="block2-txt-child2 flex-r p-t-3">' +
             '      <a href="#" class="btn-addwish-b2 dis-block pos-relative js-addwish-b2">' +
@@ -5018,7 +5028,7 @@ function initDynamicRelatedProducts() {
             '</div>';
     });
 
-    var premiumHtml = '<div class="p-b-45"><h3 class="ltext-106 cl5 txt-center">Related Products</h3></div>' +
+    var premiumHtml = '<div class="p-b-45"><h3 class="ltext-106 cl5 txt-center">You may also like</h3></div>' +
         '<div class="wrap-slick2"><div class="slick2" id="related-slick-instance">' + itemsHtml + '</div>' +
         '  <button class="arrow-slick2 prev-slick2" aria-label="Previous"><i class="fa fa-angle-left" aria-hidden="true"></i></button>' +
         '  <button class="arrow-slick2 next-slick2" aria-label="Next"><i class="fa fa-angle-right" aria-hidden="true"></i></button>' +
@@ -5090,22 +5100,27 @@ $(document).ready(function() {
 
 // Master Store Catalog for instant global search across all pages
 var GANESH_STORE_CATALOG = [
-    { id: '1', name: 'Esprit Ruffle Shirt', price: '$16.64', category: 'Women', tag: '.women', img: 'images/product-01.jpg', url: 'p-Esprit-Ruffle-Shirt.html' },
-    { id: '2', name: 'Herschel supply', price: '$35.31', category: 'Women', tag: '.women', img: 'images/product-02.jpg', url: 'p-Herschel-supply.html' },
-    { id: '3', name: 'Only Check Trouser', price: '$25.50', category: 'Men', tag: '.men', img: 'images/product-03.jpg', url: 'p-Only-Check-Trouser.html' },
-    { id: '4', name: 'Classic Trench Coat', price: '$75.00', category: 'Women', tag: '.women', img: 'images/product-04.jpg', url: 'p-Classic-Trench-Coat.html' },
-    { id: '5', name: 'Front Pocket Jumper', price: '$34.75', category: 'Women', tag: '.women', img: 'images/product-05.jpg', url: 'p-Front-Pocket-Jumper.html' },
-    { id: '6', name: 'Vintage Inspired Classic', price: '$93.20', category: 'Watches', tag: '.watches', img: 'images/product-06.jpg', url: 'p-Vintage-Inspired-Classic.html' },
-    { id: '7', name: 'Shirt in Stretch Cotton', price: '$52.66', category: 'Women', tag: '.women', img: 'images/product-07.jpg', url: 'p-Shirt-in-Stretch-Cotton.html' },
-    { id: '8', name: 'Pieces Metallic Printed', price: '$18.96', category: 'Women', tag: '.women', img: 'images/product-08.jpg', url: 'p-Pieces-Metallic-Printed.html' },
-    { id: '9', name: 'Converse All Star Hi Plimsolls', price: '$75.00', category: 'Shoes', tag: '.shoes', img: 'images/product-09.jpg', url: 'p-Converse-All-Star-Hi-Plimsolls.html' },
-    { id: '10', name: 'Femme T-Shirt In Stripe', price: '$25.85', category: 'Women', tag: '.women', img: 'images/product-10.jpg', url: 'p-Femme-T-Shirt-In-Stripe.html' },
-    { id: '11', name: 'Herschel supply men', price: '$63.16', category: 'Men', tag: '.men', img: 'images/product-11.jpg', url: 'p-Herschel-supply-men.html' },
-    { id: '12', name: 'Herschel supply watch', price: '$63.15', category: 'Watches', tag: '.watches', img: 'images/product-12.jpg', url: 'p-Herschel-supply-watch.html' },
-    { id: '13', name: 'T-Shirt with Sleeve', price: '$18.49', category: 'Women', tag: '.women', img: 'images/product-13.jpg', url: 'p-T-Shirt-with-Sleeve.html' },
-    { id: '14', name: 'Pretty Little Thing', price: '$54.79', category: 'Women', tag: '.women', img: 'images/product-14.jpg', url: 'p-Pretty-Little-Thing.html' },
-    { id: '15', name: 'Mini Silver Mesh Watch', price: '$86.85', category: 'Watches', tag: '.watches', img: 'images/product-15.jpg', url: 'p-Mini-Silver-Mesh-Watch.html' },
-    { id: '16', name: 'Square Neck Back', price: '$29.64', category: 'Women', tag: '.women', img: 'images/product-16.jpg', url: 'p-Square-Neck-Back.html' }
+    { id: '1', sku: 'GS001', name: 'Esprit Ruffle Shirt', price: '$16.64', category: 'Women', tag: '.women', img: 'images/product-01.jpg', url: 'p-Esprit-Ruffle-Shirt.html' },
+    { id: '2', sku: 'GS002', name: 'Herschel supply', price: '$35.31', category: 'Women', tag: '.women', img: 'images/product-02.jpg', url: 'p-Herschel-supply.html' },
+    { id: '3', sku: 'GS003', name: 'Only Check Trouser', price: '$25.50', category: 'Men', tag: '.men', img: 'images/product-03.jpg', url: 'p-Only-Check-Trouser.html' },
+    { id: '4', sku: 'GS004', name: 'Classic Trench Coat', price: '$75.00', was: '$93.75', category: 'Women', tag: '.women', img: 'images/product-04.jpg', url: 'p-Classic-Trench-Coat.html' },
+    { id: '5', sku: 'GS005', name: 'Front Pocket Jumper', price: '$34.75', category: 'Women', tag: '.women', img: 'images/product-05.jpg', url: 'p-Front-Pocket-Jumper.html' },
+    { id: '6', sku: 'GS006', name: 'Vintage Inspired Classic', price: '$93.20', was: '$116.50', category: 'Watches', tag: '.watches', img: 'images/product-06.jpg', url: 'p-Vintage-Inspired-Classic.html' },
+    { id: '7', sku: 'GS007', name: 'Shirt in Stretch Cotton', price: '$52.66', category: 'Women', tag: '.women', img: 'images/product-07.jpg', url: 'p-Shirt-in-Stretch-Cotton.html' },
+    { id: '8', sku: 'GS008', name: 'Pieces Metallic Printed', price: '$18.96', category: 'Women', tag: '.women', img: 'images/product-08.jpg', url: 'p-Pieces-Metallic-Printed.html' },
+    { id: '9', sku: 'GS009', name: 'Converse All Star Hi Plimsolls', price: '$75.00', category: 'Shoes', tag: '.shoes', img: 'images/product-09.jpg', url: 'p-Converse-All-Star-Hi-Plimsolls.html' },
+    { id: '10', sku: 'GS010', name: 'Femme T-Shirt In Stripe', price: '$25.85', category: 'Women', tag: '.women', img: 'images/product-10.jpg', url: 'p-Femme-T-Shirt-In-Stripe.html' },
+    { id: '11', sku: 'GS011', name: 'Herschel supply men', price: '$63.16', was: '$78.95', category: 'Men', tag: '.men', img: 'images/product-11.jpg', url: 'p-Herschel-supply-men.html' },
+    { id: '12', sku: 'GS012', name: 'Herschel supply watch', price: '$63.15', category: 'Watches', tag: '.watches', img: 'images/product-12.jpg', url: 'p-Herschel-supply-watch.html' },
+    { id: '13', sku: 'GS013', name: 'T-Shirt with Sleeve', price: '$18.49', category: 'Women', tag: '.women', img: 'images/product-13.jpg', url: 'p-T-Shirt-with-Sleeve.html' },
+    { id: '14', sku: 'GS014', name: 'Pretty Little Thing', price: '$54.79', was: '$68.49', category: 'Women', tag: '.women', img: 'images/product-14.jpg', url: 'p-Pretty-Little-Thing.html' },
+    { id: '15', sku: 'GS015', name: 'Mini Silver Mesh Watch', price: '$86.85', category: 'Watches', tag: '.watches', img: 'images/product-15.jpg', url: 'p-Mini-Silver-Mesh-Watch.html' },
+    { id: '16', sku: 'GS016', name: 'Square Neck Back', price: '$29.64', category: 'Women', tag: '.women', img: 'images/product-16.jpg', url: 'p-Square-Neck-Back.html' },
+    { id: '17', sku: 'GS017', name: 'Roll-Top Canvas Backpack', price: '$68.00', isNew: true, category: 'Bags', tag: '.bag', img: 'images/product-68.jpg', url: 'p-Roll-Top-Canvas-Backpack.html' },
+    { id: '18', sku: 'GS018', name: 'Olive City Backpack', price: '$54.50', isNew: true, category: 'Bags', tag: '.bag', img: 'images/product-69.jpg', url: 'p-Olive-City-Backpack.html' },
+    { id: '19', sku: 'GS019', name: 'Leather Platform Ankle Boots', price: '$89.00', isNew: true, category: 'Shoes', tag: '.shoes', img: 'images/product-70.jpg', url: 'p-Leather-Platform-Ankle-Boots.html' },
+    { id: '20', sku: 'GS020', name: 'Windowpane Wool Blazer', price: '$98.00', isNew: true, category: 'Men', tag: '.men', img: 'images/product-71.jpg', url: 'p-Windowpane-Wool-Blazer.html' },
+    { id: '21', sku: 'GS021', name: 'Sherpa-Lined Denim Jacket', price: '$84.00', isNew: true, category: 'Men', tag: '.men', img: 'images/product-72.jpg', url: 'p-Sherpa-Lined-Denim-Jacket.html' }
 ];
 
 // Feature 1: Smart Live Search Overlay Engine
